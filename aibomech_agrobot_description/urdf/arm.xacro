@@ -1,0 +1,133 @@
+<?xml version="1.0"?>
+<!--
+  AIBOMECH AgroBot arm: 4-axis arm (J1/J2 SCARA-type horizontal plane, J3 pitch,
+  J4 wrist) with a single-acting jaw gripper.
+
+  Kinematics and meshes come from the SolidWorks model of the real prototype
+  (cad/aibomech_agrobot_v2_mass_properties.csv). Mass properties include the
+  actuators, see tools/compute_physical_params.py.
+
+  Standard frames (ROS-Industrial conventions):
+    base   - J1 axis on the mounting surface, z up
+    flange - wrist mounting face (on link_4), z out of the tool
+    tool0  - identical to flange, for tools that are configured relative to it
+    tcp    - tool centre point between the gripper jaws, z = approach direction
+-->
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <xacro:property name="arm_phys" value="${xacro.load_yaml('$(find aibomech_agrobot_description)/config/arm_physical.yaml')}"/>
+  <xacro:property name="arm_lim" value="${xacro.load_yaml('$(find aibomech_agrobot_description)/config/joint_limits.yaml')}"/>
+  <xacro:property name="mesh_dir" value="package://aibomech_agrobot_description/meshes"/>
+
+  <!-- TCP between the jaws, in link_4 coordinates. Placed where the centre of a
+       20 mm object sits when the fixed jaw touches it. -->
+  <xacro:property name="tcp_x" value="-0.135"/>
+  <xacro:property name="tcp_y" value="0.0725"/>
+  <xacro:property name="tcp_z" value="-0.008"/>
+
+  <xacro:macro name="arm_link" params="prefix name material">
+    <xacro:property name="p" value="${arm_phys[name]}"/>
+    <link name="${prefix}${name}">
+      <inertial>
+        <origin xyz="${p['com']['x']} ${p['com']['y']} ${p['com']['z']}" rpy="0 0 0"/>
+        <mass value="${p['mass']}"/>
+        <inertia ixx="${p['inertia']['ixx']}" ixy="${p['inertia']['ixy']}" ixz="${p['inertia']['ixz']}"
+                 iyy="${p['inertia']['iyy']}" iyz="${p['inertia']['iyz']}" izz="${p['inertia']['izz']}"/>
+      </inertial>
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <mesh filename="${mesh_dir}/${name}.STL"/>
+        </geometry>
+        <material name="${material}"/>
+      </visual>
+      <xacro:arm_collision_box box="${p['collision_box']}"/>
+      <xacro:if value="${'collision_box_jaw' in p}">
+        <xacro:arm_collision_box box="${p['collision_box_jaw']}"/>
+      </xacro:if>
+    </link>
+  </xacro:macro>
+
+  <xacro:macro name="arm_collision_box" params="box">
+    <collision>
+      <origin xyz="${box['x']} ${box['y']} ${box['z']}" rpy="0 0 0"/>
+      <geometry>
+        <box size="${box['sx']} ${box['sy']} ${box['sz']}"/>
+      </geometry>
+    </collision>
+  </xacro:macro>
+
+  <xacro:macro name="arm_joint" params="prefix name type parent child xyz rpy axis">
+    <xacro:property name="l" value="${arm_lim[name]}"/>
+    <joint name="${prefix}${name}" type="${type}">
+      <origin xyz="${xyz}" rpy="${rpy}"/>
+      <parent link="${prefix}${parent}"/>
+      <child link="${prefix}${child}"/>
+      <axis xyz="${axis}"/>
+      <limit lower="${l['lower']}" upper="${l['upper']}" velocity="${l['velocity']}" effort="${l['effort']}"/>
+      <dynamics damping="${l['damping']}" friction="${l['friction']}"/>
+      <safety_controller soft_lower_limit="${l['lower'] + l['soft_margin']}"
+                         soft_upper_limit="${l['upper'] - l['soft_margin']}"
+                         k_position="20" k_velocity="${l['effort'] / l['velocity']}"/>
+    </joint>
+  </xacro:macro>
+
+  <xacro:macro name="aibomech_agrobot_arm" params="prefix parent *origin">
+
+    <joint name="${prefix}arm_mount_joint" type="fixed">
+      <xacro:insert_block name="origin"/>
+      <parent link="${parent}"/>
+      <child link="${prefix}base_link"/>
+    </joint>
+
+    <xacro:arm_link prefix="${prefix}" name="base_link" material="graphite"/>
+    <xacro:arm_link prefix="${prefix}" name="link_1" material="agro_orange"/>
+    <xacro:arm_link prefix="${prefix}" name="link_2" material="agro_orange"/>
+    <xacro:arm_link prefix="${prefix}" name="link_3" material="agro_orange"/>
+    <xacro:arm_link prefix="${prefix}" name="link_4" material="graphite"/>
+    <xacro:arm_link prefix="${prefix}" name="link_5" material="aluminium"/>
+
+    <!-- Joint origins are the SolidWorks export values of the prototype. -->
+    <xacro:arm_joint prefix="${prefix}" name="joint_1" type="revolute" parent="base_link" child="link_1"
+                     xyz="-0.0905 0 0.1735" rpy="1.5708 0 -0.65897" axis="0 1 0"/>
+    <xacro:arm_joint prefix="${prefix}" name="joint_2" type="revolute" parent="link_1" child="link_2"
+                     xyz="-0.12 0 0" rpy="0 0.60223 0" axis="0 1 0"/>
+    <xacro:arm_joint prefix="${prefix}" name="joint_3" type="revolute" parent="link_2" child="link_3"
+                     xyz="-0.12 0.013028 0" rpy="1.5708 0 0.49429" axis="0 1 0"/>
+    <xacro:arm_joint prefix="${prefix}" name="joint_4" type="revolute" parent="link_3" child="link_4"
+                     xyz="-0.041826 0 0.115" rpy="0 0.88733 1.5708" axis="0 1 0"/>
+    <xacro:arm_joint prefix="${prefix}" name="gripper_jaw_joint" type="prismatic" parent="link_4" child="link_5"
+                     xyz="-0.075 0.080174 0" rpy="-0.84443 -1.5708 2.4684" axis="1 0 0"/>
+
+    <!-- Standard frames -->
+    <link name="${prefix}base"/>
+    <joint name="${prefix}base_link-base" type="fixed">
+      <origin xyz="-0.0905 0 0" rpy="0 0 ${pi}"/>
+      <parent link="${prefix}base_link"/>
+      <child link="${prefix}base"/>
+    </joint>
+
+    <link name="${prefix}flange"/>
+    <joint name="${prefix}link_4-flange" type="fixed">
+      <origin xyz="-0.075 ${tcp_y} 0" rpy="0 ${-pi/2} 0"/>
+      <parent link="${prefix}link_4"/>
+      <child link="${prefix}flange"/>
+    </joint>
+
+    <link name="${prefix}tool0"/>
+    <joint name="${prefix}flange-tool0" type="fixed">
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <parent link="${prefix}flange"/>
+      <child link="${prefix}tool0"/>
+    </joint>
+
+    <!-- tcp: x = jaw closing direction, z = approach direction -->
+    <link name="${prefix}tcp"/>
+    <joint name="${prefix}link_4-tcp" type="fixed">
+      <origin xyz="${tcp_x} ${tcp_y} ${tcp_z}" rpy="0 ${-pi/2} 0"/>
+      <parent link="${prefix}link_4"/>
+      <child link="${prefix}tcp"/>
+    </joint>
+
+  </xacro:macro>
+</robot>

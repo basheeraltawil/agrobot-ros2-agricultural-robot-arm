@@ -1,0 +1,56 @@
+Panels:
+  - Class: rviz_common/Displays
+    Name: Displays
+Visualization Manager:
+  Class: ""
+  Displays:
+    - Class: rviz_default_plugins/Grid
+      Name: Grid
+      Cell Size: 0.1
+      Plane Cell Count: 60
+      Value: true
+    - Class: rviz_default_plugins/RobotModel
+      Name: RobotModel
+      Description Source: Topic
+      Description Topic:
+        Value: /robot_description
+      Value: true
+    - Class: rviz_default_plugins/TF
+      Name: TF
+      Show Names: true
+      Marker Scale: 0.1
+      Frames:
+        All Enabled: false
+        tcp: {Value: true}
+        base: {Value: true}
+        camera_color_optical_frame: {Value: true}
+      Value: false
+    - Class: rviz_default_plugins/MarkerArray
+      Name: Detections
+      Topic:
+        Value: /agrobot/detections/markers
+      Value: true
+    - Class: rviz_default_plugins/PointCloud2
+      Name: Camera points
+      Topic:
+        Value: /camera/depth/color/points
+        Reliability Policy: Best Effort
+      Size (m): 0.003
+      Style: Points
+      Color Transformer: RGB8
+      Value: false
+    - Class: rviz_default_plugins/Image
+      Name: Detection image
+      Topic:
+        Value: /agrobot/detections/image
+      Value: true
+  Global Options:
+    Fixed Frame: world
+    Background Color: 48; 48; 48
+  Views:
+    Current:
+      Class: rviz_default_plugins/Orbit
+      Distance: 1.8
+      Focal Point: {X: 0.3, Y: 0.1, Z: 0.85}
+      Pitch: 0.45
+      Yaw: 3.9

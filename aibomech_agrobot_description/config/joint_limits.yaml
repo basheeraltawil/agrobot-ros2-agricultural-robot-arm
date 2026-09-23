@@ -1,0 +1,55 @@
+# Hardware joint limits used to build the URDF.
+# position: hard stops of the mechanism (rad or m)
+# velocity / effort: actuator rating (rad/s, N*m or m/s, N)
+# soft_margin: distance from the hard stop where the safety controller starts to act
+# damping / friction: joint dynamics used by the simulator
+joint_1:
+  lower: -1.09
+  upper: 2.10
+  velocity: 2.0
+  effort: 2.9
+  damping: 0.10
+  friction: 0.05
+  soft_margin: 0.03
+joint_2:
+  lower: -2.10
+  upper: 1.11
+  velocity: 2.0
+  effort: 2.9
+  damping: 0.10
+  friction: 0.05
+  soft_margin: 0.03
+joint_3:
+  lower: -2.00
+  upper: 1.10
+  velocity: 2.0
+  effort: 2.9
+  damping: 0.10
+  friction: 0.05
+  soft_margin: 0.03
+joint_4:
+  lower: -1.00
+  upper: 2.30
+  velocity: 3.0
+  effort: 1.5
+  damping: 0.05
+  friction: 0.02
+  soft_margin: 0.03
+# Moving jaw of the single-acting gripper. -0.017 is jaw contact, 0.010 is fully open.
+gripper_jaw_joint:
+  lower: -0.017
+  upper: 0.010
+  velocity: 0.05
+  effort: 20.0
+  damping: 0.5
+  friction: 0.1
+  soft_margin: 0.0005
+# External linear axis: trolley on the greenhouse heating-pipe rail.
+rail_joint:
+  lower: 0.0
+  upper: 3.0
+  velocity: 0.30
+  effort: 200.0
+  damping: 20.0
+  friction: 2.0
+  soft_margin: 0.01

@@ -1,0 +1,33 @@
+# Selective strawberry harvesting (world: strawberry_greenhouse)
+strawberry_harvest:
+  ros__parameters:
+    # Rail positions where the camera surveys the row (m)
+    survey_stations: [0.35, 0.75, 1.15, 1.55, 1.95, 2.35]
+    # Colour classes, HSV in OpenCV units (H 0-179). Each range: h_lo s_lo v_lo h_hi s_hi v_hi
+    detection:
+      ripe:
+        hsv_ranges: [0, 140, 70, 8, 255, 255, 170, 140, 70, 179, 255, 255]
+        min_area: 25
+        max_area: 2500
+        radius: 0.0095
+        draw_bgr: [0, 0, 255]
+      unripe:
+        hsv_ranges: [28, 35, 90, 46, 120, 255]
+        min_area: 25
+        max_area: 2500
+        radius: 0.0095
+        draw_bgr: [0, 255, 255]
+    # Gripper approach direction in the world frame: horizontally into the row
+    approach: [0.0, 1.0, 0.0]
+    pregrasp_distance: 0.06
+    # Pull back and down after gripping: breaks the peduncle on the real crop
+    retreat_offset: [0.0, -0.06, -0.015]
+    max_approach_error_deg: 35.0
+    # Candidate positions of the fruit relative to the arm along the row (m)
+    rail_offsets: [0.18, -0.18, 0.15, -0.15, 0.21, -0.21]
+    fruit_width: 0.019
+    drop_height: 0.09
+    refine_radius: 0.03
+    max_fruit: 0          # 0 = all detected ripe fruit
+    speed_scale: 0.5
+    cartesian_speed: 0.04

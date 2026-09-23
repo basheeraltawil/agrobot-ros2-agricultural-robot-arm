@@ -1,0 +1,74 @@
+<?xml version="1.0"?>
+<!--
+  AIBOMECH AgroBot - complete robot cell.
+
+  xacro agrobot.urdf.xacro hardware:=gz platform:=rail_trolley mount_height:=0.85
+-->
+<robot name="agrobot" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <xacro:arg name="prefix" default=""/>
+  <!-- mock | gz | real -->
+  <xacro:arg name="hardware" default="mock"/>
+  <!-- rail_trolley | pedestal | table -->
+  <xacro:arg name="platform" default="rail_trolley"/>
+  <!-- Height of the arm mounting plate above the floor (m) -->
+  <xacro:arg name="mount_height" default="0.85"/>
+  <xacro:arg name="rail_length" default="3.0"/>
+  <!-- Yaw of the arm on its mount; -pi/2 makes the arm's zero pose point across the row (+y) -->
+  <xacro:arg name="mount_yaw" default="${-pi/2}"/>
+  <xacro:arg name="use_camera" default="true"/>
+  <!-- Camera pose relative to arm_mount: "x y z" and "roll pitch yaw" -->
+  <xacro:arg name="camera_xyz" default="0.0 -0.15 0.60"/>
+  <xacro:arg name="camera_rpy" default="0 1.0 1.5708"/>
+  <xacro:arg name="initial_positions_file" default="$(find aibomech_agrobot_description)/config/initial_positions.yaml"/>
+  <xacro:arg name="calibration_file" default="$(find aibomech_agrobot_description)/config/hardware_calibration.yaml"/>
+  <xacro:arg name="serial_port" default="/dev/ttyACM0"/>
+  <xacro:arg name="baud_rate" default="115200"/>
+  <!-- Absolute path of the controller parameters, required for hardware:=gz -->
+  <xacro:arg name="controllers_file" default=""/>
+
+  <xacro:property name="prefix" value="$(arg prefix)"/>
+  <xacro:property name="hardware" value="$(arg hardware)"/>
+  <xacro:property name="platform" value="$(arg platform)"/>
+  <xacro:property name="use_rail" value="${platform == 'rail_trolley'}"/>
+  <xacro:property name="mount_yaw" value="$(arg mount_yaw)"/>
+
+  <xacro:include filename="$(find aibomech_agrobot_description)/urdf/materials.xacro"/>
+  <xacro:include filename="$(find aibomech_agrobot_description)/urdf/arm.xacro"/>
+  <xacro:include filename="$(find aibomech_agrobot_description)/urdf/platform.xacro"/>
+  <xacro:include filename="$(find aibomech_agrobot_description)/urdf/camera.xacro"/>
+  <xacro:include filename="$(find aibomech_agrobot_description)/urdf/agrobot.ros2_control.xacro"/>
+
+  <link name="world"/>
+
+  <xacro:if value="${platform == 'rail_trolley'}">
+    <xacro:rail_trolley prefix="${prefix}" parent="world" mount_height="$(arg mount_height)" rail_length="$(arg rail_length)"/>
+  </xacro:if>
+  <xacro:if value="${platform == 'pedestal'}">
+    <xacro:pedestal prefix="${prefix}" parent="world" mount_height="$(arg mount_height)"/>
+  </xacro:if>
+  <xacro:if value="${platform == 'table'}">
+    <xacro:table_mount prefix="${prefix}" parent="world" mount_height="$(arg mount_height)"/>
+  </xacro:if>
+
+  <!-- base_link origin is 0.0905 m off the J1 axis; place it so J1 is on the column axis. -->
+  <xacro:aibomech_agrobot_arm prefix="${prefix}" parent="${prefix}arm_mount">
+    <origin xyz="${0.0905*cos(mount_yaw)} ${0.0905*sin(mount_yaw)} 0" rpy="0 0 ${mount_yaw}"/>
+  </xacro:aibomech_agrobot_arm>
+
+  <xacro:if value="$(arg use_camera)">
+    <xacro:rgbd_camera prefix="${prefix}" parent="${prefix}arm_mount" xyz="$(arg camera_xyz)" rpy="$(arg camera_rpy)"
+                       mast_height="${float('$(arg camera_xyz)'.split()[2]) + 0.02}" sim="${hardware == 'gz'}"/>
+  </xacro:if>
+
+  <xacro:agrobot_ros2_control prefix="${prefix}" hardware="${hardware}" use_rail="${use_rail}"
+      initial_positions="${xacro.load_yaml('$(arg initial_positions_file)')}"
+      calibration="${xacro.load_yaml('$(arg calibration_file)')}"
+      serial_port="$(arg serial_port)" baud_rate="$(arg baud_rate)"/>
+
+  <xacro:if value="${hardware == 'gz'}">
+    <xacro:include filename="$(find aibomech_agrobot_description)/urdf/agrobot.gazebo.xacro"/>
+    <xacro:agrobot_gazebo prefix="${prefix}" controllers_file="$(arg controllers_file)"/>
+  </xacro:if>
+
+</robot>

@@ -1,0 +1,58 @@
+<?xml version="1.0"?>
+<!--
+  ros2_control description. The same controllers run on all three back-ends:
+    mock : mock_components/GenericSystem, commands are mirrored to states
+    gz   : gz_ros2_control inside Gazebo Sim
+    real : aibomech_agrobot_hardware/AgrobotSystemHardware, serial link to the
+           motor-controller board running firmware/agrobot_mcu
+-->
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <xacro:macro name="agrobot_ros2_control" params="prefix hardware use_rail initial_positions calibration serial_port baud_rate">
+
+    <xacro:macro name="control_joint" params="name">
+      <joint name="${prefix}${name}">
+        <command_interface name="position">
+          <param name="min">${arm_lim[name]['lower']}</param>
+          <param name="max">${arm_lim[name]['upper']}</param>
+        </command_interface>
+        <state_interface name="position">
+          <param name="initial_value">${initial_positions[name]}</param>
+        </state_interface>
+        <state_interface name="velocity"/>
+        <xacro:if value="${hardware == 'real'}">
+          <param name="channel">${calibration[name]['channel']}</param>
+          <param name="direction">${calibration[name]['direction']}</param>
+          <param name="offset">${calibration[name]['offset']}</param>
+        </xacro:if>
+      </joint>
+    </xacro:macro>
+
+    <ros2_control name="AgrobotSystem" type="system">
+      <hardware>
+        <xacro:if value="${hardware == 'mock'}">
+          <plugin>mock_components/GenericSystem</plugin>
+          <param name="calculate_dynamics">true</param>
+        </xacro:if>
+        <xacro:if value="${hardware == 'gz'}">
+          <plugin>gz_ros2_control/GazeboSimSystem</plugin>
+        </xacro:if>
+        <xacro:if value="${hardware == 'real'}">
+          <plugin>aibomech_agrobot_hardware/AgrobotSystemHardware</plugin>
+          <param name="serial_port">${serial_port}</param>
+          <param name="baud_rate">${baud_rate}</param>
+          <param name="timeout_ms">100</param>
+          <param name="max_missed_frames">10</param>
+        </xacro:if>
+      </hardware>
+      <xacro:control_joint name="joint_1"/>
+      <xacro:control_joint name="joint_2"/>
+      <xacro:control_joint name="joint_3"/>
+      <xacro:control_joint name="joint_4"/>
+      <xacro:control_joint name="gripper_jaw_joint"/>
+      <xacro:if value="${use_rail}">
+        <xacro:control_joint name="rail_joint"/>
+      </xacro:if>
+    </ros2_control>
+  </xacro:macro>
+</robot>

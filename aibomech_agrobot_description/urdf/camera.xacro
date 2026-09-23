@@ -1,0 +1,98 @@
+<?xml version="1.0"?>
+<!--
+  Eye-to-hand RGB-D camera (Intel RealSense D435 class) on a mast attached to
+  the arm mounting plate, so it rides along with the trolley and the lift
+  column. Frames follow the realsense2_camera driver: camera_link (x forward)
+  and camera_color_optical_frame (z forward, x right, y down).
+-->
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <xacro:macro name="rgbd_camera" params="prefix parent xyz rpy mast_height sim">
+    <link name="${prefix}camera_mast">
+      <visual>
+        <origin xyz="0 0 ${mast_height/2}" rpy="0 0 0"/>
+        <geometry><box size="0.02 0.02 ${mast_height}"/></geometry>
+        <material name="aluminium"/>
+      </visual>
+      <collision>
+        <origin xyz="0 0 ${mast_height/2}" rpy="0 0 0"/>
+        <geometry><box size="0.02 0.02 ${mast_height}"/></geometry>
+      </collision>
+      <inertial>
+        <origin xyz="0 0 ${mast_height/2}" rpy="0 0 0"/>
+        <mass value="0.3"/>
+        <inertia ixx="${0.3*mast_height*mast_height/12}" ixy="0" ixz="0" iyy="${0.3*mast_height*mast_height/12}" iyz="0" izz="2e-5"/>
+      </inertial>
+    </link>
+    <joint name="${prefix}camera_mast_joint" type="fixed">
+      <origin xyz="${xyz.split()[0]} ${xyz.split()[1]} 0" rpy="0 0 0"/>
+      <parent link="${parent}"/>
+      <child link="${prefix}camera_mast"/>
+    </joint>
+
+    <link name="${prefix}camera_link">
+      <visual>
+        <origin xyz="-0.0125 0 0" rpy="0 0 0"/>
+        <geometry><box size="0.025 0.09 0.025"/></geometry>
+        <material name="black"/>
+      </visual>
+      <collision>
+        <origin xyz="-0.0125 0 0" rpy="0 0 0"/>
+        <geometry><box size="0.025 0.09 0.025"/></geometry>
+      </collision>
+      <inertial>
+        <origin xyz="-0.0125 0 0" rpy="0 0 0"/>
+        <mass value="0.072"/>
+        <inertia ixx="5.2e-5" ixy="0" ixz="0" iyy="7.5e-6" iyz="0" izz="5.2e-5"/>
+      </inertial>
+    </link>
+    <joint name="${prefix}camera_joint" type="fixed">
+      <origin xyz="0 0 ${xyz.split()[2]}" rpy="${rpy}"/>
+      <parent link="${prefix}camera_mast"/>
+      <child link="${prefix}camera_link"/>
+    </joint>
+
+    <link name="${prefix}camera_color_optical_frame"/>
+    <joint name="${prefix}camera_optical_joint" type="fixed">
+      <origin xyz="0 0 0" rpy="${-pi/2} 0 ${-pi/2}"/>
+      <parent link="${prefix}camera_link"/>
+      <child link="${prefix}camera_color_optical_frame"/>
+    </joint>
+
+    <xacro:if value="${sim}">
+      <gazebo reference="${prefix}camera_link">
+        <sensor name="rgbd_camera" type="rgbd_camera">
+          <always_on>true</always_on>
+          <update_rate>10</update_rate>
+          <visualize>true</visualize>
+          <topic>agrobot/camera</topic>
+          <ignition_frame_id>${prefix}camera_color_optical_frame</ignition_frame_id>
+          <camera name="d435">
+            <!-- D435 colour stream: 69 deg HFOV, 640x480 used for speed -->
+            <horizontal_fov>1.2043</horizontal_fov>
+            <image>
+              <width>640</width>
+              <height>480</height>
+              <format>R8G8B8</format>
+            </image>
+            <clip>
+              <near>0.10</near>
+              <far>4.0</far>
+            </clip>
+            <depth_camera>
+              <clip>
+                <near>0.10</near>
+                <far>4.0</far>
+              </clip>
+            </depth_camera>
+            <noise>
+              <type>gaussian</type>
+              <mean>0.0</mean>
+              <stddev>0.005</stddev>
+            </noise>
+          </camera>
+        </sensor>
+      </gazebo>
+    </xacro:if>
+  </xacro:macro>
+</robot>

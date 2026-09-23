@@ -1,0 +1,7 @@
+<library path="aibomech_agrobot_hardware">
+  <class name="aibomech_agrobot_hardware/AgrobotSystemHardware"
+         type="aibomech_agrobot_hardware::AgrobotSystemHardware"
+         base_class_type="hardware_interface::SystemInterface">
+    <description>Serial link to the AgroBot motor-controller board (firmware/agrobot_mcu).</description>
+  </class>
+</library>

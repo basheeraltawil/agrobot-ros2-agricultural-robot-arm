@@ -1,0 +1,200 @@
+<?xml version="1.0"?>
+<!--
+  Carrier platforms for the arm.
+
+  rail_trolley : trolley on the greenhouse heating-pipe rail (external linear
+                 axis rail_joint) with a lift column, harvest crate shelf and
+                 electrical cabinet. This is how commercial greenhouse robots
+                 move along a crop row.
+  pedestal     : the same column bolted to the floor, no linear axis.
+  table        : arm screwed directly onto a table top (the lab prototype).
+
+  Every platform ends in the link "${prefix}arm_mount": the arm's mounting
+  plate, z up, x along the row.
+-->
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <xacro:property name="rail_gauge" value="0.40"/>
+  <xacro:property name="rail_pipe_radius" value="0.0255"/>
+  <xacro:property name="rail_height" value="0.10"/>
+  <xacro:property name="deck_length" value="0.50"/>
+  <xacro:property name="deck_width" value="0.46"/>
+  <xacro:property name="deck_thickness" value="0.04"/>
+  <xacro:property name="column_size" value="0.08"/>
+
+  <xacro:macro name="box_inertial" params="mass x y z *origin">
+    <inertial>
+      <xacro:insert_block name="origin"/>
+      <mass value="${mass}"/>
+      <inertia ixx="${mass*(y*y+z*z)/12}" ixy="0" ixz="0" iyy="${mass*(x*x+z*z)/12}" iyz="0" izz="${mass*(x*x+y*y)/12}"/>
+    </inertial>
+  </xacro:macro>
+
+  <xacro:macro name="box_part" params="name size xyz material collision:=true">
+    <visual name="${name}">
+      <origin xyz="${xyz}" rpy="0 0 0"/>
+      <geometry><box size="${size}"/></geometry>
+      <material name="${material}"/>
+    </visual>
+    <xacro:if value="${collision}">
+      <collision name="${name}">
+        <origin xyz="${xyz}" rpy="0 0 0"/>
+        <geometry><box size="${size}"/></geometry>
+      </collision>
+    </xacro:if>
+  </xacro:macro>
+
+  <xacro:macro name="wheel" params="x y">
+    <visual>
+      <origin xyz="${x} ${y} ${rail_height + rail_pipe_radius + 0.02}" rpy="${pi/2} 0 0"/>
+      <geometry><cylinder radius="0.045" length="0.03"/></geometry>
+      <material name="black"/>
+    </visual>
+  </xacro:macro>
+
+  <!-- Lift column with top plate and crate shelf. The column is manually
+       height-adjustable on the real robot; mount_height is set per task. -->
+  <xacro:macro name="lift_column" params="prefix parent base_z mount_height crate">
+    <xacro:property name="col_len" value="${mount_height - base_z - 0.01}"/>
+    <!-- crate floor 88 mm below the mounting plate -->
+    <xacro:property name="crate_z" value="${col_len - 0.078}"/>
+    <link name="${prefix}lift_column">
+      <xacro:box_inertial mass="6.0" x="${column_size}" y="${column_size}" z="${col_len}">
+        <origin xyz="0 0 ${col_len/2}" rpy="0 0 0"/>
+      </xacro:box_inertial>
+      <xacro:box_part name="column" size="${column_size} ${column_size} ${col_len}" xyz="0 0 ${col_len/2}" material="aluminium"/>
+      <xacro:box_part name="top_plate" size="0.20 0.22 0.01" xyz="0 -0.04 ${col_len + 0.005}" material="graphite"/>
+      <xacro:if value="${crate}">
+        <!-- Harvest crate on a shelf beside the arm (+x), inside its reach and
+             outside the camera's view of the crop row. -->
+        <xacro:box_part name="shelf" size="0.26 0.14 0.008" xyz="0.17 -0.08 ${crate_z - 0.006}" material="aluminium"/>
+        <xacro:box_part name="crate_floor" size="0.16 0.12 0.004" xyz="0.20 -0.08 ${crate_z}" material="crate_green"/>
+        <xacro:box_part name="crate_wall_n" size="0.16 0.004 0.045" xyz="0.20 -0.022 ${crate_z + 0.0245}" material="crate_green"/>
+        <xacro:box_part name="crate_wall_s" size="0.16 0.004 0.045" xyz="0.20 -0.138 ${crate_z + 0.0245}" material="crate_green"/>
+        <xacro:box_part name="crate_wall_e" size="0.004 0.12 0.045" xyz="0.278 -0.08 ${crate_z + 0.0245}" material="crate_green"/>
+        <xacro:box_part name="crate_wall_w" size="0.004 0.12 0.045" xyz="0.122 -0.08 ${crate_z + 0.0245}" material="crate_green"/>
+      </xacro:if>
+    </link>
+    <joint name="${prefix}lift_column_joint" type="fixed">
+      <origin xyz="0 0 ${base_z}" rpy="0 0 0"/>
+      <parent link="${parent}"/>
+      <child link="${prefix}lift_column"/>
+    </joint>
+
+    <link name="${prefix}arm_mount"/>
+    <joint name="${prefix}arm_mount_plate_joint" type="fixed">
+      <origin xyz="0 0 ${col_len + 0.01}" rpy="0 0 0"/>
+      <parent link="${prefix}lift_column"/>
+      <child link="${prefix}arm_mount"/>
+    </joint>
+
+    <!-- Crate centre, used by the tasks as drop-off location. -->
+    <xacro:if value="${crate}">
+      <link name="${prefix}crate"/>
+      <joint name="${prefix}crate_joint" type="fixed">
+        <origin xyz="0.20 -0.08 ${crate_z + 0.002}" rpy="0 0 0"/>
+        <parent link="${prefix}lift_column"/>
+        <child link="${prefix}crate"/>
+      </joint>
+    </xacro:if>
+  </xacro:macro>
+
+  <xacro:macro name="rail_trolley" params="prefix parent mount_height rail_length">
+    <!-- Heating-pipe rail, fixed in the greenhouse -->
+    <link name="${prefix}rail">
+      <xacro:box_inertial mass="50" x="${rail_length}" y="${rail_gauge}" z="0.05">
+        <origin xyz="${rail_length/2} 0 ${rail_height}" rpy="0 0 0"/>
+      </xacro:box_inertial>
+      <xacro:property name="rail_x" value="${rail_length/2 - 0.1}"/>
+      <xacro:property name="pipe_len" value="${rail_length + 0.6}"/>
+      <visual name="pipe_left">
+        <origin xyz="${rail_x} ${rail_gauge/2} ${rail_height}" rpy="0 ${pi/2} 0"/>
+        <geometry><cylinder radius="${rail_pipe_radius}" length="${pipe_len}"/></geometry>
+        <material name="pipe_white"/>
+      </visual>
+      <visual name="pipe_right">
+        <origin xyz="${rail_x} ${-rail_gauge/2} ${rail_height}" rpy="0 ${pi/2} 0"/>
+        <geometry><cylinder radius="${rail_pipe_radius}" length="${pipe_len}"/></geometry>
+        <material name="pipe_white"/>
+      </visual>
+    </link>
+    <joint name="${prefix}rail_fixed_joint" type="fixed">
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <parent link="${parent}"/>
+      <child link="${prefix}rail"/>
+    </joint>
+
+    <xacro:property name="deck_z" value="${rail_height + rail_pipe_radius + 0.07}"/>
+    <link name="${prefix}trolley">
+      <xacro:box_inertial mass="25.0" x="${deck_length}" y="${deck_width}" z="0.15">
+        <origin xyz="0 0 ${deck_z}" rpy="0 0 0"/>
+      </xacro:box_inertial>
+      <xacro:box_part name="deck" size="${deck_length} ${deck_width} ${deck_thickness}" xyz="0 0 ${deck_z}" material="graphite"/>
+      <!-- Electrical cabinet: controller, drives, battery -->
+      <xacro:box_part name="cabinet" size="0.22 0.18 0.24" xyz="-0.12 -0.10 ${deck_z + deck_thickness/2 + 0.12}" material="cabinet_grey"/>
+      <!-- Emergency stop button on the cabinet -->
+      <visual name="estop_base">
+        <origin xyz="-0.12 -0.10 ${deck_z + deck_thickness/2 + 0.255}" rpy="0 0 0"/>
+        <geometry><box size="0.07 0.07 0.03"/></geometry>
+        <material name="safety_yellow"/>
+      </visual>
+      <visual name="estop_button">
+        <origin xyz="-0.12 -0.10 ${deck_z + deck_thickness/2 + 0.28}" rpy="0 0 0"/>
+        <geometry><cylinder radius="0.02" length="0.02"/></geometry>
+        <material name="estop_red"/>
+      </visual>
+      <!-- Signal tower -->
+      <visual name="signal_tower">
+        <origin xyz="-0.21 -0.17 ${deck_z + deck_thickness/2 + 0.30}" rpy="0 0 0"/>
+        <geometry><cylinder radius="0.012" length="0.12"/></geometry>
+        <material name="signal_green"/>
+      </visual>
+      <!-- Flanged wheels riding on the pipes -->
+      <xacro:wheel x="0.18" y="${rail_gauge/2}"/>
+      <xacro:wheel x="-0.18" y="${rail_gauge/2}"/>
+      <xacro:wheel x="0.18" y="${-rail_gauge/2}"/>
+      <xacro:wheel x="-0.18" y="${-rail_gauge/2}"/>
+    </link>
+    <joint name="${prefix}rail_joint" type="prismatic">
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <parent link="${prefix}rail"/>
+      <child link="${prefix}trolley"/>
+      <axis xyz="1 0 0"/>
+      <xacro:property name="l" value="${arm_lim['rail_joint']}"/>
+      <limit lower="${l['lower']}" upper="${min(l['upper'], rail_length)}" velocity="${l['velocity']}" effort="${l['effort']}"/>
+      <dynamics damping="${l['damping']}" friction="${l['friction']}"/>
+      <safety_controller soft_lower_limit="${l['lower'] + l['soft_margin']}"
+                         soft_upper_limit="${min(l['upper'], rail_length) - l['soft_margin']}"
+                         k_position="20" k_velocity="${l['effort'] / l['velocity']}"/>
+    </joint>
+
+    <xacro:lift_column prefix="${prefix}" parent="${prefix}trolley" base_z="${deck_z + deck_thickness/2}"
+                       mount_height="${mount_height}" crate="true"/>
+  </xacro:macro>
+
+  <xacro:macro name="pedestal" params="prefix parent mount_height">
+    <link name="${prefix}pedestal_foot">
+      <xacro:box_inertial mass="20.0" x="0.40" y="0.40" z="0.02">
+        <origin xyz="0 0 0.01" rpy="0 0 0"/>
+      </xacro:box_inertial>
+      <xacro:box_part name="foot" size="0.40 0.40 0.02" xyz="0 0 0.01" material="graphite"/>
+    </link>
+    <joint name="${prefix}pedestal_fixed_joint" type="fixed">
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <parent link="${parent}"/>
+      <child link="${prefix}pedestal_foot"/>
+    </joint>
+    <xacro:lift_column prefix="${prefix}" parent="${prefix}pedestal_foot" base_z="0.02"
+                       mount_height="${mount_height}" crate="true"/>
+  </xacro:macro>
+
+  <xacro:macro name="table_mount" params="prefix parent mount_height">
+    <link name="${prefix}arm_mount"/>
+    <joint name="${prefix}table_fixed_joint" type="fixed">
+      <origin xyz="0 0 ${mount_height}" rpy="0 0 0"/>
+      <parent link="${parent}"/>
+      <child link="${prefix}arm_mount"/>
+    </joint>
+  </xacro:macro>
+
+</robot>

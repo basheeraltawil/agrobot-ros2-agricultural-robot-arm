@@ -1,0 +1,11 @@
+# Calibration of the real robot, read by aibomech_agrobot_hardware.
+# channel   : actuator index on the motor-controller board (firmware array index)
+# direction : +1 or -1, flips the actuator sense to match the URDF axis
+# offset    : actuator reading (rad or m) when the URDF joint is at zero
+# Fill in the offsets with the procedure in README.md, section "Calibration".
+joint_1:           {channel: 0, direction: 1, offset: 0.0}
+joint_2:           {channel: 1, direction: 1, offset: 0.0}
+joint_3:           {channel: 2, direction: 1, offset: 0.0}
+joint_4:           {channel: 3, direction: 1, offset: 0.0}
+gripper_jaw_joint: {channel: 4, direction: 1, offset: 0.0}
+rail_joint:        {channel: 5, direction: 1, offset: 0.0}

@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+  <xacro:macro name="agrobot_gazebo" params="prefix controllers_file">
+    <gazebo>
+      <plugin filename="gz_ros2_control-system" name="gz_ros2_control::GazeboSimROS2ControlPlugin">
+        <parameters>${controllers_file}</parameters>
+      </plugin>
+    </gazebo>
+
+    <!-- High-friction rubber pads on the gripper jaws -->
+    <gazebo reference="${prefix}link_4">
+      <mu1>1.2</mu1>
+      <mu2>1.2</mu2>
+    </gazebo>
+    <gazebo reference="${prefix}link_5">
+      <mu1>1.2</mu1>
+      <mu2>1.2</mu2>
+    </gazebo>
+  </xacro:macro>
+</robot>
