@@ -12,10 +12,10 @@ AIBOMECH AgroBot is a 4-axis agricultural arm with a single-acting jaw gripper. 
 
 | Scenario | Task | World | Result in simulation |
 |---|---|---|---|
-| `strawberry_harvest` | Selective harvesting of ripe strawberries from a table-top gutter | `strawberry_greenhouse` | 10/12 ripe fruit in the crate, 0 unripe |
+| `strawberry_harvest` | Selective harvesting of ripe strawberries from a table-top gutter | `strawberry_greenhouse` | 12/12 ripe fruit in the crate, 0 unripe |
 | `plant_inspection` | Per-plant fruit count, ripeness, fruit size, canopy cover, yield estimate | `strawberry_greenhouse` | 12/12 ripe and 10/10 unripe fruit counted |
 | `seedling_transplant` | Soil blocks from a propagation tray into pots | `nursery_transplanting` | 8/8 seedlings potted |
-| `precision_weeding` | Detect weeds between lettuce and pull them out with the root | `weeding_bed` | 8/8 weeds detected, 7/8 removed |
+| `precision_weeding` | Detect weeds between lettuce and pull them out with the root | `weeding_bed` | 8/8 weeds removed |
 
 **Target platform:** ROS 2 Humble (Ubuntu 22.04) and Gazebo Fortress (`ros_gz` 0.244, `gz_ros2_control` 0.7).
 
@@ -386,12 +386,12 @@ Headless runs on a laptop (real-time factor below 1 because the camera is render
 
 | Scenario | Result | Mean cycle time |
 |---|---|---|
-| strawberry_harvest | 12/12 ripe fruit detected, 10 picked and verified in the crate, 2 reported unreachable, 0 unripe picked | 80 s |
+| strawberry_harvest | 12/12 ripe fruit detected, 12 picked and verified in the crate (1 in the second pass), 0 unripe picked | 61 s |
 | plant_inspection | 6 plants, 12/12 ripe and 10/10 unripe fruit counted | – |
-| seedling_transplant | 8/8 seedlings placed in pots (verified from simulation poses) | 37 s |
-| precision_weeding | 8/8 weeds detected, 7 removed, 1 aborted safely on contact | 47 s |
+| seedling_transplant | 8/8 seedlings placed and standing in their pots (verified from simulation poses) | 50 s |
+| precision_weeding | 8/8 weeds detected and removed into the bin (3 in the second pass) | 57 s |
 
-Cycle times include IK, planning and the 0.6 s camera settle time. They are dominated by Python planning and would drop to around 10–15 s with a compiled planner. Failures are reported per crop in `results.csv`, never by crashing the run.
+Cycle times include IK, collision-checked planning, the 0.6 s camera settle time and folding the arm before every rail move. They are dominated by Python planning and would drop to around 10–15 s with a compiled planner. A crop that fails is reported in `results.csv` and retried once in a second pass; a failure never stops the run.
 
 ### How grasping is simulated
 
@@ -877,7 +877,8 @@ Parameters shared by all task nodes (set them in the task's YAML file or with `-
 | `cartesian_speed` | 0.04 m/s | TCP speed on straight approach and retreat lines |
 | `home_joints` | `[-0.97, -2.0, -1.12, 1.46]` | Folded pose outside the camera view; start, recovery and return pose |
 | `rail_limits` | `[0.03, 2.97]` m | Rail range the tasks may use (kept off the end stops) |
-| `obstacles` | none | Fixed scene boxes, flat list `[cx, cy, cz, sx, sy, sz, …]` in the world frame |
+| `obstacles` | none | Fixed scene boxes, flat list `[cx, cy, cz, sx, sy, sz, …]` in the world frame; the arm keeps 3 mm clearance to them |
+| `crop_clearance` | -0.002 m | Clearance to crop boxes (neighbouring fruit, lettuce, seedlings); negative lets the gripper brush soft crops, the transplant task uses +0.003 for rigid soil blocks |
 | `detection_region` | unlimited | Box `[x_min, x_max, y_min, y_max, z_min, z_max]` (world) outside which detections are ignored |
 | `detection.<class>.hsv_ranges` | – | One or more ranges `h_lo s_lo v_lo h_hi s_hi v_hi` (OpenCV units, H 0–179) |
 | `detection.<class>.min_area` / `max_area` | 30 / 20000 px | Blob size window |

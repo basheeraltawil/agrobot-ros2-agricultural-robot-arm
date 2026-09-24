@@ -77,6 +77,9 @@ class RobotInterface:
         # frame (z = approach direction) and the offset of its centre from the TCP.
         self.held_half = np.array(p('held_half_size', [HELD_RADIUS] * 3).value, float)
         self.held_offset = np.array(p('held_offset', [0.0, 0.0, 0.0]).value, float)
+        # Clearance to crop obstacle boxes; negative lets the arm brush soft
+        # crops (fruit), positive keeps it away from rigid ones (soil blocks).
+        self.crop_clearance = p('crop_clearance', -0.002).value
 
         self._lock = threading.Lock()
         self._joint_positions = {}
@@ -215,7 +218,10 @@ class RobotInterface:
     # ----------------------------------------------------------- collision --
     def update_obstacles(self):
         """Express the world obstacles in the (moving) arm base frame."""
-        boxes = self.world_obstacles + self.crop_obstacles
+        # Fixtures (gutter, bench, tray, soil) are rigid and need clearance;
+        # crop boxes are already generous and the crops are soft.
+        boxes = ([(c, s, self.collision.obstacle_clearance) for c, s in self.world_obstacles]
+                 + [(c, s, self.crop_clearance) for c, s in self.crop_obstacles])
         if not boxes:
             self.collision.set_obstacles([])
             return
@@ -223,7 +229,7 @@ class RobotInterface:
         shift = np.zeros(3)
         if self.planning_rail is not None:
             shift[0] = self.planning_rail - self.rail_position
-        self.collision.set_obstacles([((t @ np.append(c - shift, 1.0))[:3], s) for c, s in boxes])
+        self.collision.set_obstacles([((t @ np.append(c - shift, 1.0))[:3], s, k) for c, s, k in boxes])
 
     def _hits(self, q):
         if self.held:

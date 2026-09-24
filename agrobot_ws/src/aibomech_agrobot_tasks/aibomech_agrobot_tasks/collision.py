@@ -86,6 +86,7 @@ class CollisionModel:
         self.pairs += [(a, b) for a, b in itertools.combinations(self.moving, 2)
                        if tuple(sorted((a, b))) not in ignore]
         self.obstacles = []
+        self.obstacle_clearances = []
 
     def _rigid_to_base(self, link):
         """True if no movable joint separates `link` from the base frame's carrier."""
@@ -103,8 +104,14 @@ class CollisionModel:
         return True
 
     def set_obstacles(self, boxes_base):
-        """Obstacles as (centre[3], size[3]) axis-aligned in the base frame."""
-        self.obstacles = [Box(np.asarray(c, float), np.eye(3), np.asarray(s, float) / 2) for c, s in boxes_base]
+        """Obstacles as (centre[3], size[3]) or (centre[3], size[3], clearance), axis-aligned
+        in the base frame. Without an explicit clearance, obstacle_clearance applies."""
+        self.obstacles = []
+        self.obstacle_clearances = []
+        for box in boxes_base:
+            c, s = box[0], box[1]
+            self.obstacles.append(Box(np.asarray(c, float), np.eye(3), np.asarray(s, float) / 2))
+            self.obstacle_clearances.append(box[2] if len(box) > 2 else self.obstacle_clearance)
 
     def link_poses(self, joint_values):
         """Poses of all links relative to the base frame."""
@@ -156,6 +163,6 @@ class CollisionModel:
                         hits.append(('held_object', l))
         for name, bx in moving_boxes:
             for k, ob in enumerate(self.obstacles):
-                if boxes_overlap(bx, ob, self.obstacle_clearance):
+                if boxes_overlap(bx, ob, self.obstacle_clearances[k]):
                     hits.append((name, f'obstacle_{k}'))
         return hits
