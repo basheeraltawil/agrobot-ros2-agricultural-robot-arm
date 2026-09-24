@@ -22,11 +22,16 @@ precision_weeding:
     crop_obstacle_size: 0.08
     grasp_height_above_detection: 0.03
     stem_width: 0.006
+    # Aim the middle of the open jaws at the stem, so the fixed jaw clears it
+    tcp_frame: tcp_center
+    # The pulled weed (leaf rosette + root ball) for collision checking
+    held_half_size: [0.02, 0.02, 0.025]
+    held_offset: [0.0, 0.0, 0.02]
     pregrasp_distance: 0.05
     pull_height: 0.08
     drop_height: 0.07
     max_approach_error_deg: 35.0
-    rail_offsets: [0.0, 0.05, -0.05, 0.10, -0.10]
+    rail_offsets: [0.0, 0.05, -0.05, 0.10, -0.10, 0.15, -0.15, 0.03, -0.03]
     max_weeds: 0
     speed_scale: 0.7
     cartesian_speed: 0.04

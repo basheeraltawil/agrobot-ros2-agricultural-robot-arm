@@ -47,4 +47,4 @@ def test_links_have_positive_inertia():
 
 def test_standard_frames_present():
     names = {link.get('name') for link in expand().findall('link')}
-    assert {'base', 'flange', 'tool0', 'tcp', 'camera_color_optical_frame', 'crate'} <= names
+    assert {'base', 'flange', 'tool0', 'tcp', 'tcp_center', 'camera_color_optical_frame', 'crate'} <= names

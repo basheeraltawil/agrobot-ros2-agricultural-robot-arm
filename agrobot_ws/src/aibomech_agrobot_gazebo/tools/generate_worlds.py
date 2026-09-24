@@ -452,7 +452,7 @@ def lettuce_visual(name, x, y, z, rng):
 def weed_model(name, x, y, z, rng):
     body = (inertial(0.008, (0.02, 0.02, 0.04))
             + visual('stem', cylinder(0.003, 0.035), (0.35, 0.12, 0.25), pose(0, 0, 0.0175))
-            + collision('core', cylinder(0.003, 0.035), pose(0, 0, 0.0175)))
+            + collision('core', cylinder(0.0015, 0.035), pose(0, 0, 0.0175)))
     for k in range(5):
         a = k * 2 * math.pi / 5 + rng.uniform(-0.3, 0.3)
         body += visual(f'leaf{k}', ellipsoid(0.016, 0.008, 0.002), WEED,

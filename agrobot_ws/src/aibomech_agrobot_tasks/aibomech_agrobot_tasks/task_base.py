@@ -84,6 +84,22 @@ class AgrobotTask:
         except MotionError as exc:
             raise MotionError(f'{phase} failed: {exc}') from exc
 
+    def approach(self, p_base, approach, q_goal=None, contact_tolerance=0.012):
+        """Straight-line approach that accepts stopping on contact near the goal.
+
+        Crops are soft and never exactly where the camera saw them. If the arm
+        is stopped by contact within `contact_tolerance` of the goal, the
+        gripper closes there, as a compliant real gripper would; any stop
+        further away is a real failure.
+        """
+        try:
+            self.robot.move_linear(p_base, approach, None, q_goal)
+        except MotionError as exc:
+            miss = float(np.linalg.norm(self.robot.tcp_pose()[:3, 3] - p_base))
+            if miss > contact_tolerance:
+                raise
+            self.log.info(f'approach stopped on contact {miss * 1000:.0f} mm before the goal, gripping there')
+
     def go_home(self):
         # One retry: a trajectory can be aborted by a transient tracking error
         # (e.g. a heavily loaded simulator); the second attempt starts from

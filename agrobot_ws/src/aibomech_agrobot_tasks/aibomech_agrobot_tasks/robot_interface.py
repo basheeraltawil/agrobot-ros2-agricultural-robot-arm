@@ -65,11 +65,18 @@ class RobotInterface:
         self.sim_grasp = p('sim_grasp', True).value               # drive Gazebo grasp joints
         self.base_frame = p('base_frame', 'arm_mount').value
         self.world_frame = p('world_frame', 'world').value
+        # Tool frame the tasks position: 'tcp' (object touching the fixed jaw,
+        # e.g. a fruit) or 'tcp_center' (middle of the open jaws, thin stems).
+        self.tcp_frame = p('tcp_frame', 'tcp').value
         self.gripper_open_position = p('gripper_open', 0.010).value
         self.gripper_effort = p('gripper_effort', 8.0).value
         # Distance fixed jaw -> object centre at the TCP. The jaw position
         # that closes on an object of width w is w - jaw_gap_offset.
         self.jaw_gap_offset = p('jaw_gap_offset', 0.0174).value
+        # Size of a held crop for collision checking: half extents in the tcp
+        # frame (z = approach direction) and the offset of its centre from the TCP.
+        self.held_half = np.array(p('held_half_size', [HELD_RADIUS] * 3).value, float)
+        self.held_offset = np.array(p('held_offset', [0.0, 0.0, 0.0]).value, float)
 
         self._lock = threading.Lock()
         self._joint_positions = {}
@@ -92,6 +99,7 @@ class RobotInterface:
         self.world_obstacles = []   # (centre[3], size[3]) axis-aligned boxes in the world frame
         self.crop_obstacles = []    # same, for crops detected by the task (updated per cycle)
         self.planning_rail = None   # evaluate obstacles for this rail position instead of the current one
+        self._relax_steps = 0
         self.held = None          # simulated object currently fixed to the gripper
 
     # ------------------------------------------------------------ plumbing --
@@ -128,7 +136,7 @@ class RobotInterface:
             time.sleep(0.2)
         else:
             raise MotionError('robot not ready (controllers or /robot_description missing)')
-        self.arm = Chain(self._urdf, self.base_frame, 'tcp')
+        self.arm = Chain(self._urdf, self.base_frame, self.tcp_frame)
         self.collision = CollisionModel(self._urdf, self.base_frame, ARM_LINKS)
         self.ik = IkSolver(self.arm, valid=self.is_free)
         self.has_rail = 'rail_joint' in self._joint_positions
@@ -217,20 +225,14 @@ class RobotInterface:
             shift[0] = self.planning_rail - self.rail_position
         self.collision.set_obstacles([((t @ np.append(c - shift, 1.0))[:3], s) for c, s in boxes])
 
-    def is_free(self, q):
-        hits = self.collision.collisions(dict(zip(ARM_JOINTS, q)),
-                                         held_radius=HELD_RADIUS if self.held else 0.0)
-        return not hits
+    def _hits(self, q):
+        if self.held:
+            return self.collision.collisions(dict(zip(ARM_JOINTS, q)), tcp_link=self.tcp_frame,
+                                             held_half=self.held_half, held_offset=self.held_offset)
+        return self.collision.collisions(dict(zip(ARM_JOINTS, q)))
 
-    def path_collision(self, q0, q1, step=0.04):
-        n = max(2, int(np.ceil(np.max(np.abs(q1 - q0)) / step)))
-        for s in np.linspace(0.0, 1.0, n + 1)[1:]:
-            q = q0 + s * (q1 - q0)
-            hits = self.collision.collisions(dict(zip(ARM_JOINTS, q)),
-                                             held_radius=HELD_RADIUS if self.held else 0.0)
-            if hits:
-                return hits
-        return None
+    def is_free(self, q):
+        return not self._hits(q)
 
     # -------------------------------------------------------------- motion --
     def move_joints(self, q_target, speed_scale=None):
@@ -240,12 +242,13 @@ class RobotInterface:
         q1 = np.clip(np.asarray(q_target, float), self.arm.lower, self.arm.upper)
         if not self.is_free(q1):
             raise MotionError('target configuration is in collision')
+        valid = self.is_free
         if not self.is_free(q0):
-            # Starting in contact (e.g. after an e-stop): only allow the direct move out.
-            self.log.warning('arm starts in contact, moving directly to the target')
-            self._move_joints(q1, speed_scale)
-            return
-        path = plan(q0, q1, self.is_free, self.arm.lower + 0.02, self.arm.upper - 0.02)
+            # Starting inside the clearance zone (e.g. right after a grasp):
+            # the path may leave the start region, but must be free after that.
+            self.log.warning('arm starts close to an obstacle, planning out of it')
+            valid = lambda q: self.is_free(q) or np.linalg.norm(q - q0) < 0.15  # noqa: E731
+        path = plan(q0, q1, valid, self.arm.lower + 0.02, self.arm.upper - 0.02)
         if path is None:
             raise MotionError('no collision-free joint path found')
         for q in path[1:]:
@@ -287,6 +290,11 @@ class RobotInterface:
             q_goal = end.q
         q_goal = np.asarray(q_goal, float)
         n = max(2, int(np.ceil(np.linalg.norm(goal_base - start) / step)))
+        # A line that starts in contact (a crop just lifted out of its tray or
+        # soil) may stay in the clearance zone for its first few centimetres.
+        self._relax_steps = 0
+        if not self.is_free(q_start):
+            self._relax_steps = int(np.ceil(0.025 / max(np.linalg.norm(goal_base - start) / n, 1e-6)))
         path, reason = self._line_by_interpolation(q_start, q_goal, start, goal_base, n)
         if path is None:
             # Start and end lie on different branches: follow the line step by
@@ -322,7 +330,7 @@ class RobotInterface:
             return f'line leaves the workspace at step {i}/{n}'
         if np.max(np.abs(res.q - q_prev)) > 0.35:
             return 'line needs a joint flip (singularity)'
-        if not self.is_free(res.q):
+        if i > self._relax_steps and not self.is_free(res.q):
             return f'line collides at step {i}/{n}'
         return None
 

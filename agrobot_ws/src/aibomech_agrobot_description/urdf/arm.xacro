@@ -24,6 +24,8 @@
   <xacro:property name="tcp_x" value="-0.135"/>
   <xacro:property name="tcp_y" value="0.0725"/>
   <xacro:property name="tcp_z" value="-0.008"/>
+  <!-- Middle between the fixed jaw face (-0.016) and the open moving jaw (+0.009) -->
+  <xacro:property name="tcp_center_z" value="-0.003"/>
 
   <xacro:macro name="arm_link" params="prefix name material">
     <xacro:property name="p" value="${arm_phys[name]}"/>
@@ -131,6 +133,15 @@
       <origin xyz="${tcp_x} ${tcp_y} ${tcp_z}" rpy="0 ${-pi/2} 0"/>
       <parent link="${prefix}link_4"/>
       <child link="${prefix}tcp"/>
+    </joint>
+
+    <!-- tcp_center: middle of the open jaw gap. Use it for thin objects (stems)
+         that must not touch the fixed jaw on the way in. -->
+    <link name="${prefix}tcp_center"/>
+    <joint name="${prefix}link_4-tcp_center" type="fixed">
+      <origin xyz="${tcp_x} ${tcp_y} ${tcp_center_z}" rpy="0 ${-pi/2} 0"/>
+      <parent link="${prefix}link_4"/>
+      <child link="${prefix}tcp_center"/>
     </joint>
 
   </xacro:macro>

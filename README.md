@@ -139,7 +139,8 @@ The standard frames follow ROS-Industrial conventions:
 
 - `base`: the J1 axis on the mounting plate.
 - `flange` / `tool0`: the wrist mounting face, z pointing out of the tool.
-- `tcp`: the point between the jaws, z along the approach direction.
+- `tcp`: the point between the jaws where a 19 mm fruit touching the fixed jaw has its centre, z along the approach direction.
+- `tcp_center`: the middle of the open jaw gap, 5 mm further towards the moving jaw. Thin objects such as weed stems are aimed here, so the curved fixed jaw clears them on the way in.
 - `arm_mount`: the mounting plate on the lift column; the task layer plans in this frame.
 - `crate`: the drop-off point.
 - `camera_color_optical_frame`: same name as the `realsense2_camera` driver.
@@ -324,8 +325,10 @@ stateDiagram-v2
 
 1. Camera check that the cell holds a seedling.
 2. Top-down pick of the block.
-3. Lift, and move the rail to the pot.
+3. Lift, fold the arm, and move the rail to the pot. The rail only travels with the arm folded, so it never sweeps over the plants.
 4. Top-down place, release, lift.
+
+Seedlings still in the tray and seedlings already potted are obstacles for the planner, and the held soil block is checked as a 54 mm box hanging below the TCP. A seedling that fails is retried in a second pass.
 
 The soil blocks stand higher than the tray walls, so the open jaws (about 60 mm across) never enter a cell. That is also why commercial transplanters prefer soil blocks.
 
@@ -357,7 +360,7 @@ stateDiagram-v2
 1. Survey detects weeds (purple) and lettuce (large green blobs).
 2. Weeds closer than `crop_protection_radius` (6 cm) to a lettuce are left alone and reported. A real system would switch to a finer tool, a laser or a micro-sprayer there.
 3. Every other weed is gripped at the stem, pulled 8 cm straight up with its root, and dropped into the bin on the trolley.
-4. Lettuce heads are obstacles for the planner.
+4. Lettuce heads are obstacles for the planner. A weed that fails is retried in a second pass.
 
 ```mermaid
 stateDiagram-v2
@@ -526,6 +529,7 @@ flowchart TD
     link_4 -- gripper_jaw_joint --> link_5
     link_4 --> flange --> tool0
     link_4 --> tcp
+    link_4 --> tcp_center
 ```
 
 ### Simulation start-up
@@ -559,10 +563,10 @@ sequenceDiagram
 |---|---|---|
 | `perception.py` | Find crops in the RGB-D image and turn them into 3D points | HSV thresholds per class, blob size window, median depth, shift by object radius, transform with TF into `world`, crop region filter |
 | `kinematics.py` | Forward and inverse kinematics from the URDF | Geometric Jacobian; IK solves position first, then uses the one redundant DOF to align the approach direction (null-space); multi-start; `track`/`refine` for local solutions |
-| `collision.py` | Is a joint configuration collision-free? | The URDF's own collision boxes, separating-axis test, arm vs. carrier, arm vs. itself, arm and held crop vs. obstacle boxes (gutter, bench, crops) |
+| `collision.py` | Is a joint configuration collision-free? | The URDF's own collision boxes, separating-axis test, arm vs. carrier, arm vs. itself, arm and held crop vs. obstacle boxes (gutter, bench, tray, crops). Scene obstacles need 3 mm clearance, because touching them stalls the arm |
 | `planner.py` | Collision-free joint path between two configurations | RRT-Connect with random shortcutting; direct path if already free |
-| `robot_interface.py` | Execute motions safely | Planned joint moves (quintic segments), straight TCP lines that stay on one arm branch, rail and gripper actions, e-stop cancelling, simulated grasp topics |
-| `task_base.py` | Shared scenario logic | Rail as external axis (`plan_reach`), crop obstacles, recovery, sim ground truth, reports |
+| `robot_interface.py` | Execute motions safely | Planned joint moves (quintic segments), straight TCP lines (interpolated between known start and end configurations, so the wrist never flips; step-by-step tracking as fallback), rail and gripper actions, e-stop cancelling, simulated grasp topics, retrying goals while controllers start |
+| `task_base.py` | Shared scenario logic | Rail as external axis (`plan_reach`), compliant approach (a stop on contact within 12 mm of the goal still grips, because crops are soft and never exactly where the camera saw them), crop obstacles, recovery, sim ground truth, reports |
 
 #### Perception pipeline
 
@@ -879,6 +883,8 @@ Parameters shared by all task nodes (set them in the task's YAML file or with `-
 | `detection.<class>.min_area` / `max_area` | 30 / 20000 px | Blob size window |
 | `detection.<class>.radius` | 0.01 m | Surface-to-centre correction along the viewing ray |
 | `gripper_open`, `gripper_effort`, `jaw_gap_offset` | 0.010 m, 8 N, 0.0174 m | Gripper opening, force, and the jaw offset used to close on an object of known width |
+| `tcp_frame` | `tcp` | Tool frame the task positions: `tcp` for fruit, `tcp_center` for thin stems (weeding) |
+| `held_half_size`, `held_offset` | 12 mm cube at the TCP | Size (half extents, tcp frame) and centre offset of a gripped crop for collision checking; the soil block and the pulled weed use longer boxes hanging below the TCP |
 | `sim_grasp` | `true` in simulation | Drive the Gazebo grasp joints; set automatically by `scenario.launch.py` |
 | `report_dir` | `~/.ros/agrobot_reports` | Where reports are written |
 

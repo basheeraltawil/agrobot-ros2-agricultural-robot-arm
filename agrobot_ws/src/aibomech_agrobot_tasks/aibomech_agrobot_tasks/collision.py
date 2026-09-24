@@ -46,9 +46,14 @@ def boxes_overlap(a, b, margin=0.0):
 class CollisionModel:
     """Tree FK over the whole URDF plus the collision boxes of every link."""
 
-    def __init__(self, urdf_xml, base_frame, moving_links, ignore_pairs=(), margin=0.002):
+    def __init__(self, urdf_xml, base_frame, moving_links, ignore_pairs=(), margin=0.002,
+                 obstacle_clearance=0.003):
         root = ET.fromstring(urdf_xml)
+        # Robot parts may touch their neighbours by up to `margin` (the boxes
+        # are conservative); scene obstacles must stay `obstacle_clearance` away,
+        # because touching them stalls the arm in simulation and on the robot.
         self.margin = margin
+        self.obstacle_clearance = obstacle_clearance
         self.joints = {}
         self.children = {}
         for j in root.findall('joint'):
@@ -125,8 +130,14 @@ class CollisionModel:
     def _world_boxes(self, link, pose):
         return [Box((pose @ local)[:3, 3], (pose @ local)[:3, :3], half) for local, half in self.boxes[link]]
 
-    def collisions(self, joint_values, held_radius=0.0, tcp_link='tcp'):
-        """List of colliding (link, other) pairs for a joint configuration."""
+    def collisions(self, joint_values, held_radius=0.0, tcp_link='tcp', held_half=None, held_offset=None):
+        """List of colliding (link, other) pairs for a joint configuration.
+
+        A held crop is a box at the TCP: a cube of half-size held_radius, or
+        held_half (half extents in the tcp frame) shifted by held_offset.
+        """
+        if held_half is not None:
+            held_radius = float(np.max(held_half))
         poses = self.link_poses(joint_values)
         boxes = {l: self._world_boxes(l, poses[l]) for l in set(itertools.chain(*self.pairs))}
         hits = []
@@ -136,13 +147,15 @@ class CollisionModel:
         moving_boxes = [(l, bx) for l in self.moving for bx in boxes[l]]
         if held_radius > 0 and tcp_link in poses:
             t = poses[tcp_link]
-            moving_boxes.append(('held_object', Box(t[:3, 3], t[:3, :3], np.full(3, held_radius))))
+            half = np.full(3, held_radius) if held_half is None else np.asarray(held_half, float)
+            offset = np.zeros(3) if held_offset is None else np.asarray(held_offset, float)
+            moving_boxes.append(('held_object', Box(t[:3, 3] + t[:3, :3] @ offset, t[:3, :3], half)))
             for l in self.static:
                 for bx in self._world_boxes(l, poses[l]):
                     if boxes_overlap(moving_boxes[-1][1], bx, -self.margin):
                         hits.append(('held_object', l))
         for name, bx in moving_boxes:
             for k, ob in enumerate(self.obstacles):
-                if boxes_overlap(bx, ob, -self.margin):
+                if boxes_overlap(bx, ob, self.obstacle_clearance):
                     hits.append((name, f'obstacle_{k}'))
         return hits

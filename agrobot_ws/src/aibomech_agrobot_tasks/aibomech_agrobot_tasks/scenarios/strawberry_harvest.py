@@ -111,7 +111,7 @@ class StrawberryHarvest(AgrobotTask):
         step = self.step
         step('approach', self.robot.open_gripper)
         step('approach', self.robot.move_joints, q_pre)
-        step('approach', self.robot.move_linear, p_grasp, approach, None, q_grasp)
+        step('approach', self.approach, p_grasp, approach, q_grasp)
         step('grip', self.robot.close_on, self.fruit_width)
         self.robot.attach(obj)
         # Real robot: the pull-and-twist below breaks the peduncle.

@@ -27,6 +27,10 @@ seedling_transplant:
     obstacles: [1.2, 0.30, 0.733, 2.4, 0.30, 0.03,
                 0.54, 0.32, 0.757, 0.25, 0.13, 0.018]
     plug_width: 0.018
+    # The held soil block for collision checking: 22 x 22 x 54 mm, its centre
+    # 20 mm below the TCP along the approach direction (tcp z points down here)
+    held_half_size: [0.011, 0.011, 0.027]
+    held_offset: [0.0, 0.0, 0.02]
     pregrasp_distance: 0.05
     lift_height: 0.06
     max_approach_error_deg: 35.0

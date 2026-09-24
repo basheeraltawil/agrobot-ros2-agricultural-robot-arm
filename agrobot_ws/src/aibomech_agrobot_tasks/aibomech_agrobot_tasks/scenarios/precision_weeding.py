@@ -68,11 +68,22 @@ class PrecisionWeeding(AgrobotTask):
         if plan is None:
             return 'unreachable'
         self.robot.move_rail(plan.rail)
+        # Look again from the working position: the weed is now close to the
+        # image centre, which gives a better 3D position than the survey.
+        dets, _ = self.camera.detect(self.classes[:1])
+        close = [d for d in dets if np.linalg.norm(d.position - weed['position']) < 0.03]
+        if close:
+            best = min(close, key=lambda d: np.linalg.norm(d.position - weed['position']))
+            target = best.position + [0.0, 0.0, self.grasp_offset]
         obj = self.sim_object_near(weed['position'], 'weed_', 0.04) if self.robot.sim_grasp else None
         p = self.robot.world_to_base(target)
+        q_grasp = self.robot.ik.track(p, DOWN, plan.q_grasp)
+        q_pre = self.robot.ik.track(p + [0, 0, self.pre_distance], DOWN, plan.q_pre)
+        if not (q_grasp.success and q_pre.success):
+            return 'unreachable'
         step('approach', self.robot.open_gripper)
-        step('approach', self.robot.move_joints, plan.q_pre)
-        step('approach', self.robot.move_linear, p, DOWN, None, plan.q_grasp)
+        step('approach', self.robot.move_joints, q_pre.q)
+        step('approach', self.approach, p, DOWN, q_grasp.q)
         step('grip', self.robot.close_on, self.stem_width)
         self.robot.attach(obj)
         self.robot.detach_from_plant(obj)          # the root comes out with the pull
@@ -84,6 +95,26 @@ class PrecisionWeeding(AgrobotTask):
         step('return', self.robot.move_joints, self.home)
         return 'removed'
 
+    def attempt(self, k, weed, crops):
+        t0 = time.monotonic()
+        p = weed['position']
+        nearest = min((np.linalg.norm(p[:2] - c[:2]) for c in crops), default=np.inf)
+        if nearest < self.protect_radius:
+            outcome = 'protected_zone'
+        else:
+            try:
+                outcome = self.remove(weed)
+            except MotionError as exc:
+                self.log.warning(f'weed {k}: {exc}')
+                outcome = 'motion_error'
+                self.recover()
+        dt = time.monotonic() - t0
+        self.log.info(f'weed {k} at ({p[0]:.3f}, {p[1]:.3f}): {outcome} in {dt:.1f} s')
+        self.rows.append({'weed': k, 'x': round(p[0], 4), 'y': round(p[1], 4), 'z': round(p[2], 4),
+                          'distance_to_crop_m': round(float(nearest), 3), 'outcome': outcome,
+                          'cycle_time_s': round(dt, 1)})
+        return outcome
+
     def execute(self):
         self.robot.open_gripper()
         self.go_home()
@@ -91,24 +122,14 @@ class PrecisionWeeding(AgrobotTask):
         self.robot.crop_obstacles = [(c + [0, 0, 0.03], np.array([self.crop_size] * 2 + [0.06])) for c in crops]
         if self.max_weeds:
             weeds = weeds[:self.max_weeds]
+        retry = []
         for k, weed in enumerate(weeds):
-            t0 = time.monotonic()
-            p = weed['position']
-            nearest = min((np.linalg.norm(p[:2] - c[:2]) for c in crops), default=np.inf)
-            if nearest < self.protect_radius:
-                outcome = 'protected_zone'
-            else:
-                try:
-                    outcome = self.remove(weed)
-                except MotionError as exc:
-                    self.log.warning(f'weed {k}: {exc}')
-                    outcome = 'motion_error'
-                    self.recover()
-            dt = time.monotonic() - t0
-            self.log.info(f'weed {k} at ({p[0]:.3f}, {p[1]:.3f}): {outcome} in {dt:.1f} s')
-            self.rows.append({'weed': k, 'x': round(p[0], 4), 'y': round(p[1], 4), 'z': round(p[2], 4),
-                              'distance_to_crop_m': round(float(nearest), 3), 'outcome': outcome,
-                              'cycle_time_s': round(dt, 1)})
+            if self.attempt(k, weed, crops) in ('unreachable', 'motion_error'):
+                retry.append((k, weed))
+        for k, weed in retry:
+            self.log.info(f'weed {k}: second attempt')
+            self.rows = [r for r in self.rows if r['weed'] != k]
+            self.attempt(k, weed, crops)
         self.robot.move_rail(self.stations[0])
         removed = [r for r in self.rows if r['outcome'] == 'removed']
         self.summary['attempted'] = len(self.rows)
