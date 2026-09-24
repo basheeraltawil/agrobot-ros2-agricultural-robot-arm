@@ -1,4 +1,5 @@
 .vscode/
+# colcon output (the workspace is agrobot_ws/)
 build/
 install/
 log/

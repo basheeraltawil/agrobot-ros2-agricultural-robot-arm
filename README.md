@@ -38,6 +38,8 @@ AIBOMECH AgroBot is a 4-axis agricultural arm with a single-acting jaw gripper. 
 
 ## Repository layout
 
+The ROS 2 packages live in the colcon workspace `agrobot_ws/src/`. Build from `agrobot_ws/`.
+
 | Package / folder | Contents |
 |---|---|
 | `aibomech_agrobot_description` | URDF/xacro: arm, gripper, rail trolley, lift column, crate, RGB-D camera, `ros2_control` tags; meshes; CAD mass properties; `tools/compute_physical_params.py` |
@@ -45,7 +47,7 @@ AIBOMECH AgroBot is a 4-axis agricultural arm with a single-acting jaw gripper. 
 | `aibomech_agrobot_gazebo` | The three Gazebo worlds, their generator (`tools/generate_worlds.py`), the ground-truth object lists, the bridge configurations, `sim.launch.py` and `sim_manager.py` |
 | `aibomech_agrobot_hardware` | `ros2_control` SystemInterface for the real robot (serial protocol, watchdog, e-stop), Arduino firmware and the board emulator |
 | `aibomech_agrobot_tasks` | Python task layer: kinematics/IK, collision model, RRT-Connect planner, RGB-D crop detection, the four scenario nodes and `scenario.launch.py` |
-| `Manuplator-Analysis-and-control` | Mathematica derivation of the arm dynamics (Jacobians, inertia matrix, Christoffel symbols, joint torques, workspace) and a PyTorch image-segmentation notebook |
+| `Manuplator-Analysis-and-control` (repository root, not a ROS package) | Mathematica derivation of the arm dynamics (Jacobians, inertia matrix, Christoffel symbols, joint torques, workspace) and a PyTorch image-segmentation notebook |
 
 The original ROS 1 (catkin) package is preserved in the git history under the tag [`ros1-legacy`](../../tree/ros1-legacy).
 
@@ -98,7 +100,7 @@ The standard frames follow ROS-Industrial conventions:
 - `crate`: the drop-off point.
 - `camera_color_optical_frame`: same name as the `realsense2_camera` driver.
 
-Every limit lives in `aibomech_agrobot_description/config/joint_limits.yaml`. The physical parameters are regenerated with `python3 tools/compute_physical_params.py`, which reads the CAD CSV and the actuator table in that script.
+Every limit lives in `agrobot_ws/src/aibomech_agrobot_description/config/joint_limits.yaml`. The physical parameters are regenerated with `python3 agrobot_ws/src/aibomech_agrobot_description/tools/compute_physical_params.py`, which reads the CAD CSV and the actuator table in that script.
 
 ### Why the arm needs the rail
 
@@ -119,34 +121,36 @@ Commercial greenhouse robots solve this with their rail. The task layer does the
 
 ## Install and build
 
+The repository already contains a ready colcon workspace, `agrobot_ws/`, with every package in `agrobot_ws/src/`. Clone, build, run:
+
 ```bash
-# ROS 2 Humble and Gazebo Fortress (ros-humble-ros-gz installs Fortress)
+# 1. ROS 2 Humble and Gazebo Fortress (ros-humble-ros-gz installs Fortress)
 sudo apt install ros-humble-desktop ros-humble-ros-gz ros-humble-gz-ros2-control \
                  ros-humble-ros2-control ros-humble-ros2-controllers ros-humble-xacro \
-                 ros-humble-joint-state-publisher-gui python3-opencv python3-numpy python3-yaml
+                 ros-humble-joint-state-publisher-gui python3-opencv python3-numpy python3-yaml \
+                 python3-rosdep python3-colcon-common-extensions
 
-mkdir -p ~/agrobot_ws/src && cd ~/agrobot_ws/src
+# 2. Clone and build the workspace
 git clone https://github.com/basheeraltawil/aibomech_agrobot.git
-cd ~/agrobot_ws
-rosdep install --from-paths src --ignore-src -r -y
+cd aibomech_agrobot/agrobot_ws
+source /opt/ros/humble/setup.bash
+rosdep install --from-paths src --ignore-src -r -y   # run 'sudo rosdep init && rosdep update' once if rosdep is new
 colcon build --symlink-install
 source install/setup.bash
 ```
 
+Every new terminal needs `source <repo>/agrobot_ws/install/setup.bash`. Add it to `~/.bashrc` if you use the robot daily.
+
 For the real robot, also install `ros-humble-realsense2-camera`. To flash the firmware you need the Arduino IDE or `arduino-cli`.
 
-To run the tests, build first; `colcon test` uses the `build/` folder of the workspace. Run these from the workspace root (`~/agrobot_ws`), not from inside the repository:
+To run the tests, run these from `agrobot_ws/` after building:
 
 ```bash
-cd ~/agrobot_ws
-colcon build --symlink-install && source install/setup.bash
-colcon test --packages-select aibomech_agrobot_description aibomech_agrobot_hardware aibomech_agrobot_tasks
+colcon test
 colcon test-result --verbose
 ```
 
-The tests cover URDF expansion for every platform and back-end, the serial protocol, and the task layer's IK, collision model and planner.
-
-You can also build directly inside a cloned repository. `build/`, `install/` and `log/` are git-ignored there.
+The tests cover URDF expansion for every platform and back-end, the serial protocol, and the task layer's IK, collision model and planner. `build/`, `install/` and `log/` are git-ignored.
 
 ---
 
@@ -181,7 +185,7 @@ In RViz, the *Detection image* panel shows what the camera classified, and the y
 
 ## Agricultural scenarios
 
-The worlds are generated by `aibomech_agrobot_gazebo/tools/generate_worlds.py` with fixed random seeds, so every run sees the same crop. Change the seed or the layout there and re-run the script. It rewrites the world, the ground-truth list (`config/<world>_objects.yaml`) and the bridge configuration.
+The worlds are generated by `agrobot_ws/src/aibomech_agrobot_gazebo/tools/generate_worlds.py` with fixed random seeds, so every run sees the same crop. Change the seed or the layout there and re-run the script. It rewrites the world, the ground-truth list (`config/<world>_objects.yaml`) and the bridge configuration.
 
 ### 1. Selective strawberry harvesting (`strawberry_harvest`)
 
@@ -199,7 +203,7 @@ The worlds are generated by `aibomech_agrobot_gazebo/tools/generate_worlds.py` w
    - Planned move to the crate, release, then home.
 5. **Report.** Detected, attempted and picked fruit, cycle times and, in simulation, fruit verified in the crate. Unripe fruit in the crate counts as an error.
 
-The parameters are in `aibomech_agrobot_tasks/config/strawberry_harvest.yaml`: survey stations, HSV ranges, approach direction, rail offsets, obstacles and speeds.
+The parameters are in `agrobot_ws/src/aibomech_agrobot_tasks/config/strawberry_harvest.yaml`: survey stations, HSV ranges, approach direction, rail offsets, obstacles and speeds.
 
 ![Ripe and unripe fruit detected by the trolley camera](docs/images/harvest_detection.png)
 
@@ -340,7 +344,7 @@ This exercises the real plugin, the serial protocol, the watchdog and the e-stop
 
 ### Step 4: Flash the firmware
 
-1. Open `aibomech_agrobot_hardware/firmware/agrobot_mcu/agrobot_mcu.ino`.
+1. Open `agrobot_ws/src/aibomech_agrobot_hardware/firmware/agrobot_mcu/agrobot_mcu.ino`.
 2. Check the pin assignment and the `SERVO_CENTER_US`, `SERVO_US_PER_UNIT` and `RAIL_STEPS_PER_M` values for your hardware.
 3. Flash the board, for example `arduino-cli compile -b arduino:avr:mega … && arduino-cli upload …`.
 4. Give the serial device a fixed name with a udev rule, for example `/dev/agrobot_mcu`, and add yourself to the `dialout` group.
@@ -348,7 +352,7 @@ This exercises the real plugin, the serial protocol, the watchdog and the e-stop
 ### Step 5: Calibrate the joints
 
 1. **Mechanical zero.** Move every joint by hand, or at low torque, to the pose the URDF calls zero. `ros2 launch aibomech_agrobot_description view_robot.launch.py` with all sliders at 0 shows that pose.
-2. **Read the offsets.** With the robot launched on real hardware, run `ros2 topic echo /joint_states` and read the reported positions. Enter them with opposite sign as `offset` in `aibomech_agrobot_description/config/hardware_calibration.yaml`, or pass your own file with `calibration_file:=`.
+2. **Read the offsets.** With the robot launched on real hardware, run `ros2 topic echo /joint_states` and read the reported positions. Enter them with opposite sign as `offset` in `agrobot_ws/src/aibomech_agrobot_description/config/hardware_calibration.yaml`, or pass your own file with `calibration_file:=`.
 3. **Directions.** Command small moves, for example +0.1 rad with the `ros2 action send_goal` line from the Quick start. Compare them with RViz and set `direction: -1` where the real joint turns the other way.
 4. **Limits.** Jog each joint towards both ends at `speed_scale` 0.2. Keep the software limits at least 3° inside the mechanical stops.
 5. **Gripper.** Close the jaw on a 20 mm gauge. The jaw position should read about 0.0026. Tune `jaw_gap_offset` in the task configuration if it differs.
@@ -427,8 +431,8 @@ The task that was running exits with code 2; restart it. It re-surveys the crop,
 
 - **Collision model.** The task layer's collision model reads the same boxes as Gazebo, so a motion that passes the checker does not jam in simulation.
 - **Grasp tuning.** Tune `jaw_gap_offset` and the TCP (`tcp_*` in `arm.xacro`) together if you change the gripper.
-- **Worlds.** Regenerate them after changing `MOUNT_HEIGHT` or the robot geometry: `python3 aibomech_agrobot_gazebo/tools/generate_worlds.py`.
-- **Physical parameters.** Regenerate them after changing the CAD or the actuators: `python3 aibomech_agrobot_description/tools/compute_physical_params.py`.
+- **Worlds.** Regenerate them after changing `MOUNT_HEIGHT` or the robot geometry: `python3 agrobot_ws/src/aibomech_agrobot_gazebo/tools/generate_worlds.py`.
+- **Physical parameters.** Regenerate them after changing the CAD or the actuators: `python3 agrobot_ws/src/aibomech_agrobot_description/tools/compute_physical_params.py`.
 - **Possible extensions:**
   - a MoveIt 2 configuration for interactive planning;
   - a trained crop detector;
