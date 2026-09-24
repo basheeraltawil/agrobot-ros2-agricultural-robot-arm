@@ -30,6 +30,11 @@ def transform(xyz=(0, 0, 0), rpy=(0, 0, 0)):
     return t
 
 
+def cross(a, b):
+    """3-vector cross product (np.cross is slow for single small vectors)."""
+    return np.array([a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]])
+
+
 def axis_angle(axis, angle):
     axis = np.asarray(axis, float)
     k = np.array([[0, -axis[2], axis[1]], [axis[2], 0, -axis[0]], [-axis[1], axis[0], 0]])
@@ -136,7 +141,7 @@ class Chain:
             if seg.type == 'prismatic':
                 jac[:3, i] = axis
             else:
-                jac[:3, i] = np.cross(axis, p_tip - frame[:3, 3])
+                jac[:3, i] = cross(axis, p_tip - frame[:3, 3])
                 jac[3:, i] = axis
         return tip, jac
 
@@ -150,14 +155,17 @@ class IkResult:
     position_error: float     # m
     approach_error: float     # rad, angle between tcp z and requested approach
     success: bool
+    valid: bool = True        # passed the validity check (collision free)
 
 
 class IkSolver:
     """Position IK with approach direction optimised in the null space."""
 
     def __init__(self, chain, position_tolerance=0.002, limit_margin=0.02,
-                 max_iterations=200, restarts=12, seed=7):
+                 max_iterations=200, restarts=12, seed=7, valid=None):
         self.chain = chain
+        # Optional check q -> bool (e.g. collision free); invalid solutions lose.
+        self.valid = valid
         self.position_tolerance = position_tolerance
         self.limit_margin = limit_margin
         self.max_iterations = max_iterations
@@ -186,11 +194,12 @@ class IkSolver:
             res = self._descend(q0, position, approach, lo, hi)
             if best is None or self._score(res, q_seed) < self._score(best, q_seed):
                 best = res
-            if res.position_error < self.position_tolerance and (
+            if res.position_error < self.position_tolerance and res.valid and (
                     approach is None or res.approach_error < 0.05) and q_seed is not None:
                 break
         best.success = bool(best.position_error < self.position_tolerance
-                            and best.approach_error <= max_approach_error)
+                            and best.approach_error <= max_approach_error
+                            and best.valid)
         return best
 
     def track(self, position, approach, q_seed):
@@ -201,13 +210,15 @@ class IkSolver:
                             np.asarray(position, float),
                             None if approach is None else np.asarray(approach, float) / np.linalg.norm(approach),
                             lo, hi)
-        res.success = bool(res.position_error < self.position_tolerance)
+        res.success = bool(res.position_error < self.position_tolerance and res.valid)
         return res
 
     def _score(self, res, q_seed):
         # Lexicographic: any solution inside the position tolerance beats any
         # solution outside it; then smallest approach error; then least motion.
         score = res.approach_error
+        if not res.valid:
+            score += 50.0
         if res.position_error > self.position_tolerance:
             score += 100.0 + res.position_error * 1000.0
         if q_seed is not None:
@@ -224,6 +235,10 @@ class IkSolver:
             q_app = self._iterate(q_pos, target, approach, lo, hi)
             candidates.append(self._iterate(q_app, target, None, lo, hi))
         results = [self._evaluate(c, target, approach) for c in candidates]
+        if self.valid is not None:
+            for r in results:
+                if r.position_error < self.position_tolerance:
+                    r.valid = bool(self.valid(r.q))
         return min(results, key=lambda r: self._score(r, None))
 
     def _evaluate(self, q, target, approach):
@@ -243,7 +258,7 @@ class IkSolver:
             jp_pinv = jp.T @ np.linalg.inv(jp @ jp.T + 1e-4 * eye3)
             dq = jp_pinv @ e_p
             if approach is not None:
-                e_a = np.cross(tip[:3, 2], approach)   # rotation turning tcp z onto approach
+                e_a = cross(tip[:3, 2], approach)   # rotation turning tcp z onto approach
                 null = np.eye(self.chain.dof) - jp_pinv @ jp
                 ja_n = jac[3:] @ null
                 dq += 0.5 * null @ (ja_n.T @ np.linalg.solve(ja_n @ ja_n.T + 1e-3 * eye3, e_a))
@@ -251,6 +266,6 @@ class IkSolver:
             if step > 0.2:
                 dq *= 0.2 / step
             q = np.clip(q + dq, lo, hi)
-            if step < 1e-5:
+            if step < 1e-4:
                 break
         return q

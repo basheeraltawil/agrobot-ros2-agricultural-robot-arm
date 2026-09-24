@@ -11,11 +11,11 @@ objects:
   - {name: lettuce_5, type: lettuce, x: 1.8000, y: 0.3511, z: 0.7700}
   - {name: lettuce_6, type: lettuce, x: 2.1000, y: 0.3451, z: 0.7700}
   - {name: lettuce_7, type: lettuce, x: 2.4000, y: 0.3439, z: 0.7700}
-  - {name: weed_0, type: weed, x: 0.4364, y: 0.2213, z: 0.7700}
-  - {name: weed_1, type: weed, x: 0.5745, y: 0.2280, z: 0.7700}
-  - {name: weed_2, type: weed, x: 0.7561, y: 0.2783, z: 0.7700}
-  - {name: weed_3, type: weed, x: 1.0995, y: 0.2673, z: 0.7700}
-  - {name: weed_4, type: weed, x: 1.3431, y: 0.2876, z: 0.7700}
-  - {name: weed_5, type: weed, x: 1.4623, y: 0.2535, z: 0.7700}
-  - {name: weed_6, type: weed, x: 1.6281, y: 0.2228, z: 0.7700}
-  - {name: weed_7, type: weed, x: 1.9622, y: 0.2771, z: 0.7700}
+  - {name: weed_0, type: weed, x: 0.4364, y: 0.2571, z: 0.7700}
+  - {name: weed_1, type: weed, x: 0.5235, y: 0.2879, z: 0.7700}
+  - {name: weed_2, type: weed, x: 0.7561, y: 0.2927, z: 0.7700}
+  - {name: weed_3, type: weed, x: 1.0995, y: 0.2858, z: 0.7700}
+  - {name: weed_4, type: weed, x: 1.2199, y: 0.2568, z: 0.7700}
+  - {name: weed_5, type: weed, x: 1.3431, y: 0.2985, z: 0.7700}
+  - {name: weed_6, type: weed, x: 1.6281, y: 0.2580, z: 0.7700}
+  - {name: weed_7, type: weed, x: 1.9622, y: 0.2919, z: 0.7700}

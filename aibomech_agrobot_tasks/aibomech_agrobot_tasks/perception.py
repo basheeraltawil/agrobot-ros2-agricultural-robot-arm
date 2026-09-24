@@ -84,6 +84,9 @@ class CropDetector:
         self.depth_topic = p('camera.depth_topic', '/camera/aligned_depth_to_color/image_raw').value
         self.info_topic = p('camera.info_topic', '/camera/color/camera_info').value
         self.camera_frame = p('camera.frame', 'camera_color_optical_frame').value
+        # Only detections inside this box (target frame) count, e.g. the crop
+        # row, so fruit already in the crate is not harvested twice.
+        self.region = p('detection_region', [-1e3, 1e3, -1e3, 1e3, -1e3, 1e3]).value
         self._lock = threading.Lock()
         self._color = self._depth = self._info = None
         node.create_subscription(Image, self.color_topic, self._on_color, 2)
@@ -149,6 +152,9 @@ class CropDetector:
                 surface = ray * z
                 centre = surface + ray / np.linalg.norm(ray) * cls.radius
                 pos = (cam_to_target @ np.append(centre, 1.0))[:3]
+                r = self.region
+                if not (r[0] <= pos[0] <= r[1] and r[2] <= pos[1] <= r[3] and r[4] <= pos[2] <= r[5]):
+                    continue
                 extent = 2.0 * np.sqrt(area / np.pi) * z / fx
                 detections.append(Detection(cls.name, (float(u), float(v)), area, pos, z, extent))
                 if annotate:

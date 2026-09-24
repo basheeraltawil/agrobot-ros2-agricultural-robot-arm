@@ -34,7 +34,7 @@
     <visual name="${name}">
       <origin xyz="${xyz}" rpy="0 0 0"/>
       <geometry><box size="${size}"/></geometry>
-      <material name="${material}"/>
+      <xacro:mat name="${material}"/>
     </visual>
     <xacro:if value="${collision}">
       <collision name="${name}">
@@ -48,7 +48,7 @@
     <visual>
       <origin xyz="${x} ${y} ${rail_height + rail_pipe_radius + 0.02}" rpy="${pi/2} 0 0"/>
       <geometry><cylinder radius="0.045" length="0.03"/></geometry>
-      <material name="black"/>
+      <xacro:mat name="black"/>
     </visual>
   </xacro:macro>
 
@@ -56,23 +56,25 @@
        height-adjustable on the real robot; mount_height is set per task. -->
   <xacro:macro name="lift_column" params="prefix parent base_z mount_height crate">
     <xacro:property name="col_len" value="${mount_height - base_z - 0.01}"/>
-    <!-- crate floor 88 mm below the mounting plate -->
-    <xacro:property name="crate_z" value="${col_len - 0.078}"/>
+    <!-- Crate floor 40 mm below the mounting plate, on a bracket at +x: at the
+         arm's height, so carried crops never swing under the mounting plate. -->
+    <xacro:property name="crate_z" value="${col_len - 0.03}"/>
+    <xacro:property name="crate_x" value="0.26"/>
+    <xacro:property name="crate_y" value="-0.04"/>
     <link name="${prefix}lift_column">
       <xacro:box_inertial mass="6.0" x="${column_size}" y="${column_size}" z="${col_len}">
         <origin xyz="0 0 ${col_len/2}" rpy="0 0 0"/>
       </xacro:box_inertial>
       <xacro:box_part name="column" size="${column_size} ${column_size} ${col_len}" xyz="0 0 ${col_len/2}" material="aluminium"/>
-      <xacro:box_part name="top_plate" size="0.20 0.22 0.01" xyz="0 -0.04 ${col_len + 0.005}" material="graphite"/>
+      <xacro:box_part name="top_plate" size="0.12 0.12 0.01" xyz="0 0 ${col_len + 0.005}" material="graphite"/>
       <xacro:if value="${crate}">
-        <!-- Harvest crate on a shelf beside the arm (+x), inside its reach and
-             outside the camera's view of the crop row. -->
-        <xacro:box_part name="shelf" size="0.26 0.14 0.008" xyz="0.17 -0.08 ${crate_z - 0.006}" material="aluminium"/>
-        <xacro:box_part name="crate_floor" size="0.16 0.12 0.004" xyz="0.20 -0.08 ${crate_z}" material="crate_green"/>
-        <xacro:box_part name="crate_wall_n" size="0.16 0.004 0.045" xyz="0.20 -0.022 ${crate_z + 0.0245}" material="crate_green"/>
-        <xacro:box_part name="crate_wall_s" size="0.16 0.004 0.045" xyz="0.20 -0.138 ${crate_z + 0.0245}" material="crate_green"/>
-        <xacro:box_part name="crate_wall_e" size="0.004 0.12 0.045" xyz="0.278 -0.08 ${crate_z + 0.0245}" material="crate_green"/>
-        <xacro:box_part name="crate_wall_w" size="0.004 0.12 0.045" xyz="0.122 -0.08 ${crate_z + 0.0245}" material="crate_green"/>
+        <xacro:box_part name="crate_bracket" size="0.12 0.03 0.008" xyz="0.10 ${crate_y} ${crate_z - 0.006}" material="aluminium"/>
+        <xacro:box_part name="shelf" size="0.20 0.14 0.008" xyz="${crate_x} ${crate_y} ${crate_z - 0.006}" material="aluminium"/>
+        <xacro:box_part name="crate_floor" size="0.16 0.12 0.004" xyz="${crate_x} ${crate_y} ${crate_z}" material="crate_green"/>
+        <xacro:box_part name="crate_wall_n" size="0.16 0.004 0.045" xyz="${crate_x} ${crate_y + 0.058} ${crate_z + 0.0245}" material="crate_green"/>
+        <xacro:box_part name="crate_wall_s" size="0.16 0.004 0.045" xyz="${crate_x} ${crate_y - 0.058} ${crate_z + 0.0245}" material="crate_green"/>
+        <xacro:box_part name="crate_wall_e" size="0.004 0.12 0.045" xyz="${crate_x + 0.078} ${crate_y} ${crate_z + 0.0245}" material="crate_green"/>
+        <xacro:box_part name="crate_wall_w" size="0.004 0.12 0.045" xyz="${crate_x - 0.078} ${crate_y} ${crate_z + 0.0245}" material="crate_green"/>
       </xacro:if>
     </link>
     <joint name="${prefix}lift_column_joint" type="fixed">
@@ -92,7 +94,7 @@
     <xacro:if value="${crate}">
       <link name="${prefix}crate"/>
       <joint name="${prefix}crate_joint" type="fixed">
-        <origin xyz="0.20 -0.08 ${crate_z + 0.002}" rpy="0 0 0"/>
+        <origin xyz="${crate_x} ${crate_y} ${crate_z + 0.002}" rpy="0 0 0"/>
         <parent link="${prefix}lift_column"/>
         <child link="${prefix}crate"/>
       </joint>
@@ -110,12 +112,12 @@
       <visual name="pipe_left">
         <origin xyz="${rail_x} ${rail_gauge/2} ${rail_height}" rpy="0 ${pi/2} 0"/>
         <geometry><cylinder radius="${rail_pipe_radius}" length="${pipe_len}"/></geometry>
-        <material name="pipe_white"/>
+        <xacro:mat name="pipe_white"/>
       </visual>
       <visual name="pipe_right">
         <origin xyz="${rail_x} ${-rail_gauge/2} ${rail_height}" rpy="0 ${pi/2} 0"/>
         <geometry><cylinder radius="${rail_pipe_radius}" length="${pipe_len}"/></geometry>
-        <material name="pipe_white"/>
+        <xacro:mat name="pipe_white"/>
       </visual>
     </link>
     <joint name="${prefix}rail_fixed_joint" type="fixed">
@@ -136,18 +138,18 @@
       <visual name="estop_base">
         <origin xyz="-0.12 -0.10 ${deck_z + deck_thickness/2 + 0.255}" rpy="0 0 0"/>
         <geometry><box size="0.07 0.07 0.03"/></geometry>
-        <material name="safety_yellow"/>
+        <xacro:mat name="safety_yellow"/>
       </visual>
       <visual name="estop_button">
         <origin xyz="-0.12 -0.10 ${deck_z + deck_thickness/2 + 0.28}" rpy="0 0 0"/>
         <geometry><cylinder radius="0.02" length="0.02"/></geometry>
-        <material name="estop_red"/>
+        <xacro:mat name="estop_red"/>
       </visual>
       <!-- Signal tower -->
       <visual name="signal_tower">
-        <origin xyz="-0.21 -0.17 ${deck_z + deck_thickness/2 + 0.30}" rpy="0 0 0"/>
+        <origin xyz="-0.04 -0.16 ${deck_z + deck_thickness/2 + 0.30}" rpy="0 0 0"/>
         <geometry><cylinder radius="0.012" length="0.12"/></geometry>
-        <material name="signal_green"/>
+        <xacro:mat name="signal_green"/>
       </visual>
       <!-- Flanged wheels riding on the pipes -->
       <xacro:wheel x="0.18" y="${rail_gauge/2}"/>

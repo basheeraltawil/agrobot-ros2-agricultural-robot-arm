@@ -7,16 +7,18 @@
 -->
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro">
 
-  <xacro:macro name="rgbd_camera" params="prefix parent xyz rpy mast_height sim">
+  <xacro:macro name="rgbd_camera" params="prefix parent xyz rpy mast_height sim mast_bottom:=0.0">
+    <!-- The mast runs from mast_bottom (e.g. the cabinet lid) to the camera. -->
+    <xacro:property name="mast_len" value="${mast_height - mast_bottom}"/>
     <link name="${prefix}camera_mast">
       <visual>
-        <origin xyz="0 0 ${mast_height/2}" rpy="0 0 0"/>
-        <geometry><box size="0.02 0.02 ${mast_height}"/></geometry>
-        <material name="aluminium"/>
+        <origin xyz="0 0 ${mast_bottom + mast_len/2}" rpy="0 0 0"/>
+        <geometry><box size="0.02 0.02 ${mast_len}"/></geometry>
+        <xacro:mat name="aluminium"/>
       </visual>
       <collision>
-        <origin xyz="0 0 ${mast_height/2}" rpy="0 0 0"/>
-        <geometry><box size="0.02 0.02 ${mast_height}"/></geometry>
+        <origin xyz="0 0 ${mast_bottom + mast_len/2}" rpy="0 0 0"/>
+        <geometry><box size="0.02 0.02 ${mast_len}"/></geometry>
       </collision>
       <inertial>
         <origin xyz="0 0 ${mast_height/2}" rpy="0 0 0"/>
@@ -34,7 +36,7 @@
       <visual>
         <origin xyz="-0.0125 0 0" rpy="0 0 0"/>
         <geometry><box size="0.025 0.09 0.025"/></geometry>
-        <material name="black"/>
+        <xacro:mat name="black"/>
       </visual>
       <collision>
         <origin xyz="-0.0125 0 0" rpy="0 0 0"/>

@@ -44,6 +44,8 @@ def launch_setup(context):
             PythonLaunchDescriptionSource(os.path.join(
                 get_package_share_directory('aibomech_agrobot_bringup'), 'launch', 'robot.launch.py')),
             launch_arguments={'hardware': hardware, 'rviz': LaunchConfiguration('rviz'),
+                              'platform': LaunchConfiguration('platform'),
+                              'mount_height': LaunchConfiguration('mount_height'),
                               'serial_port': LaunchConfiguration('serial_port'),
                               'realsense': 'true' if hardware == 'real' else 'false'}.items())
 
@@ -63,5 +65,8 @@ def generate_launch_description():
         DeclareLaunchArgument('gui', default_value='true'),
         DeclareLaunchArgument('rviz', default_value='true'),
         DeclareLaunchArgument('serial_port', default_value='/dev/ttyACM0'),
+        DeclareLaunchArgument('platform', default_value='rail_trolley',
+                              description='real/mock only: rail_trolley | pedestal | table'),
+        DeclareLaunchArgument('mount_height', default_value='0.85', description='real/mock only'),
         OpaqueFunction(function=launch_setup),
     ])

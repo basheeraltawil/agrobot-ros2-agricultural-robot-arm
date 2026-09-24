@@ -3,19 +3,19 @@
 world: nursery_transplanting
 mount_height: 0.85
 objects:
-  - {name: seedling_0, type: seedling, x: 0.4500, y: 0.2600, z: 0.7695, cell: 0-0}
-  - {name: seedling_1, type: seedling, x: 0.4500, y: 0.3100, z: 0.7695, cell: 0-1}
-  - {name: seedling_2, type: seedling, x: 0.5000, y: 0.2600, z: 0.7695, cell: 1-0}
-  - {name: seedling_3, type: seedling, x: 0.5000, y: 0.3100, z: 0.7695, cell: 1-1}
-  - {name: seedling_4, type: seedling, x: 0.5500, y: 0.2600, z: 0.7695, cell: 2-0}
-  - {name: seedling_5, type: seedling, x: 0.5500, y: 0.3100, z: 0.7695, cell: 2-1}
-  - {name: seedling_6, type: seedling, x: 0.6000, y: 0.2600, z: 0.7695, cell: 3-0}
-  - {name: seedling_7, type: seedling, x: 0.6000, y: 0.3100, z: 0.7695, cell: 3-1}
-  - {name: pot_0, type: pot, x: 1.1000, y: 0.2400, z: 0.7840}
-  - {name: pot_1, type: pot, x: 1.1000, y: 0.3200, z: 0.7840}
-  - {name: pot_2, type: pot, x: 1.2000, y: 0.2400, z: 0.7840}
-  - {name: pot_3, type: pot, x: 1.2000, y: 0.3200, z: 0.7840}
-  - {name: pot_4, type: pot, x: 1.3000, y: 0.2400, z: 0.7840}
-  - {name: pot_5, type: pot, x: 1.3000, y: 0.3200, z: 0.7840}
-  - {name: pot_6, type: pot, x: 1.4000, y: 0.2400, z: 0.7840}
-  - {name: pot_7, type: pot, x: 1.4000, y: 0.3200, z: 0.7840}
+  - {name: seedling_0, type: seedling, x: 0.4500, y: 0.2900, z: 0.7770, cell: 0-0}
+  - {name: seedling_1, type: seedling, x: 0.4500, y: 0.3500, z: 0.7770, cell: 0-1}
+  - {name: seedling_2, type: seedling, x: 0.5100, y: 0.2900, z: 0.7770, cell: 1-0}
+  - {name: seedling_3, type: seedling, x: 0.5100, y: 0.3500, z: 0.7770, cell: 1-1}
+  - {name: seedling_4, type: seedling, x: 0.5700, y: 0.2900, z: 0.7770, cell: 2-0}
+  - {name: seedling_5, type: seedling, x: 0.5700, y: 0.3500, z: 0.7770, cell: 2-1}
+  - {name: seedling_6, type: seedling, x: 0.6300, y: 0.2900, z: 0.7770, cell: 3-0}
+  - {name: seedling_7, type: seedling, x: 0.6300, y: 0.3500, z: 0.7770, cell: 3-1}
+  - {name: pot_0, type: pot, x: 1.1000, y: 0.2900, z: 0.7840}
+  - {name: pot_1, type: pot, x: 1.1000, y: 0.3650, z: 0.7840}
+  - {name: pot_2, type: pot, x: 1.2000, y: 0.2900, z: 0.7840}
+  - {name: pot_3, type: pot, x: 1.2000, y: 0.3650, z: 0.7840}
+  - {name: pot_4, type: pot, x: 1.3000, y: 0.2900, z: 0.7840}
+  - {name: pot_5, type: pot, x: 1.3000, y: 0.3650, z: 0.7840}
+  - {name: pot_6, type: pot, x: 1.4000, y: 0.2900, z: 0.7840}
+  - {name: pot_7, type: pot, x: 1.4000, y: 0.3650, z: 0.7840}

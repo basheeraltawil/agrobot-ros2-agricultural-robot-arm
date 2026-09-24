@@ -1,8 +1,10 @@
 # Joint positions the simulator and the mock hardware start in.
 # "home" pose: arm folded beside the column, out of the camera's view, gripper open.
-joint_1: -1.0
-joint_2: -1.85
-joint_3: 0.8
-joint_4: -0.25
+# The rail starts 5 cm off its end stop (a joint that starts exactly on its
+# limit is locked by the Gazebo physics engine; the real rail homes to 0 and backs off).
+joint_1: -0.97
+joint_2: -2.0
+joint_3: -1.12
+joint_4: 1.46
 gripper_jaw_joint: 0.010
-rail_joint: 0.0
+rail_joint: 0.05

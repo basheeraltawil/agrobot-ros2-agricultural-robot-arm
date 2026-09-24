@@ -1,7 +1,6 @@
 """Common scaffolding of the agricultural task nodes."""
 import csv
 import json
-import math
 import os
 import threading
 import time
@@ -17,9 +16,13 @@ from rclpy.node import Node
 from tf2_msgs.msg import TFMessage
 
 from .perception import CropDetector
+from .planner import plan
 from .robot_interface import EmergencyStop, MotionError, RobotInterface
 
-HOME = [-1.0, -1.85, 0.8, -0.25]
+# Folded beside the column, collision free even with a fruit in the gripper,
+# and outside the camera's view of the crop row.
+HOME = [-0.97, -2.0, -1.12, 1.46]
+PRE_EXTRA_TILT = np.radians(20.0)
 
 
 @dataclass
@@ -42,7 +45,12 @@ class AgrobotTask:
         self.camera = CropDetector(self.node, self.robot) if self.uses_camera else None
         p = self.node.declare_parameter
         self.home = np.array(p('home_joints', HOME).value, float)
-        self.rail_limits = p('rail_limits', [0.0, 3.0]).value
+        # Stay clear of the hard stops of the rail.
+        self.rail_limits = p('rail_limits', [0.03, 2.97]).value
+        # Fixed obstacles of the scene as flat list [cx, cy, cz, sx, sy, sz, ...] (world frame)
+        obst = p('obstacles', [0.0] * 6).value
+        self.robot.world_obstacles = [(np.array(obst[i:i + 3]), np.array(obst[i + 3:i + 6]))
+                                      for i in range(0, len(obst), 6) if any(obst[i + 3:i + 6])]
         self.report_root = os.path.expanduser(p('report_dir', '~/.ros/agrobot_reports').value)
         # Simulation only: ground truth of the world, used to score the run.
         truth_file = p('sim_objects_file', '').value
@@ -66,6 +74,14 @@ class AgrobotTask:
     def param(self, name, default):
         return self.node.declare_parameter(name, default).value
 
+    def step(self, phase, action, *args):
+        """Runs one motion of a task cycle and names the phase if it fails."""
+        self.log.debug(f'{phase}: {action.__name__}')
+        try:
+            return action(*args)
+        except MotionError as exc:
+            raise MotionError(f'{phase} failed: {exc}') from exc
+
     def go_home(self):
         self.robot.move_joints(self.home)
 
@@ -73,12 +89,13 @@ class AgrobotTask:
         """After a failed pick: let go of whatever is held and return home."""
         try:
             self.robot.open_gripper()
+            self.robot.release()
             self.robot.move_joints(self.home)
         except MotionError as exc:
             self.log.error(f'recovery failed: {exc}')
 
     def plan_reach(self, target_world, approach, pre_distance, rail_offsets, max_approach_error,
-                   pre_offset=None):
+                   pre_offset=None, retreat=None):
         """Chooses the rail position and joint solutions to reach a world point.
 
         The linear axis is used like an external axis of an industrial cell:
@@ -89,23 +106,47 @@ class AgrobotTask:
         pre_vec = -approach * pre_distance if pre_offset is None else np.asarray(pre_offset, float)
         best = None
         candidates = rail_offsets if self.robot.has_rail else [None]
+        try:
+            best = self._plan_reach(target_world, approach, pre_vec, candidates, max_approach_error, retreat)
+        finally:
+            self.robot.planning_rail = None
+            self.robot.update_obstacles()
+        return best
+
+    def _plan_reach(self, target_world, approach, pre_vec, candidates, max_approach_error, retreat):
+        feasible = []
         for dx in candidates:
             rail = None
             if dx is not None:
                 rail = float(np.clip(target_world[0] - dx, *self.rail_limits))
             p_grasp = self.robot.world_to_base(target_world, rail)
+            self.robot.planning_rail = rail
             grasp = self.robot.solve(p_grasp, approach, self.home, max_approach_error)
             if not grasp.success:
                 continue
-            pre = self.robot.ik.solve(p_grasp + pre_vec, approach, grasp.q, max_approach_error)
-            if not pre.success:
+            # The pre-grasp pose may tilt more; only the grasp itself must be well aligned.
+            pre = self.robot.ik.solve(p_grasp + pre_vec, approach, grasp.q, max_approach_error + PRE_EXTRA_TILT)
+            if not pre.success or not self.robot.line_free(pre.q, p_grasp, approach):
                 continue
-            err = max(grasp.approach_error, pre.approach_error)
-            if best is None or err < best.approach_error:
-                best = ReachPlan(rail if rail is not None else self.robot.rail_position, pre.q, grasp.q, err)
-            if err < math.radians(5):
-                break
-        return best
+            if retreat is not None and not self.robot.line_free(grasp.q, p_grasp + retreat, approach):
+                continue
+            err = grasp.approach_error
+            feasible.append((err, rail, pre.q, grasp.q))
+        # Best tool orientation first, but only if the arm can actually get there
+        # from home without collisions (some solutions lie behind the column).
+        for err, rail, q_pre, q_grasp in sorted(feasible, key=lambda f: f[0]):
+            self.robot.planning_rail = rail
+            self.robot.update_obstacles()
+            if plan(self.home, q_pre, self.robot.is_free, self.robot.arm.lower + 0.02,
+                    self.robot.arm.upper - 0.02, max_iterations=600) is not None:
+                return ReachPlan(rail if rail is not None else self.robot.rail_position, q_pre, q_grasp, err)
+        return None
+
+    def set_crop_obstacles(self, points, size, exclude=None, exclude_radius=0.02):
+        """Treat detected crops (except the target) as obstacles."""
+        self.robot.crop_obstacles = [
+            (np.asarray(p, float), np.full(3, size)) for p in points
+            if exclude is None or np.linalg.norm(np.asarray(p) - exclude) > exclude_radius]
 
     def base_point(self, world_point):
         return self.robot.world_to_base(world_point)

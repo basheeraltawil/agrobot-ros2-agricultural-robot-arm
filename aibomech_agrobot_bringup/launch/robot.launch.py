@@ -27,6 +27,9 @@ def generate_launch_description():
                               description='rail_trolley | pedestal | table'),
         DeclareLaunchArgument('mount_height', default_value='0.85'),
         DeclareLaunchArgument('use_camera', default_value='true'),
+        DeclareLaunchArgument('camera_xyz', default_value='-0.20 -0.18 0.60',
+                              description='Camera position relative to arm_mount (hand-eye calibration)'),
+        DeclareLaunchArgument('camera_rpy', default_value='0 0.93 1.075'),
         DeclareLaunchArgument('serial_port', default_value='/dev/ttyACM0'),
         DeclareLaunchArgument('baud_rate', default_value='115200'),
         DeclareLaunchArgument('calibration_file', default_value=PathJoinSubstitution(
@@ -45,6 +48,8 @@ def generate_launch_description():
         ' platform:=', cfg('platform'),
         ' mount_height:=', cfg('mount_height'),
         ' use_camera:=', cfg('use_camera'),
+        ' camera_xyz:="', cfg('camera_xyz'), '"',
+        ' camera_rpy:="', cfg('camera_rpy'), '"',
         ' serial_port:=', cfg('serial_port'),
         ' baud_rate:=', cfg('baud_rate'),
         ' calibration_file:=', cfg('calibration_file'),

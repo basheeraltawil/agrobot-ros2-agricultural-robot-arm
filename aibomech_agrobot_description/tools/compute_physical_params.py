@@ -91,6 +91,15 @@ def main():
 
         verts = read_stl(os.path.join(PKG, 'meshes', f'{link}.STL'))
         boxes = {'collision_box': verts}
+        if link == 'base_link':
+            # L-shaped column: foot plate, post, top bracket carrying J1.
+            # The post has no vertices along its length, so it is spanned from
+            # the top of the foot to the underside of the bracket.
+            top = verts[(verts[:, 0] >= -0.016) & (verts[:, 2] >= 0.169)]
+            post = np.vstack([top, top * [1, 1, 0] + [0, 0, 0.010]])
+            boxes = {'collision_box': verts[verts[:, 2] <= 0.011],
+                     'collision_box_post': post,
+                     'collision_box_bracket': verts[verts[:, 2] >= 0.169]}
         if link == 'link_4':
             # One box would fill the space between the jaws, so the gripper
             # body and the fixed jaw get separate boxes.

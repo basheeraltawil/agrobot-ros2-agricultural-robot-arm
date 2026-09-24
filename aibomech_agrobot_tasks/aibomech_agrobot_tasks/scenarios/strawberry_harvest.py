@@ -16,7 +16,7 @@ import numpy as np
 
 from ..perception import classes_from_params, merge_detections
 from ..robot_interface import MotionError
-from ..task_base import AgrobotTask, run_task
+from ..task_base import PRE_EXTRA_TILT, AgrobotTask, run_task
 
 
 class StrawberryHarvest(AgrobotTask):
@@ -35,6 +35,9 @@ class StrawberryHarvest(AgrobotTask):
         self.drop_height = self.param('drop_height', 0.09)
         self.refine_radius = self.param('refine_radius', 0.03)
         self.max_fruit = self.param('max_fruit', 0)
+        # Edge length of the box that keeps the arm away from non-target fruit (m)
+        self.obstacle_size = self.param('fruit_obstacle_size', 0.014)
+        self.fruit_map = []
 
     def survey(self):
         found = []
@@ -47,6 +50,8 @@ class StrawberryHarvest(AgrobotTask):
             self.log.info(f'station {x:.2f} m: {sum(d.label == "ripe" for d in dets)} ripe, '
                           f'{sum(d.label == "unripe" for d in dets)} unripe')
         fruit = merge_detections(found)
+        # All fruit stays in the map as obstacles; picked ones are removed.
+        self.fruit_map = [f['position'] for f in fruit]
         ripe = sorted((f for f in fruit if f['label'] == 'ripe'), key=lambda f: f['position'][0])
         self.summary['detected_ripe'] = len(ripe)
         self.summary['detected_unripe'] = sum(f['label'] == 'unripe' for f in fruit)
@@ -61,14 +66,16 @@ class StrawberryHarvest(AgrobotTask):
 
     def drop_pose(self):
         crate = self.robot.lookup(self.robot.base_frame, 'crate')[:3, 3]
-        res = self.robot.solve(crate + [0.0, 0.0, self.drop_height], np.array([0.0, 0.0, -1.0]), self.home)
+        res = self.robot.solve(crate + [0.0, 0.0, self.drop_height], np.array([0.0, 0.0, -1.0]))
         if not res.success:
             raise MotionError('crate is out of reach')
         return res.q
 
     def pick(self, fruit):
         target = fruit['position']
-        plan = self.plan_reach(target, self.approach, self.pre_distance, self.rail_offsets, self.max_err)
+        self.set_crop_obstacles(self.fruit_map, self.obstacle_size, exclude=target)
+        plan = self.plan_reach(target, self.approach, self.pre_distance, self.rail_offsets, self.max_err,
+                               retreat=self.retreat)
         if plan is None:
             return 'unreachable'
         self.robot.move_rail(plan.rail)
@@ -76,28 +83,31 @@ class StrawberryHarvest(AgrobotTask):
         if refined is None:
             return 'lost'
         target = refined
+        self.set_crop_obstacles(self.fruit_map, self.obstacle_size, exclude=target, exclude_radius=0.03)
         obj = self.sim_object_near(target, 'fruit_') if self.robot.sim_grasp else None
 
         p_grasp = self.robot.world_to_base(target)
         grasp = self.robot.solve(p_grasp, self.approach, plan.q_grasp, self.max_err)
-        pre = self.robot.ik.solve(p_grasp - self.approach * self.pre_distance, self.approach, grasp.q, self.max_err)
+        pre = self.robot.ik.solve(p_grasp - self.approach * self.pre_distance, self.approach, grasp.q,
+                                  self.max_err + PRE_EXTRA_TILT)
         if not (grasp.success and pre.success):
             return 'unreachable'
 
-        self.robot.open_gripper()
-        self.robot.move_joints(pre.q)
-        self.robot.move_linear(p_grasp, self.approach)
-        self.robot.close_on(self.fruit_width)
+        step = self.step
+        step('approach', self.robot.open_gripper)
+        step('approach', self.robot.move_joints, pre.q)
+        step('approach', self.robot.move_linear, p_grasp, self.approach)
+        step('grip', self.robot.close_on, self.fruit_width)
         self.robot.attach(obj)
         # Real robot: the pull-and-twist below breaks the peduncle.
         self.robot.detach_from_plant(obj)
-        self.robot.move_linear(p_grasp + self.retreat, self.approach)
-        self.robot.move_joints(self.home)
-        self.robot.move_joints(self.drop_pose())
-        self.robot.open_gripper()
+        step('retreat', self.robot.move_linear, p_grasp + self.retreat, self.approach)
+        step('place', self.robot.move_joints, self.drop_pose())
+        step('place', self.robot.open_gripper)
         self.robot.release(obj)
         time.sleep(0.5)
-        self.robot.move_joints(self.home)
+        step('return', self.robot.move_joints, self.home)
+        self.fruit_map = [p for p in self.fruit_map if np.linalg.norm(p - fruit['position']) > 0.03]
         return 'picked'
 
     def execute(self):

@@ -319,6 +319,8 @@ def fruit_model(name, x, y, z, ripe):
 # Scenario 2: nursery bench (seedling transplanting)
 # --------------------------------------------------------------------------
 TRAY_FLOOR = MOUNT_HEIGHT - 0.098
+PLUG = 0.05    # soil block height
+WALL = 0.012   # tray wall height
 
 
 def nursery_transplanting(rng):
@@ -332,19 +334,20 @@ def nursery_transplanting(rng):
                        pose(dx, dy, -(bench_top - 0.03) / 2 - 0.015))
     w.add(static_model('bench', pose(1.2, 0.30, bench_top - 0.015), body))
 
-    # Plug tray: 2 x 4 cells, 50 mm pitch, 20 mm high walls.
-    cols, rows, pitch = 4, 2, 0.05
-    tray_x, tray_y = 0.45, 0.26
+    # Shallow tray for soil blocks: 2 x 4 cells, 60 mm pitch, 12 mm high walls.
+    # The blocks stand proud of the walls so the open gripper never enters a cell.
+    cols, rows, pitch = 4, 2, 0.06
+    tray_x, tray_y = 0.45, 0.29
     tray = visual('base', box((cols * pitch + 0.01, rows * pitch + 0.01, 0.004)), TRAY) \
         + collision('base', box((cols * pitch + 0.01, rows * pitch + 0.01, 0.004)))
     for i in range(cols + 1):
         x = (i - cols / 2) * pitch
-        tray += visual(f'wx{i}', box((0.002, rows * pitch, 0.02)), TRAY, pose(x, 0, 0.012)) \
-            + collision(f'wx{i}', box((0.002, rows * pitch, 0.02)), pose(x, 0, 0.012))
+        tray += visual(f'wx{i}', box((0.002, rows * pitch, WALL)), TRAY, pose(x, 0, 0.002 + WALL / 2)) \
+            + collision(f'wx{i}', box((0.002, rows * pitch, WALL)), pose(x, 0, 0.002 + WALL / 2))
     for j in range(rows + 1):
         y = (j - rows / 2) * pitch
-        tray += visual(f'wy{j}', box((cols * pitch, 0.002, 0.02)), TRAY, pose(0, y, 0.012)) \
-            + collision(f'wy{j}', box((cols * pitch, 0.002, 0.02)), pose(0, y, 0.012))
+        tray += visual(f'wy{j}', box((cols * pitch, 0.002, WALL)), TRAY, pose(0, y, 0.002 + WALL / 2)) \
+            + collision(f'wy{j}', box((cols * pitch, 0.002, WALL)), pose(0, y, 0.002 + WALL / 2))
     w.add(static_model('plug_tray', pose(tray_x + (cols - 1) * pitch / 2, tray_y + (rows - 1) * pitch / 2,
                                          bench_top + 0.002), tray))
     sid = 0
@@ -353,7 +356,7 @@ def nursery_transplanting(rng):
             name = f'seedling_{sid}'
             sid += 1
             x, y = tray_x + i * pitch, tray_y + j * pitch
-            z = TRAY_FLOOR + 0.0175
+            z = TRAY_FLOOR + PLUG / 2
             w.add(seedling_model(name, x, y, z, rng))
             w.grasp.append(name)
             w.objects.append({'name': name, 'type': 'seedling', 'x': x, 'y': y, 'z': z, 'cell': f'{i}-{j}'})
@@ -364,7 +367,7 @@ def nursery_transplanting(rng):
         for j in range(2):
             name = f'pot_{pid}'
             pid += 1
-            x, y = 1.10 + i * 0.10, 0.24 + j * 0.08
+            x, y = 1.10 + i * 0.10, 0.29 + j * 0.075
             soil = bench_top + 0.036
             pot = (visual('shell', cylinder(0.034, 0.045), POT, pose(0, 0, 0.0225))
                    + visual('soil', cylinder(0.031, 0.002), SOIL, pose(0, 0, 0.035))
@@ -375,14 +378,15 @@ def nursery_transplanting(rng):
 
 
 def seedling_model(name, x, y, z, rng):
-    body = (inertial(0.012, (0.018, 0.018, 0.035))
-            + visual('plug', box((0.018, 0.018, 0.035)), SOIL)
-            + visual('stem', cylinder(0.0015, 0.03), CALYX, pose(0, 0, 0.032))
-            + collision('core', box((0.010, 0.010, 0.035)), mu=1.5))
+    h = PLUG
+    body = (inertial(0.016, (0.018, 0.018, h))
+            + visual('plug', box((0.018, 0.018, h)), SOIL)
+            + visual('stem', cylinder(0.0015, 0.03), CALYX, pose(0, 0, h / 2 + 0.015))
+            + collision('core', box((0.010, 0.010, h)), mu=1.5))
     for k in range(3):
         a = k * 2.1 + rng.uniform(-0.3, 0.3)
         body += visual(f'leaf{k}', ellipsoid(0.014, 0.007, 0.002), LEAF,
-                       pose(0.012 * math.cos(a), 0.012 * math.sin(a), 0.047, 0.25, 0, a))
+                       pose(0.012 * math.cos(a), 0.012 * math.sin(a), h / 2 + 0.03, 0.25, 0, a))
     return (f'<model name="{name}">{pose(x, y, z)}<link name="link">{body}</link>'
             + grasp_plugin(name) + '</model>')
 
@@ -416,7 +420,7 @@ def weeding_bed(rng):
 
     weeds, plugins = [], []
     while len(weeds) < 8:
-        x, y = rng.uniform(0.35, 2.35), rng.uniform(0.21, 0.29)
+        x, y = rng.uniform(0.35, 2.35), rng.uniform(0.25, 0.30)
         if all(math.dist((x, y), c) > 0.10 for c in crops) and all(math.dist((x, y), q) > 0.09 for q in weeds):
             weeds.append((x, y))
     weeds.sort()

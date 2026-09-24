@@ -39,11 +39,15 @@
         <geometry>
           <mesh filename="${mesh_dir}/${name}.STL"/>
         </geometry>
-        <material name="${material}"/>
+        <xacro:mat name="${material}"/>
       </visual>
       <xacro:arm_collision_box box="${p['collision_box']}"/>
       <xacro:if value="${'collision_box_jaw' in p}">
         <xacro:arm_collision_box box="${p['collision_box_jaw']}"/>
+      </xacro:if>
+      <xacro:if value="${'collision_box_post' in p}">
+        <xacro:arm_collision_box box="${p['collision_box_post']}"/>
+        <xacro:arm_collision_box box="${p['collision_box_bracket']}"/>
       </xacro:if>
     </link>
   </xacro:macro>

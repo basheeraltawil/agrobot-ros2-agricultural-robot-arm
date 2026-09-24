@@ -21,9 +21,13 @@ from std_msgs.msg import Bool, Empty, String
 from tf2_ros import Buffer, TransformListener
 from trajectory_msgs.msg import JointTrajectoryPoint
 
+from .collision import CollisionModel
 from .kinematics import Chain, IkSolver
+from .planner import plan
 
 ARM_JOINTS = ['joint_1', 'joint_2', 'joint_3', 'joint_4']
+ARM_LINKS = ['link_1', 'link_2', 'link_3', 'link_4', 'link_5']
+HELD_RADIUS = 0.012   # m, size of a grasped crop for collision checking
 
 
 class EmergencyStop(RuntimeError):
@@ -85,6 +89,10 @@ class RobotInterface:
         self.gripper_client = ActionClient(node, GripperCommand, '/gripper_controller/gripper_cmd')
         self._sim_pubs = {}
         self._active_goal = None
+        self.world_obstacles = []   # (centre[3], size[3]) axis-aligned boxes in the world frame
+        self.crop_obstacles = []    # same, for crops detected by the task (updated per cycle)
+        self.planning_rail = None   # evaluate obstacles for this rail position instead of the current one
+        self.held = None          # simulated object currently fixed to the gripper
 
     # ------------------------------------------------------------ plumbing --
     def _on_description(self, msg):
@@ -121,7 +129,8 @@ class RobotInterface:
         else:
             raise MotionError('robot not ready (controllers or /robot_description missing)')
         self.arm = Chain(self._urdf, self.base_frame, 'tcp')
-        self.ik = IkSolver(self.arm)
+        self.collision = CollisionModel(self._urdf, self.base_frame, ARM_LINKS)
+        self.ik = IkSolver(self.arm, valid=self.is_free)
         self.has_rail = 'rail_joint' in self._joint_positions
         self.log.info('Robot ready.')
 
@@ -185,14 +194,60 @@ class RobotInterface:
         goal.trajectory.joint_names = names
         goal.trajectory.points = points
         goal.goal_time_tolerance = to_duration(1.0)
-        result = self._send(client, goal, duration + 10.0)
+        # Wall-clock timeout: generous, because a loaded simulator runs slower than real time.
+        result = self._send(client, goal, 3.0 * duration + 15.0)
         if result.error_code != FollowJointTrajectory.Result.SUCCESSFUL:
             raise MotionError(f'trajectory failed ({result.error_code}): {result.error_string}')
 
+    # ----------------------------------------------------------- collision --
+    def update_obstacles(self):
+        """Express the world obstacles in the (moving) arm base frame."""
+        boxes = self.world_obstacles + self.crop_obstacles
+        if not boxes:
+            self.collision.set_obstacles([])
+            return
+        t = self.lookup(self.base_frame, self.world_frame)
+        shift = np.zeros(3)
+        if self.planning_rail is not None:
+            shift[0] = self.planning_rail - self.rail_position
+        self.collision.set_obstacles([((t @ np.append(c - shift, 1.0))[:3], s) for c, s in boxes])
+
+    def is_free(self, q):
+        hits = self.collision.collisions(dict(zip(ARM_JOINTS, q)),
+                                         held_radius=HELD_RADIUS if self.held else 0.0)
+        return not hits
+
+    def path_collision(self, q0, q1, step=0.04):
+        n = max(2, int(np.ceil(np.max(np.abs(q1 - q0)) / step)))
+        for s in np.linspace(0.0, 1.0, n + 1)[1:]:
+            q = q0 + s * (q1 - q0)
+            hits = self.collision.collisions(dict(zip(ARM_JOINTS, q)),
+                                             held_radius=HELD_RADIUS if self.held else 0.0)
+            if hits:
+                return hits
+        return None
+
+    # -------------------------------------------------------------- motion --
     def move_joints(self, q_target, speed_scale=None):
-        """Joint-space move with a quintic time profile."""
+        """Collision-free joint move: direct if possible, otherwise planned (RRT-Connect)."""
+        self.update_obstacles()
         q0 = self.joints()
         q1 = np.clip(np.asarray(q_target, float), self.arm.lower, self.arm.upper)
+        if not self.is_free(q1):
+            raise MotionError('target configuration is in collision')
+        if not self.is_free(q0):
+            # Starting in contact (e.g. after an e-stop): only allow the direct move out.
+            self.log.warning('arm starts in contact, moving directly to the target')
+            self._move_joints(q1, speed_scale)
+            return
+        path = plan(q0, q1, self.is_free, self.arm.lower + 0.02, self.arm.upper - 0.02)
+        if path is None:
+            raise MotionError('no collision-free joint path found')
+        for q in path[1:]:
+            self._move_joints(q, speed_scale)
+
+    def _move_joints(self, q1, speed_scale=None):
+        q0 = self.joints()
         vmax = self.arm.max_velocity * (speed_scale or self.speed_scale)
         # Quintic peak velocity is 1.875 x the mean velocity.
         duration = max(0.6, float(np.max(np.abs(q1 - q0) / vmax)) * 1.875)
@@ -205,12 +260,26 @@ class RobotInterface:
                 time_from_start=to_duration(s_t * duration)))
         self._follow(self.arm_client, ARM_JOINTS, points, duration)
 
+    def line_free(self, q_start, goal_base, approach, step=0.01):
+        """True if the TCP can move on a straight line to goal_base without collision."""
+        q = np.asarray(q_start, float)
+        start = self.arm.fk(q)[:3, 3]
+        n = max(2, int(np.ceil(np.linalg.norm(goal_base - start) / step)))
+        for i in range(1, n + 1):
+            res = self.ik.track(start + (goal_base - start) * i / n, approach, q)
+            if not res.success or np.max(np.abs(res.q - q)) > 0.35:
+                return False
+            q = res.q
+        return True
+
     def solve(self, position_base, approach=None, q_seed=None, max_approach_error=np.pi):
+        self.update_obstacles()
         seed = self.joints() if q_seed is None else q_seed
         return self.ik.solve(position_base, approach, seed, max_approach_error)
 
     def move_linear(self, position_base, approach=None, speed=None, step=0.005):
         """Straight TCP line from the current pose to `position_base`."""
+        self.update_obstacles()
         q = self.joints()
         start = self.arm.fk(q)[:3, 3]
         goal = np.asarray(position_base, float)
@@ -226,6 +295,8 @@ class RobotInterface:
             dq = res.q - q
             if np.max(np.abs(dq)) > 0.35:
                 raise MotionError('linear move needs a joint flip (singularity)')
+            if not self.is_free(res.q):
+                raise MotionError(f'linear move collides at {np.round(target, 3)}')
             t += max(np.linalg.norm(goal - start) / n / speed, float(np.max(np.abs(dq) / vmax)))
             points.append(JointTrajectoryPoint(positions=list(res.q), time_from_start=to_duration(t)))
             q = res.q
@@ -276,9 +347,12 @@ class RobotInterface:
     def attach(self, obj):
         """Simulation: fix the object to the gripper (the real gripper just holds it)."""
         self._sim(obj, 'attach_gripper')
+        self.held = obj
 
-    def release(self, obj):
+    def release(self, obj=None):
+        obj = obj or self.held
         self._sim(obj, 'detach_gripper')
+        self.held = None
 
     def detach_from_plant(self, obj):
         """Simulation: cut the peduncle / pull the root out of the soil."""

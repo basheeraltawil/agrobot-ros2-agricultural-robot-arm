@@ -1,0 +1,22 @@
+# Plant inspection / phenotyping (world: strawberry_greenhouse)
+plant_inspection:
+  ros__parameters:
+    plant_positions: [0.40, 0.80, 1.20, 1.60, 2.00, 2.40]
+    plant_window: 0.20
+    mean_fruit_mass_kg: 0.015
+    detection:
+      ripe:
+        hsv_ranges: [0, 140, 70, 8, 255, 255, 170, 140, 70, 179, 255, 255]
+        min_area: 25
+        max_area: 2500
+        radius: 0.0095
+        draw_bgr: [0, 0, 255]
+      unripe:
+        hsv_ranges: [28, 35, 90, 46, 120, 255]
+        min_area: 25
+        max_area: 2500
+        radius: 0.0095
+        draw_bgr: [0, 255, 255]
+      leaf:
+        hsv_ranges: [50, 100, 30, 66, 255, 255]
+    detection_region: [-0.5, 3.5, 0.12, 0.30, 0.80, 1.00]

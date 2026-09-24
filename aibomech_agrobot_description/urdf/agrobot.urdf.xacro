@@ -18,8 +18,8 @@
   <xacro:arg name="mount_yaw" default="${-pi/2}"/>
   <xacro:arg name="use_camera" default="true"/>
   <!-- Camera pose relative to arm_mount: "x y z" and "roll pitch yaw" -->
-  <xacro:arg name="camera_xyz" default="0.0 -0.15 0.60"/>
-  <xacro:arg name="camera_rpy" default="0 1.0 1.5708"/>
+  <xacro:arg name="camera_xyz" default="-0.20 -0.18 0.60"/>
+  <xacro:arg name="camera_rpy" default="0 0.93 1.075"/>
   <xacro:arg name="initial_positions_file" default="$(find aibomech_agrobot_description)/config/initial_positions.yaml"/>
   <xacro:arg name="calibration_file" default="$(find aibomech_agrobot_description)/config/hardware_calibration.yaml"/>
   <xacro:arg name="serial_port" default="/dev/ttyACM0"/>
@@ -58,7 +58,8 @@
 
   <xacro:if value="$(arg use_camera)">
     <xacro:rgbd_camera prefix="${prefix}" parent="${prefix}arm_mount" xyz="$(arg camera_xyz)" rpy="$(arg camera_rpy)"
-                       mast_height="${float('$(arg camera_xyz)'.split()[2]) + 0.02}" sim="${hardware == 'gz'}"/>
+                       mast_height="${float('$(arg camera_xyz)'.split()[2]) + 0.02}" sim="${hardware == 'gz'}"
+                       mast_bottom="${-(float('$(arg mount_height)') - 0.455) if platform == 'rail_trolley' else 0.0}"/>
   </xacro:if>
 
   <xacro:agrobot_ros2_control prefix="${prefix}" hardware="${hardware}" use_rail="${use_rail}"
