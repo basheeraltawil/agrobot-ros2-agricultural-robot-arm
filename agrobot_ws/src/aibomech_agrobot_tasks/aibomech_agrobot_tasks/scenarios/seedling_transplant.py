@@ -14,7 +14,7 @@ import numpy as np
 
 from ..perception import classes_from_params
 from ..robot_interface import MotionError
-from ..task_base import PRE_EXTRA_TILT, AgrobotTask, run_task
+from ..task_base import AgrobotTask, run_task
 
 DOWN = np.array([0.0, 0.0, -1.0])
 
@@ -30,9 +30,9 @@ class SeedlingTransplant(AgrobotTask):
     def __init__(self):
         super().__init__()
         self.cells = grid(self.param('tray.first_cell', [0.45, 0.29]), self.param('tray.pitch', [0.06, 0.06]),
-                          self.param('tray.cols', 4), self.param('tray.rows', 2), self.param('tray.grasp_z', 0.792))
+                          self.param('tray.cols', 4), self.param('tray.rows', 2), self.param('tray.grasp_z', 0.797))
         self.pots = grid(self.param('pots.first_pot', [1.10, 0.29]), self.param('pots.pitch', [0.10, 0.075]),
-                         self.param('pots.cols', 4), self.param('pots.rows', 2), self.param('pots.place_z', 0.828))
+                         self.param('pots.cols', 4), self.param('pots.rows', 2), self.param('pots.place_z', 0.833))
         self.classes = classes_from_params(self.node, 'detection', ['seedling'])
         self.check_occupancy = self.param('check_occupancy', True)
         self.plug_width = self.param('plug_width', 0.018)
@@ -41,20 +41,29 @@ class SeedlingTransplant(AgrobotTask):
         self.max_err = math.radians(self.param('max_approach_error_deg', 35.0))
         self.rail_offsets = self.param('rail_offsets', [0.0, 0.05, -0.05, 0.1, -0.1])
         self.max_plants = self.param('max_plants', 0)
+        self.in_tray = list(self.cells)
+        self.potted = []
 
     def occupied(self, cell):
         dets, _ = self.camera.detect(self.classes)
         return any(np.linalg.norm(d.position[:2] - cell[:2]) < 0.03 for d in dets)
 
+    def update_obstacles(self, exclude):
+        """Seedlings still in the tray and already potted are obstacles."""
+        blocks = [c - [0, 0, 0.020] for c in self.in_tray] + [p - [0, 0, 0.024] for p in self.potted]
+        self.robot.crop_obstacles = [(b + [0, 0, 0.01], np.array([0.022, 0.022, 0.07])) for b in blocks
+                                     if np.linalg.norm(b[:2] - exclude[:2]) > 0.02]
+
     def reach(self, target):
+        self.update_obstacles(target)
         plan = self.plan_reach(target, DOWN, self.pre_distance, self.rail_offsets, self.max_err, retreat=self.lift)
         if plan is None:
             return None
+        # Rail travel only with the arm folded, never sweeping over the plants.
+        if abs(plan.rail - self.robot.rail_position) > 0.005:
+            self.go_home()
         self.robot.move_rail(plan.rail)
-        p = self.robot.world_to_base(target)
-        grasp = self.robot.solve(p, DOWN, plan.q_grasp, self.max_err)
-        pre = self.robot.ik.solve(p + [0, 0, self.pre_distance], DOWN, grasp.q, self.max_err + PRE_EXTRA_TILT)
-        return (p, pre.q) if grasp.success and pre.success else None
+        return self.robot.world_to_base(target), plan.q_pre, plan.q_grasp
 
     def transplant(self, cell, pot):
         step = self.step
@@ -64,13 +73,14 @@ class SeedlingTransplant(AgrobotTask):
         if self.check_occupancy and not self.occupied(cell):
             return 'empty_cell'
         obj = self.sim_object_near(cell, 'seedling_', 0.04) if self.robot.sim_grasp else None
-        p, q_pre = reach
+        p, q_pre, q_grasp = reach
         step('pick', self.robot.open_gripper)
         step('pick', self.robot.move_joints, q_pre)
-        step('pick', self.robot.move_linear, p, DOWN)
+        step('pick', self.robot.move_linear, p, DOWN, None, q_grasp)
         step('pick', self.robot.close_on, self.plug_width)
         self.robot.attach(obj)
         step('pick', self.robot.move_linear, p + self.lift, DOWN)
+        self.in_tray = [c for c in self.in_tray if np.linalg.norm(c[:2] - cell[:2]) > 0.02]
 
         reach = self.reach(pot)
         if reach is None:
@@ -78,14 +88,30 @@ class SeedlingTransplant(AgrobotTask):
             step('abort', self.robot.open_gripper)
             self.robot.release(obj)
             return 'place_unreachable'
-        p, q_pre = reach
+        p, q_pre, q_grasp = reach
         step('place', self.robot.move_joints, q_pre)
-        step('place', self.robot.move_linear, p, DOWN)
+        step('place', self.robot.move_linear, p, DOWN, None, q_grasp)
         step('place', self.robot.open_gripper)
         self.robot.release(obj)
         time.sleep(0.3)
         step('place', self.robot.move_linear, p + self.lift, DOWN)
+        self.potted.append(pot)
         return 'transplanted'
+
+    def attempt(self, k, cell, pot):
+        t0 = time.monotonic()
+        try:
+            outcome = self.transplant(cell, pot)
+        except MotionError as exc:
+            self.log.warning(f'seedling {k}: {exc}')
+            outcome = 'motion_error'
+            self.recover()
+        dt = time.monotonic() - t0
+        self.log.info(f'seedling {k}: {outcome} in {dt:.1f} s')
+        self.rows.append({'seedling': k, 'cell_x': round(cell[0], 3), 'cell_y': round(cell[1], 3),
+                          'pot_x': round(pot[0], 3), 'pot_y': round(pot[1], 3),
+                          'outcome': outcome, 'cycle_time_s': round(dt, 1)})
+        return outcome
 
     def execute(self):
         self.robot.open_gripper()
@@ -93,19 +119,15 @@ class SeedlingTransplant(AgrobotTask):
         pairs = list(zip(self.cells, self.pots))
         if self.max_plants:
             pairs = pairs[:self.max_plants]
+        retry = []
         for k, (cell, pot) in enumerate(pairs):
-            t0 = time.monotonic()
-            try:
-                outcome = self.transplant(cell, pot)
-            except MotionError as exc:
-                self.log.warning(f'seedling {k}: {exc}')
-                outcome = 'motion_error'
-                self.recover()
-            dt = time.monotonic() - t0
-            self.log.info(f'seedling {k}: {outcome} in {dt:.1f} s')
-            self.rows.append({'seedling': k, 'cell_x': round(cell[0], 3), 'cell_y': round(cell[1], 3),
-                              'pot_x': round(pot[0], 3), 'pot_y': round(pot[1], 3),
-                              'outcome': outcome, 'cycle_time_s': round(dt, 1)})
+            if self.attempt(k, cell, pot) in ('pick_unreachable', 'motion_error'):
+                retry.append((k, cell, pot))
+        # Second pass: neighbours are gone, the pot is still free.
+        for k, cell, pot in retry:
+            self.log.info(f'seedling {k}: second attempt')
+            self.rows = [r for r in self.rows if r['seedling'] != k]
+            self.attempt(k, cell, pot)
         self.go_home()
         done = [r for r in self.rows if r['outcome'] == 'transplanted']
         self.summary['attempted'] = len(self.rows)

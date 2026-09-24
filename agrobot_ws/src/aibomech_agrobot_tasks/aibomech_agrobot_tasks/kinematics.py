@@ -202,6 +202,13 @@ class IkSolver:
                             and best.valid)
         return best
 
+    def refine(self, position, q_seed):
+        """Position-only correction starting at q_seed; stays on the seed's branch."""
+        lo = self.chain.lower + self.limit_margin
+        hi = self.chain.upper - self.limit_margin
+        q = self._iterate(np.clip(np.asarray(q_seed, float), lo, hi), np.asarray(position, float), None, lo, hi)
+        return self._evaluate(q, np.asarray(position, float), None)
+
     def track(self, position, approach, q_seed):
         """Local solution next to q_seed, for following a path without jumps."""
         lo = self.chain.lower + self.limit_margin

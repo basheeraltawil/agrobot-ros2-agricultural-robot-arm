@@ -72,7 +72,7 @@ class PrecisionWeeding(AgrobotTask):
         p = self.robot.world_to_base(target)
         step('approach', self.robot.open_gripper)
         step('approach', self.robot.move_joints, plan.q_pre)
-        step('approach', self.robot.move_linear, p, DOWN)
+        step('approach', self.robot.move_linear, p, DOWN, None, plan.q_grasp)
         step('grip', self.robot.close_on, self.stem_width)
         self.robot.attach(obj)
         self.robot.detach_from_plant(obj)          # the root comes out with the pull

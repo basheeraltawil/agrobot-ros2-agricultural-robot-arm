@@ -16,7 +16,7 @@ import numpy as np
 
 from ..perception import classes_from_params, merge_detections
 from ..robot_interface import MotionError
-from ..task_base import PRE_EXTRA_TILT, AgrobotTask, run_task
+from ..task_base import AgrobotTask, run_task
 
 
 class StrawberryHarvest(AgrobotTask):
@@ -26,11 +26,15 @@ class StrawberryHarvest(AgrobotTask):
         super().__init__()
         self.stations = self.param('survey_stations', [0.35, 0.75, 1.15, 1.55, 1.95, 2.35])
         self.classes = classes_from_params(self.node, 'detection', ['ripe', 'unripe'])
-        self.approach = np.array(self.param('approach', [0.0, 1.0, 0.0]), float)
+        # Preferred approach first, then tilted alternatives for fruit that is
+        # hidden behind neighbours or too close to the gutter.
+        self.approaches = [np.array(a, float) / np.linalg.norm(a) for a in np.reshape(
+            self.param('approaches', [0.0, 1.0, 0.0, 0.0, 0.94, 0.34, 0.0, 0.94, -0.34,
+                                      0.34, 0.94, 0.0, -0.34, 0.94, 0.0]), (-1, 3))]
         self.pre_distance = self.param('pregrasp_distance', 0.06)
-        self.retreat = np.array(self.param('retreat_offset', [0.0, -0.06, -0.015]), float)
+        self.retreat = np.array(self.param('retreat_offset', [0.0, -0.04, -0.01]), float)
         self.max_err = math.radians(self.param('max_approach_error_deg', 35.0))
-        self.rail_offsets = self.param('rail_offsets', [0.18, -0.18, 0.15, -0.15, 0.21, -0.21])
+        self.rail_offsets = self.param('rail_offsets', [0.16, 0.14, 0.18, 0.12, 0.20, 0.22, 0.10, -0.16, -0.19])
         self.fruit_width = self.param('fruit_width', 0.019)
         self.drop_height = self.param('drop_height', 0.09)
         self.refine_radius = self.param('refine_radius', 0.03)
@@ -71,37 +75,52 @@ class StrawberryHarvest(AgrobotTask):
             raise MotionError('crate is out of reach')
         return res.q
 
+    def plan_pick(self, target):
+        """Rail position and approach direction for one fruit (None if unreachable)."""
+        for approach in self.approaches:
+            plan = self.plan_reach(target, approach, self.pre_distance, self.rail_offsets, self.max_err,
+                                   retreat=self.retreat)
+            if plan is not None:
+                return plan, approach
+        return None, None
+
     def pick(self, fruit):
         target = fruit['position']
         self.set_crop_obstacles(self.fruit_map, self.obstacle_size, exclude=target)
-        plan = self.plan_reach(target, self.approach, self.pre_distance, self.rail_offsets, self.max_err,
-                               retreat=self.retreat)
+        plan, approach = self.plan_pick(target)
         if plan is None:
             return 'unreachable'
         self.robot.move_rail(plan.rail)
         refined = self.refine(target)
         if refined is None:
             return 'lost'
-        target = refined
-        self.set_crop_obstacles(self.fruit_map, self.obstacle_size, exclude=target, exclude_radius=0.03)
-        obj = self.sim_object_near(target, 'fruit_') if self.robot.sim_grasp else None
+        self.set_crop_obstacles(self.fruit_map, self.obstacle_size, exclude=refined, exclude_radius=0.03)
+        obj = self.sim_object_near(refined, 'fruit_') if self.robot.sim_grasp else None
 
-        p_grasp = self.robot.world_to_base(target)
-        grasp = self.robot.solve(p_grasp, self.approach, plan.q_grasp, self.max_err)
-        pre = self.robot.ik.solve(p_grasp - self.approach * self.pre_distance, self.approach, grasp.q,
-                                  self.max_err + PRE_EXTRA_TILT)
+        # Re-solve around the planned configurations for the refined position.
+        p_grasp = self.robot.world_to_base(refined)
+        grasp = self.robot.ik.track(p_grasp, approach, plan.q_grasp)
+        pre = self.robot.ik.track(p_grasp - approach * self.pre_distance, approach, plan.q_pre)
         if not (grasp.success and pre.success):
-            return 'unreachable'
+            if np.linalg.norm(refined - target) > 0.005:
+                return 'unreachable'
+            grasp, pre = None, None   # tiny correction: use the planned poses as they are
+        q_grasp = plan.q_grasp if grasp is None else grasp.q
+        q_pre = plan.q_pre if pre is None else pre.q
 
         step = self.step
         step('approach', self.robot.open_gripper)
-        step('approach', self.robot.move_joints, pre.q)
-        step('approach', self.robot.move_linear, p_grasp, self.approach)
+        step('approach', self.robot.move_joints, q_pre)
+        step('approach', self.robot.move_linear, p_grasp, approach, None, q_grasp)
         step('grip', self.robot.close_on, self.fruit_width)
         self.robot.attach(obj)
         # Real robot: the pull-and-twist below breaks the peduncle.
         self.robot.detach_from_plant(obj)
-        step('retreat', self.robot.move_linear, p_grasp + self.retreat, self.approach)
+        try:
+            self.robot.move_linear(p_grasp + self.retreat, approach)
+        except MotionError as exc:
+            # Keep the fruit: the planner finds another way out to the crate.
+            self.log.warning(f'straight retreat blocked ({exc}), planning around it')
         step('place', self.robot.move_joints, self.drop_pose())
         step('place', self.robot.open_gripper)
         self.robot.release(obj)
@@ -110,25 +129,38 @@ class StrawberryHarvest(AgrobotTask):
         self.fruit_map = [p for p in self.fruit_map if np.linalg.norm(p - fruit['position']) > 0.03]
         return 'picked'
 
+    def attempt(self, k, fruit):
+        t0 = time.monotonic()
+        try:
+            outcome = self.pick(fruit)
+        except MotionError as exc:
+            self.log.warning(f'fruit {k}: {exc}')
+            outcome = 'motion_error'
+            self.recover()
+        dt = time.monotonic() - t0
+        p = fruit['position']
+        self.log.info(f'fruit {k} at ({p[0]:.3f}, {p[1]:.3f}, {p[2]:.3f}): {outcome} in {dt:.1f} s')
+        self.rows.append({'fruit': k, 'x': round(p[0], 4), 'y': round(p[1], 4), 'z': round(p[2], 4),
+                          'outcome': outcome, 'cycle_time_s': round(dt, 1)})
+        return outcome
+
     def execute(self):
         self.robot.open_gripper()
         self.go_home()
         ripe, images = self.survey()
         if self.max_fruit:
             ripe = ripe[:self.max_fruit]
+        # First pass in row order. Fruit that is blocked by a neighbour is
+        # retried once at the end, when the neighbours have been picked.
+        retry = []
         for k, fruit in enumerate(ripe):
-            t0 = time.monotonic()
-            try:
-                outcome = self.pick(fruit)
-            except MotionError as exc:
-                self.log.warning(f'fruit {k}: {exc}')
-                outcome = 'motion_error'
-                self.recover()
-            dt = time.monotonic() - t0
-            p = fruit['position']
-            self.log.info(f'fruit {k} at ({p[0]:.3f}, {p[1]:.3f}, {p[2]:.3f}): {outcome} in {dt:.1f} s')
-            self.rows.append({'fruit': k, 'x': round(p[0], 4), 'y': round(p[1], 4), 'z': round(p[2], 4),
-                              'outcome': outcome, 'cycle_time_s': round(dt, 1)})
+            outcome = self.attempt(k, fruit)
+            if outcome in ('unreachable', 'lost', 'motion_error'):
+                retry.append((k, fruit))
+        for k, fruit in retry:
+            self.log.info(f'fruit {k}: second attempt')
+            self.rows = [r for r in self.rows if r['fruit'] != k]
+            self.attempt(k, fruit)
         self.robot.move_rail(self.stations[0])
         picked = [r for r in self.rows if r['outcome'] == 'picked']
         self.summary['attempted'] = len(self.rows)

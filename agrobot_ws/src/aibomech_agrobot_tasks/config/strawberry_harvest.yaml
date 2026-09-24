@@ -17,14 +17,15 @@ strawberry_harvest:
         max_area: 2500
         radius: 0.0095
         draw_bgr: [0, 255, 255]
-    # Gripper approach direction in the world frame: horizontally into the row
-    approach: [0.0, 1.0, 0.0]
+    # Gripper approach directions (world frame), tried in this order:
+    # horizontally into the row, then 20 deg from below / above / either side
+    approaches: [0.0, 1.0, 0.0,   0.0, 0.94, 0.34,   0.0, 0.94, -0.34,   0.34, 0.94, 0.0,   -0.34, 0.94, 0.0]
     pregrasp_distance: 0.06
     # Pull back and down after gripping: breaks the peduncle on the real crop
-    retreat_offset: [0.0, -0.06, -0.015]
+    retreat_offset: [0.0, -0.04, -0.01]
     max_approach_error_deg: 35.0
     # Candidate positions of the fruit relative to the arm along the row (m)
-    rail_offsets: [0.18, 0.15, 0.21, -0.18, -0.15, -0.21]
+    rail_offsets: [0.16, 0.14, 0.18, 0.12, 0.20, 0.22, 0.10, -0.16, -0.19]
     fruit_width: 0.019
     drop_height: 0.07
     # Crop zone in the world frame [x_min x_max y_min y_max z_min z_max]

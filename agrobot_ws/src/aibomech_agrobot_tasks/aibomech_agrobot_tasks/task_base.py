@@ -23,6 +23,8 @@ from .robot_interface import EmergencyStop, MotionError, RobotInterface
 # and outside the camera's view of the crop row.
 HOME = [-0.97, -2.0, -1.12, 1.46]
 PRE_EXTRA_TILT = np.radians(20.0)
+# Grasp alignment that is accepted without trying the remaining rail positions
+GOOD_ALIGNMENT = np.radians(10.0)
 
 
 @dataclass
@@ -83,7 +85,14 @@ class AgrobotTask:
             raise MotionError(f'{phase} failed: {exc}') from exc
 
     def go_home(self):
-        self.robot.move_joints(self.home)
+        # One retry: a trajectory can be aborted by a transient tracking error
+        # (e.g. a heavily loaded simulator); the second attempt starts from
+        # wherever the arm stopped.
+        try:
+            self.robot.move_joints(self.home)
+        except MotionError as exc:
+            self.log.warning(f'move home failed ({exc}), retrying')
+            self.robot.move_joints(self.home)
 
     def recover(self):
         """After a failed pick: let go of whatever is held and return home."""
@@ -124,23 +133,48 @@ class AgrobotTask:
             grasp = self.robot.solve(p_grasp, approach, self.home, max_approach_error)
             if not grasp.success:
                 continue
-            # The pre-grasp pose may tilt more; only the grasp itself must be well aligned.
-            pre = self.robot.ik.solve(p_grasp + pre_vec, approach, grasp.q, max_approach_error + PRE_EXTRA_TILT)
-            if not pre.success or not self.robot.line_free(pre.q, p_grasp, approach):
+            # Pre-grasp: first the one on the grasp's arm branch, then the best
+            # one overall. It may tilt more; only the grasp must be well aligned.
+            pre = None
+            for solver in (self.robot.ik.track, self.robot.ik.solve):
+                cand = solver(p_grasp + pre_vec, approach, grasp.q)
+                if (cand.success and cand.approach_error <= max_approach_error + PRE_EXTRA_TILT
+                        and self.robot.line_free(cand.q, p_grasp, approach, q_goal=grasp.q)):
+                    pre = cand
+                    break
+            if pre is None:
                 continue
-            if retreat is not None and not self.robot.line_free(grasp.q, p_grasp + retreat, approach):
+            if retreat is not None and not self._retreat_free(grasp.q, p_grasp + retreat, approach):
                 continue
-            err = grasp.approach_error
-            feasible.append((err, rail, pre.q, grasp.q))
-        # Best tool orientation first, but only if the arm can actually get there
-        # from home without collisions (some solutions lie behind the column).
-        for err, rail, q_pre, q_grasp in sorted(feasible, key=lambda f: f[0]):
-            self.robot.planning_rail = rail
-            self.robot.update_obstacles()
-            if plan(self.home, q_pre, self.robot.is_free, self.robot.arm.lower + 0.02,
-                    self.robot.arm.upper - 0.02, max_iterations=600) is not None:
-                return ReachPlan(rail if rail is not None else self.robot.rail_position, q_pre, q_grasp, err)
+            candidate = (grasp.approach_error, rail, pre.q, grasp.q)
+            # A well-aligned candidate with a free path from home is taken at once.
+            if grasp.approach_error < GOOD_ALIGNMENT and self._reachable_from_home(candidate):
+                return self._reach_plan(candidate)
+            feasible.append(candidate)
+        # Otherwise the best-aligned one that the arm can actually get to
+        # (some solutions lie behind the column).
+        for candidate in sorted(feasible, key=lambda f: f[0]):
+            if self._reachable_from_home(candidate):
+                return self._reach_plan(candidate)
         return None
+
+    def _retreat_free(self, q_grasp, goal, approach):
+        # The retreat is made with the crop in the gripper, so check it that way.
+        held, self.robot.held = self.robot.held, self.robot.held or 'planned_crop'
+        try:
+            return self.robot.line_free(q_grasp, goal, approach)
+        finally:
+            self.robot.held = held
+
+    def _reachable_from_home(self, candidate):
+        self.robot.planning_rail = candidate[1]
+        self.robot.update_obstacles()
+        return plan(self.home, candidate[2], self.robot.is_free, self.robot.arm.lower + 0.02,
+                    self.robot.arm.upper - 0.02, max_iterations=600) is not None
+
+    def _reach_plan(self, candidate):
+        err, rail, q_pre, q_grasp = candidate
+        return ReachPlan(rail if rail is not None else self.robot.rail_position, q_pre, q_grasp, err)
 
     def set_crop_obstacles(self, points, size, exclude=None, exclude_radius=0.02):
         """Treat detected crops (except the target) as obstacles."""
@@ -208,7 +242,10 @@ class AgrobotTask:
         raise NotImplementedError
 
     def shutdown(self):
-        self.executor.shutdown()
+        # Stop spinning before the node is destroyed, otherwise pending
+        # callbacks run into a half-destroyed node.
+        self.executor.shutdown(timeout_sec=2.0)
+        self._spin.join(timeout=2.0)
         self.node.destroy_node()
 
 

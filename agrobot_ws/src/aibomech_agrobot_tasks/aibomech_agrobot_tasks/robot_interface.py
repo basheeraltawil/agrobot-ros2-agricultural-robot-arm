@@ -265,46 +265,93 @@ class RobotInterface:
                 time_from_start=to_duration(s_t * duration)))
         self._follow(self.arm_client, ARM_JOINTS, points, duration)
 
-    def line_free(self, q_start, goal_base, approach, step=0.01):
-        """True if the TCP can move on a straight line to goal_base without collision."""
-        q = np.asarray(q_start, float)
-        start = self.arm.fk(q)[:3, 3]
+    def line_path(self, q_start, goal_base, approach, q_goal=None, step=0.005):
+        """Joint configurations that move the TCP on a straight line to goal_base.
+
+        The end configuration is solved first (or given), then every waypoint is
+        seeded by interpolating between start and end configuration and only
+        corrected in position. This keeps the arm on one kinematic branch, so
+        the wrist never flips half-way along the line.
+        Returns (path, None) or (None, reason).
+        """
+        q_start = np.asarray(q_start, float)
+        start = self.arm.fk(q_start)[:3, 3]
+        goal_base = np.asarray(goal_base, float)
+        if q_goal is None:
+            # Prefer the end configuration next to the start (same branch).
+            end = self.ik.track(goal_base, approach, q_start)
+            if not end.success:
+                end = self.ik.solve(goal_base, approach, q_start)
+            if not end.success:
+                return None, 'line end is unreachable or in collision'
+            q_goal = end.q
+        q_goal = np.asarray(q_goal, float)
         n = max(2, int(np.ceil(np.linalg.norm(goal_base - start) / step)))
+        path, reason = self._line_by_interpolation(q_start, q_goal, start, goal_base, n)
+        if path is None:
+            # Start and end lie on different branches: follow the line step by
+            # step from the start instead, re-aligning the tool as it goes.
+            path, reason = self._line_by_tracking(q_start, start, goal_base, approach, n)
+        return path, reason
+
+    def _line_by_interpolation(self, q_start, q_goal, start, goal, n):
+        path, q_prev = [], q_start
         for i in range(1, n + 1):
-            res = self.ik.track(start + (goal_base - start) * i / n, approach, q)
-            if not res.success or np.max(np.abs(res.q - q)) > 0.35:
-                return False
-            q = res.q
-        return True
+            s = i / n
+            res = self.ik.refine(start + (goal - start) * s, q_start + (q_goal - q_start) * s)
+            reason = self._check_step(res, q_prev, i, n)
+            if reason:
+                return None, reason
+            path.append(res.q)
+            q_prev = res.q
+        return path, None
+
+    def _line_by_tracking(self, q_start, start, goal, approach, n):
+        path, q_prev = [], q_start
+        for i in range(1, n + 1):
+            res = self.ik.track(start + (goal - start) * i / n, approach, q_prev)
+            reason = self._check_step(res, q_prev, i, n)
+            if reason:
+                return None, reason
+            path.append(res.q)
+            q_prev = res.q
+        return path, None
+
+    def _check_step(self, res, q_prev, i, n):
+        if res.position_error > 0.003:
+            return f'line leaves the workspace at step {i}/{n}'
+        if np.max(np.abs(res.q - q_prev)) > 0.35:
+            return 'line needs a joint flip (singularity)'
+        if not self.is_free(res.q):
+            return f'line collides at step {i}/{n}'
+        return None
+
+    def line_free(self, q_start, goal_base, approach, q_goal=None):
+        """True if the TCP can move on a straight line to goal_base without collision."""
+        return self.line_path(q_start, goal_base, approach, q_goal, step=0.01)[0] is not None
 
     def solve(self, position_base, approach=None, q_seed=None, max_approach_error=np.pi):
         self.update_obstacles()
         seed = self.joints() if q_seed is None else q_seed
         return self.ik.solve(position_base, approach, seed, max_approach_error)
 
-    def move_linear(self, position_base, approach=None, speed=None, step=0.005):
+    def move_linear(self, position_base, approach=None, speed=None, q_goal=None):
         """Straight TCP line from the current pose to `position_base`."""
         self.update_obstacles()
         q = self.joints()
         start = self.arm.fk(q)[:3, 3]
         goal = np.asarray(position_base, float)
-        n = max(2, int(np.ceil(np.linalg.norm(goal - start) / step)))
+        path, reason = self.line_path(q, goal, approach, q_goal)
+        if path is None:
+            raise MotionError(f'linear move: {reason}')
         speed = speed or self.cartesian_speed
         vmax = self.arm.max_velocity * self.speed_scale
+        seg = np.linalg.norm(goal - start) / len(path)
         points, t = [], 0.0
-        for i in range(1, n + 1):
-            target = start + (goal - start) * i / n
-            res = self.ik.track(target, approach, q)
-            if res.position_error > 0.003:
-                raise MotionError(f'linear move leaves the workspace at {np.round(target, 3)}')
-            dq = res.q - q
-            if np.max(np.abs(dq)) > 0.35:
-                raise MotionError('linear move needs a joint flip (singularity)')
-            if not self.is_free(res.q):
-                raise MotionError(f'linear move collides at {np.round(target, 3)}')
-            t += max(np.linalg.norm(goal - start) / n / speed, float(np.max(np.abs(dq) / vmax)))
-            points.append(JointTrajectoryPoint(positions=list(res.q), time_from_start=to_duration(t)))
-            q = res.q
+        for qi in path:
+            t += max(seg / speed, float(np.max(np.abs(qi - q) / vmax)))
+            points.append(JointTrajectoryPoint(positions=list(qi), time_from_start=to_duration(t)))
+            q = qi
         # Zero velocity at the end so the controller stops smoothly.
         points[-1].velocities = [0.0] * len(ARM_JOINTS)
         self._follow(self.arm_client, ARM_JOINTS, points, t)
@@ -356,7 +403,8 @@ class RobotInterface:
 
     def release(self, obj=None):
         obj = obj or self.held
-        self._sim(obj, 'detach_gripper')
+        if obj != 'planned_crop':
+            self._sim(obj, 'detach_gripper')
         self.held = None
 
     def detach_from_plant(self, obj):

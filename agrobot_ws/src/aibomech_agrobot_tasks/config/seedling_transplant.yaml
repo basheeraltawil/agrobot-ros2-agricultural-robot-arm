@@ -7,13 +7,13 @@ seedling_transplant:
       pitch: [0.06, 0.06]
       cols: 4
       rows: 2
-      grasp_z: 0.792        # 40 mm above the cell floor: jaws grip the top of the soil block
+      grasp_z: 0.797        # 45 mm above the cell floor: jaws grip the top of the soil block
     pots:
       first_pot: [1.10, 0.29]
       pitch: [0.10, 0.075]
       cols: 4
       rows: 2
-      place_z: 0.828        # soil block bottom just above the potting soil
+      place_z: 0.833        # soil block bottom just above the potting soil
     check_occupancy: true
     detection:
       seedling:
@@ -23,8 +23,9 @@ seedling_transplant:
         radius: 0.0
         draw_bgr: [0, 255, 0]
     detection_region: [-0.5, 3.5, 0.20, 0.36, 0.74, 0.88]
-    # Potting bench top as obstacle [cx cy cz sx sy sz]
-    obstacles: [1.2, 0.30, 0.733, 2.4, 0.30, 0.03]
+    # Obstacles [cx cy cz sx sy sz ...]: potting bench top, and the tray up to its wall tops
+    obstacles: [1.2, 0.30, 0.733, 2.4, 0.30, 0.03,
+                0.54, 0.32, 0.757, 0.25, 0.13, 0.018]
     plug_width: 0.018
     pregrasp_distance: 0.05
     lift_height: 0.06

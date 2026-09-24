@@ -382,7 +382,10 @@ def seedling_model(name, x, y, z, rng):
     body = (inertial(0.016, (0.018, 0.018, h))
             + visual('plug', box((0.018, 0.018, h)), SOIL)
             + visual('stem', cylinder(0.0015, 0.03), CALYX, pose(0, 0, h / 2 + 0.015))
-            + collision('core', box((0.010, 0.010, h)), mu=1.5))
+            # Narrow core where the jaws grip, full-width foot below the jaw tips
+            # so the block stands stably in the pot after release.
+            + collision('core', box((0.006, 0.006, h)), mu=1.5)
+            + collision('foot', box((0.018, 0.018, 0.010)), pose(0, 0, -h / 2 + 0.005), mu=1.5))
     for k in range(3):
         a = k * 2.1 + rng.uniform(-0.3, 0.3)
         body += visual(f'leaf{k}', ellipsoid(0.014, 0.007, 0.002), LEAF,
