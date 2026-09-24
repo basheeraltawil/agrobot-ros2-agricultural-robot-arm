@@ -135,12 +135,18 @@ source install/setup.bash
 
 For the real robot, also install `ros-humble-realsense2-camera`. To flash the firmware you need the Arduino IDE or `arduino-cli`.
 
-To run the tests:
+To run the tests, build first; `colcon test` uses the `build/` folder of the workspace. Run these from the workspace root (`~/agrobot_ws`), not from inside the repository:
 
 ```bash
-colcon test --packages-select aibomech_agrobot_description aibomech_agrobot_hardware && colcon test-result --verbose
-cd src/aibomech_agrobot/aibomech_agrobot_tasks && python3 -m pytest test   # IK, collision and planner
+cd ~/agrobot_ws
+colcon build --symlink-install && source install/setup.bash
+colcon test --packages-select aibomech_agrobot_description aibomech_agrobot_hardware aibomech_agrobot_tasks
+colcon test-result --verbose
 ```
+
+The tests cover URDF expansion for every platform and back-end, the serial protocol, and the task layer's IK, collision model and planner.
+
+You can also build directly inside a cloned repository. `build/`, `install/` and `log/` are git-ignored there.
 
 ---
 
