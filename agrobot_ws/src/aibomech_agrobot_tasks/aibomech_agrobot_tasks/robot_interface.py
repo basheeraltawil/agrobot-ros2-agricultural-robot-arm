@@ -169,10 +169,15 @@ class RobotInterface:
     # ------------------------------------------------------------- actions --
     def _send(self, client, goal, timeout):
         self.check_estop()
-        send = client.send_goal_async(goal)
-        handle = self._wait(send, 5.0)
-        if not handle.accepted:
-            raise MotionError('goal rejected')
+        # A controller that is still activating rejects goals; retry briefly.
+        deadline = time.monotonic() + 10.0
+        while True:
+            handle = self._wait(client.send_goal_async(goal), 5.0)
+            if handle.accepted:
+                break
+            if time.monotonic() > deadline:
+                raise MotionError('goal rejected')
+            time.sleep(0.5)
         self._active_goal = handle
         try:
             result = self._wait(handle.get_result_async(), timeout)
