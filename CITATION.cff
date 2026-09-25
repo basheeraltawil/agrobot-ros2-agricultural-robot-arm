@@ -14,3 +14,18 @@ keywords:
   - Gazebo
   - kinematics
   - dynamics
+preferred-citation:
+  type: article
+  title: "Design and Analysis of a Four DoF Robotic Arm with Two Grippers Used in Agricultural Operations"
+  authors:
+    - family-names: "Altawil"
+      given-names: "Basheer"
+    - family-names: "Can"
+      given-names: "Fatih Cemal"
+  journal: "International Journal of Applied Mathematics Electronics and Computers"
+  volume: 11
+  issue: 2
+  start: 79
+  end: 87
+  year: 2023
+  doi: "10.18100/ijamec.1217072"

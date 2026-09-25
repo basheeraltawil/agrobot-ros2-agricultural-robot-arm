@@ -27,6 +27,7 @@ Units of the thesis model: cm and kg, so torques come out in kg·cm²/s²
 
     python3 03_thesis_dynamics_check.py
 """
+import importlib.util
 import os
 import re
 
@@ -65,6 +66,35 @@ def coriolis_torque(m_q, q, q_vals, qd_vals, factor):
     return tau
 
 
+def coriolis_matrix(m_q, q, q_vals, qd_vals):
+    """C_kj = Σ_i c_ijk q̇_i with the standard factor 1/2 (Table 2 of the paper sums
+    the c_ijk of one row and column in the same way)."""
+    at = dict(zip(q, q_vals))
+    dm = [[[sp.diff(m_q[a, b], q[c]).subs(at) for c in range(4)] for b in range(4)] for a in range(4)]
+    return sp.Matrix(4, 4, lambda k, j: sum(
+        0.5 * (dm[k][j][i] + dm[k][i][j] - dm[i][j][k]) * qd_vals[i] for i in range(4)))
+
+
+def thesis_gravity(q_vals):
+    """G_k = ∂V/∂q_k with V = Σ m_i g z_ci, the COM heights of 01_kinematics_thesis_model.py.
+
+    Links 1 and 2 move in the horizontal plane (z_c1 = z_c2 = 0), so only links
+    3 and 4 contribute. g = 981 cm/s² keeps the thesis units (kg·cm²/s²)."""
+    spec = importlib.util.spec_from_file_location(
+        'kin', os.path.join(HERE, '01_kinematics_thesis_model.py'))
+    kin = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(kin)
+    values = {sp.Symbol(k, positive=True): v for k, v in PARAMS.items()}
+    energy = 981 * (PARAMS['m3'] * kin.p_c3[2] + PARAMS['m4'] * kin.p_c4[2]).subs(values)
+    return [float(sp.diff(energy, qk).subs(dict(zip(kin.q, q_vals)))) for qk in kin.q]
+
+
+def print_matrix(name, m):
+    print(f'{name} =')
+    for r in range(m.shape[0]):
+        print('   [' + '  '.join(f'{float(v):9.3f}' for v in m[r, :]) + ']')
+
+
 def main():
     q = sp.symbols('q1:5')
     m_q = notebook_mass_matrix().subs({sp.Symbol(k): v for k, v in PARAMS.items()})
@@ -81,6 +111,21 @@ def main():
     print('\nτ1..τ3 are reproduced exactly without the factor 1/2, which confirms finding 1.')
     print('τ4 differs slightly: the explicit T4 expression in notebook 15/16 does not fully')
     print('match the assembled M and C matrices of notebook 14.')
+
+    print('\nWorked example, all terms of τ = M q̈ + C q̇ + G at the same pose (kg·cm², kg·cm²/s)')
+    m_num = m_q.subs(dict(zip(q, Q))).evalf()
+    print_matrix('M(q)', m_num)
+    c_num = coriolis_matrix(m_q, q, Q, QD)
+    print_matrix('C(q, q̇) with 1/2', c_num)
+    g_vec = thesis_gravity(Q)
+    print('G(q) =', [round(v, 2) for v in g_vec], 'kg·cm²/s²  (g = 981 cm/s²)')
+    cqd = c_num * sp.Matrix(QD)
+    print('\n| joint | C q̇ | G | τ (q̈ = 0) | τ in N·m |')
+    print('|---|---|---|---|---|')
+    for k in range(4):
+        tau = float(cqd[k]) + g_vec[k]
+        print(f'| τ{k + 1} | {float(cqd[k]):8.3f} | {g_vec[k]:8.2f} | {tau:8.2f} | {tau * 1e-4:.4f} |')
+    print('Gravity is about 160 times (joint 3) and 37 times (joint 4) the velocity terms.\n')
     print('In SI units the corrected torques are about '
           + ', '.join(f'{t * 1e-4:.1e}' for t in corrected) + ' N·m: at these speeds the')
     print('dynamic torques are tiny; gravity (see 04_torque_sizing.py) sizes the motors.')

@@ -1,14 +1,24 @@
 # Analysis: kinematics, workspace, dynamics and design calculations
 
-This folder explains how the AgroBot arm moves, what it can reach and how strong its motors must be. It has two parts:
+This folder explains how the AgroBot arm moves, what it can reach and how strong its motors must be. The analysis was published in:
 
-- [`mathematica/`](mathematica/): the original symbolic derivation from the master's thesis (22 notebooks, with plain-text copies).
-- [`python/`](python/): short, commented scripts that recompute the results for the real robot and produce the figures below.
+> B. Altawil and F. C. Can, "Design and Analysis of a Four DoF Robotic Arm with Two Grippers Used in Agricultural Operations," *International Journal of Applied Mathematics Electronics and Computers*, 11(2), 79–87, 2023. [doi:10.18100/ijamec.1217072](https://doi.org/10.18100/ijamec.1217072)
+
+| Read | For |
+|---|---|
+| [kinematics.md](kinematics.md) | Denavit–Hartenberg model, transformation matrices, forward kinematics of both end effectors, Jacobian, inverse kinematics, each with a worked example |
+| [dynamics.md](dynamics.md) | Lagrangian dynamics: inertia matrix, Christoffel symbols, Coriolis and gravity terms, a fully evaluated example, servo sizing |
+| this page | summary of all results, workspace and design calculations |
+| [`mathematica/`](mathematica/) | the original symbolic derivation (22 notebooks, with plain-text copies) |
+| [`python/`](python/) | short, commented scripts that recompute every result and produce the figures |
+| [`paper/`](paper/altawil2023_four_dof_agricultural_arm.md) | text of the paper |
+
+Run the scripts:
 
 ```bash
 pip install -r requirements.txt                  # numpy, sympy, matplotlib, pyyaml; no ROS needed
 cd analysis/python
-python3 01_kinematics_thesis_model.py            # symbolic kinematics (seconds)
+python3 01_kinematics_thesis_model.py            # D-H and symbolic kinematics (~30 s)
 python3 02_workspace.py                          # workspace and approach maps (~2 min)
 python3 03_thesis_dynamics_check.py              # check of the thesis torques
 python3 04_torque_sizing.py                      # joint torques vs. servo ratings
@@ -18,9 +28,9 @@ python3 05_design_calculations.py                # mass budget, gripper, camera,
 | Script | Question it answers | Mathematica notebooks |
 |---|---|---|
 | `robot_model.py` | Shared model: forward kinematics, Jacobians, M(q), C(q, q̇), G(q) from the URDF | 01–14 (same method) |
-| `01_kinematics_thesis_model.py` | Where is each link, and how do joint velocities move it? | 01–07, 19 |
+| `01_kinematics_thesis_model.py` | D-H transforms, where both end effectors are, Jacobian, closed-form IK (worked example) | 01–07, 19 |
 | `02_workspace.py` | Where can the gripper go, and from which direction? | 18 |
-| `03_thesis_dynamics_check.py` | Are the thesis torques right? | 12–16 |
+| `03_thesis_dynamics_check.py` | Are the thesis torques right? M, C, G and τ of the worked example | 12–16 |
 | `04_torque_sizing.py` | Are the servos strong enough? | 15–17 |
 | `05_design_calculations.py` | Mass, gripper opening, camera resolution, rail cycle | – |
 
@@ -28,59 +38,25 @@ python3 05_design_calculations.py                # mass budget, gripper, camera,
 
 ---
 
-## 1. Kinematic structure
+## 1. Kinematics
 
-The arm has four joints. Two turn about vertical axes, as in a SCARA robot, followed by a pitch joint and a wrist:
+The arm has two vertical joints (J1, J2: a SCARA pair), a pitch joint (J3) and a wrist (J4). A trolley on the greenhouse heating pipes adds a fifth, linear axis along the crop row.
 
-| joint | axis | role | range |
-|---|---|---|---|
-| J1 | vertical | shoulder, swings the arm across the row | −62° … 120° |
-| J2 | vertical | elbow in the horizontal plane | −120° … 64° |
-| J3 | horizontal | pitches the forearm up and down | −115° … 63° |
-| J4 | ⊥ J3 | turns the gripper | −57° … 132° |
-
-A trolley on the greenhouse heating pipes adds a fifth, linear axis along the crop row.
-
-### Forward kinematics
-
-Each joint is a rotation about its axis. The pose of link *i* in the base frame is the product of the fixed joint offsets and the joint rotations:
+The paper describes it with the Denavit–Hartenberg convention. Each link contributes one matrix
 
 $$
-{}^{0}T_{i}(q) = \prod_{k=1}^{i} T_{\text{origin},k}\; \operatorname{Rot}(\hat{z}_k,\, q_k),
-\qquad
-\operatorname{Rot}(\hat{z}, q) = I + \sin q\,[\hat{z}]_\times + (1-\cos q)\,[\hat{z}]_\times^2
+A_i = \operatorname{Rot}_z(\theta_i)\,\operatorname{Trans}_z(d_i)\,\operatorname{Trans}_x(a_i)\,\operatorname{Rot}_x(\alpha_i), \qquad {}^{0}T_{n} = A_1 A_2 \cdots A_n
 $$
 
-The second formula is Rodrigues' formula. For the thesis model, the centre of mass of the second link, for example, is
+and the gripper position follows from the product. For example:
 
 $$
-p_{c2} = \begin{bmatrix} a_1 \cos q_1 + \tfrac{a_2}{2} \cos(q_1+q_2) \\ a_1 \sin q_1 + \tfrac{a_2}{2} \sin(q_1+q_2) \\ 0 \end{bmatrix}
+P_{e2z} = -a_3 \sin\theta_3 - d_4 \cos\theta_3 - a_{4e2} \sin(\theta_3 - \theta_4)
 $$
 
-### Jacobian
+The height does not depend on $\theta_1, \theta_2$, so the inverse kinematics has a closed form: $\theta_3$ from the height, then $\theta_1, \theta_2$ from the two-link formula. [kinematics.md](kinematics.md) derives all matrices and works through an example forward and back. `01_kinematics_thesis_model.py` checks that the D-H product reproduces the paper's equations.
 
-The Jacobian maps joint velocities to the velocity of a point. For revolute joint *k* with axis $\hat{z}_k$ through the point $o_k$:
-
-$$
-J_v^{(k)} = \hat{z}_k \times (p - o_k), \qquad J_\omega^{(k)} = \hat{z}_k, \qquad \dot{p} = J_v\,\dot{q}
-$$
-
-### Inverse kinematics
-
-For the two horizontal links alone there is a closed form (notebook 19):
-
-$$
-\cos q_2 = \frac{x^2 + y^2 - a_1^2 - a_2^2}{2 a_1 a_2}, \qquad
-q_2 = \operatorname{atan2}\!\left(\sqrt{1-\cos^2 q_2},\ \cos q_2\right), \qquad
-q_1 = \operatorname{atan2}(y, x) - \operatorname{atan2}(a_2 \sin q_2,\ a_1 + a_2 \cos q_2)
-$$
-
-The full arm has four joints but the gripper needs six numbers to be placed completely (three for position, three for orientation). The robot software therefore solves position exactly, and uses the one remaining degree of freedom to point the gripper as close as possible to the wanted approach direction $\hat{a}$. This is damped least squares with a null-space task (`aibomech_agrobot_tasks/kinematics.py`):
-
-$$
-\Delta q = J_p^{+} e_p + \left(I - J_p^{+} J_p\right) (J_\omega N)^{+} (\hat{z}_{\text{tcp}} \times \hat{a}),
-\qquad J^{+} = J^\top (J J^\top + \lambda I)^{-1}
-$$
+The ROS 2 software computes the same forward kinematics directly from the URDF. It solves the inverse kinematics numerically, because its v2 wrist is perpendicular to J3 (see [kinematics.md §9](kinematics.md#9-from-the-paper-model-to-the-ros-2-robot)).
 
 ## 2. Workspace
 
@@ -102,30 +78,32 @@ That is why the trolley rail matters: for every crop the software moves the trol
 
 ## 3. Dynamics
 
-The equation of motion follows from the Euler–Lagrange method, as in the thesis:
+The equation of motion follows from the Euler–Lagrange method, as in the paper:
 
 $$
-\tau = M(q)\,\ddot{q} + C(q,\dot{q})\,\dot{q} + G(q)
+\tau = M(\theta)\,\ddot{\theta} + C(\theta,\dot{\theta})\,\dot{\theta} + G(\theta)
 $$
 
-| term | formula | meaning |
+| Term | Formula | Meaning |
 |---|---|---|
-| inertia matrix | $M(q) = \sum_i m_i J_{v_i}^\top J_{v_i} + J_{\omega_i}^\top R_i I_i R_i^\top J_{\omega_i}$ | resistance to acceleration, changes with the pose |
-| Christoffel symbols | $c_{ijk} = \tfrac{1}{2}\left(\frac{\partial M_{kj}}{\partial q_i} + \frac{\partial M_{ki}}{\partial q_j} - \frac{\partial M_{ij}}{\partial q_k}\right)$ | how M changes as the arm moves |
-| Coriolis/centrifugal | $C_{kj} = \sum_i c_{ijk}\,\dot{q}_i$ | torques from moving joints influencing each other |
-| gravity | $G(q) = -\sum_i J_{v_i}^\top m_i\, g$ | torque needed to hold the arm still |
+| Inertia matrix | $M(\theta) = \sum_i m_i J_{v_i}^\top J_{v_i} + J_{\omega_i}^\top R_i I_i R_i^\top J_{\omega_i}$ | resistance to acceleration; changes with the pose |
+| Christoffel symbols | $c_{ijk} = \tfrac{1}{2}\left(\frac{\partial M_{kj}}{\partial \theta_i} + \frac{\partial M_{ki}}{\partial \theta_j} - \frac{\partial M_{ij}}{\partial \theta_k}\right)$ | how $M$ changes as the arm moves |
+| Coriolis/centrifugal | $C_{kj} = \sum_i c_{ijk}\,\dot{\theta}_i$ | torques from moving joints influencing each other |
+| Gravity | $G_k = \partial P / \partial \theta_k$ with $P = \sum_i m_i g z_{ci}$ | torque needed to hold the arm still |
 
-`robot_model.py` implements exactly these formulas numerically from the URDF, and checks itself:
+[dynamics.md](dynamics.md) derives every term and evaluates it at the pose of notebook 16. The result: gravity on joint 3 is about 160 times the velocity terms there, and the vertical joints J1 and J2 carry no weight at all.
 
-- $G(q)$ equals the gradient of the potential energy.
-- $M(q)$ is symmetric and positive definite.
+`robot_model.py` implements the same formulas numerically from the URDF and checks itself:
+
+- $G(\theta)$ equals the gradient of the potential energy.
+- $M(\theta)$ is symmetric and positive definite.
 - $\dot{M} - 2C$ is skew-symmetric (energy conservation).
 
 ### Check of the thesis torques
 
-`03_thesis_dynamics_check.py` takes M(q) exactly as written in notebook 12b and recomputes the example of notebook 16 (q = 30°, 20°, 90°, −15°; q̇ = 0.5, 0.4, 0.4, 0.4 rad/s):
+`03_thesis_dynamics_check.py` takes $M(\theta)$ exactly as written in notebook 12b and recomputes the example of notebook 16 ($\theta$ = 30°, 20°, 90°, −15°; $\dot{\theta}$ = 0.5, 0.4, 0.4, 0.4 rad/s):
 
-| joint | notebook 16 | recomputed without ½ | with the standard ½ |
+| Joint | Notebook 16 | Recomputed without ½ | With the standard ½ |
 |---|---|---|---|
 | τ1 | −22.931 | −22.931 | −11.466 |
 | τ2 | −3.131 | −3.131 | −1.566 |
@@ -134,7 +112,7 @@ $$
 
 (kg·cm²/s², 1 kg·cm²/s² = 10⁻⁴ N·m)
 
-The notebook's values are reproduced exactly when the factor ½ is left out of the Christoffel symbols, so the thesis Coriolis/centrifugal torques are twice too large. The notebooks also omit gravity, and their Jacobians of links 3 and 4 differ from the exact derivatives. See [mathematica/README.md](mathematica/README.md#findings-of-the-review).
+The notebook's values are reproduced exactly when the factor ½ is left out of the Christoffel symbols, so the thesis Coriolis/centrifugal torques are twice too large. The review found three more points: the gravity term is missing, $R_{40}$ in notebook 01 has a sign error, and the Jacobians of links 3 and 4 differ from the exact derivatives. See [dynamics.md §8](dynamics.md#8-review-of-the-thesis-computation).
 
 ## 4. Actuator sizing
 
@@ -151,6 +129,7 @@ The notebook's values are reproduced exactly when the factor ½ is left out of t
 
 - J1 and J2 turn about vertical axes, so gravity does not load them; they only accelerate the arm.
 - J3 carries the forearm and gripper against gravity. It is the critical joint and still has a safety factor of 6 with a 30 kg·cm (2.9 N·m) smart servo.
+- The paper's prototype used 15 kg·cm LX-16A servos and reported vibrations at J1 and J3. With that servo J3 has only a 3.2× margin, which is why v2 doubles it ([dynamics.md §9](dynamics.md#9-from-torques-to-motors)).
 - The dynamic torques at these speeds are small compared with gravity. A lighter servo would do for J1 and J2, but a common part for J1–J3 simplifies spares.
 
 ## 5. Design calculations

@@ -1,7 +1,8 @@
+> **About this copy.** Text of the open-access paper (CC BY-SA 4.0), converted from the PDF. The figures and most displayed equations were lost in the conversion. The equations are rebuilt and checked in [../kinematics.md](../kinematics.md) and [../dynamics.md](../dynamics.md). The original is at https://doi.org/10.18100/ijamec.1217072.
+
 International Journal of Applied Mathematics, Electronics and Computers 11(2): 079-087, 2023 
 
 e-ISSN: 2147-8228 
-
 
 
 ## INTERNATIONAL JOURNAL OF APPLIED MATHEMATICS ELECTRONICS AND COMPUTERS 
@@ -17,7 +18,6 @@ International Open Access Volume 11 Issue 02 June, 2023
 ## **_Basheer Altawil_**<sup>**_a,_**</sup> **_* , Fatih Cemal Can_**<sup>**_b_**</sup> 
 
 
-
 _aİzmir Katip Çelebi University,Robotics Engineering Department,35620 İzmir,Türkiye bİzmir Katip Çelebi University,Mechatronics Engineering Department,35620 İzmir,Türkiye_ 
 
 |ARTICLE INFO|ABSTRACT|
@@ -25,7 +25,6 @@ _aİzmir Katip Çelebi University,Robotics Engineering Department,35620 İzmir,T
 |_Article history:_|Both academic and commercial interest in agricultural robots has increased recently. This is due|
 |Received 12 December 2022<br>Accepted 7 April 2023<br>|to the fact that agricultural robots address significant issues such as seasonal labor shortages during<br>harvest and the rising concern over environmentally friendly practices. Because of these, several|
 |_Keywords:_<br>ROS<br>IoT<br>Mechanism<br>Robot Manipulators<br>Agricultural Robots<br>Lagrangian mechanics|distinct agricultural robots have already been created for a variety of purposes, with varying<br>degrees of success, including monitoring, spraying, harvesting, transport, etc. As a result,<br>agriculture automation became unfeasible and unprofitable. The purpose of this study is to provide<br>a new methodology for multitasking in performing agriculture operations by designing a 4 Degrees<br>of freedom (4DoF) robotic arm with a new mechanism that has a different configuration with 2<br>grippers. We did kinematics and kinetics calculations using Denavit-Hardenberg (D-H) method<br>with Lagrangian mechanics, and with the help of Christoffel Symbols of the First Kind, also We<br>used Robot Operating System (ROS) to provide potential solutions using it. It is easy to be paired<br>with other open-source technologies, such as android or IoT technologies. The robot arm can work<br>synchronously with other hardware, sensors, cameras, and agricultural machines concerning<br>farming operations. In conclusion, we believe that this new configuration will open a door for<br>agricultural tasks to be easily automated and achieved using robotic technologies.|
-
 
 
 This is an open access article under the CC BY-SA 4.0 license. (https://creativecommons.org/licenses/by-sa/4.0/) 
@@ -49,11 +48,9 @@ envelope, saving time and money. This has lately led to an increase in interest 
 In our study, we used RVIZ, GAZEBO, and MOVEIT to mimic the motion of the robot arm concerning real environment task-performing. Path planning, real-time control, and all kinematic, dynamic solutions were all imitated using ROS. For path planning, the ROS framework was employed to avoid abrupt changes during fertilizing  and harvesting operations. Using the SOLIDWORKS CAD application, a 4-DoF manipulator with 2 distinct end effectors was developed to harvest and manipulate the objects. Then, we installed the Unified Robotics Description Format (URDF) as a CAD plugin using SOLIDWORKS. This plugin assists in converting CAD-designed robots into a format that ROS can read and show on RVIZ and Gazebo in integration with MOVEIT. 
 
 
-
 **Figure 1.** Gazebo and RVIZ simulator 
 
 With our 4 degrees of freedom (4-DoF), see Figure 2, Figure 3, which can be easily integrated with a mobile robotic platform, it will be easy and simple to be able to implement and achieve the tasks. This paper will cover the design of the robot arm parts and carry on every analysis required for the motion and control of a robotic arm. 
-
 
 
 **Figure 2.** 4DoF Manipulator CAD Design 
@@ -63,17 +60,14 @@ As a result, kinematic analysis, and kinetic analysis are completed to prepare t
 SOLIDWORKS and Fusion360, 3D computer-aided design programs to prepare the parts that will be used later. 
 
 
-
 **Figure 3.** 4-DoF Manipulator Assembly 
 
 Analysis for robotics, particularly robotic manipulators, is extremely tough, and difficult. Therefore, many wellknown scientists are striving to minimize the problems and make them more adaptable for those who are interested in robotics science. We used the four Denavit–Hardenberg parameters (D-H parameters) in Figure 4, which are used for attaching reference frames to the links of a spatial kinematic chain, or robot manipulator. 
 
 
-
 **Figure 4.** D-H Link Parameters 
 
 This convention was established in 1955 by Jacques Denavit and Richard Hardenberg to standardize the coordinate frames for spatial links [6]. 
-
 
 
 **Figure 5.** Robotic Arm Kinematic Labelling 
@@ -104,7 +98,6 @@ As previously noted, Denavit-Hardenberg was the method we employed for our analy
 |4e2|a4e2|0|0|𝛩4|0-170|
 
 
-
 The set of parameters that are mentioned in table I and Figure 4, and Figure 5, twist angle 𝒂i, offset distance ai, translation distance 𝒅i, and joint angle 𝜣i. For articulated mechanisms, some of these parameters are constant, and some of them are variable. 4e1, and 4e2 in our study, they are representing the end effector 1, and end effector 2 respectively. 
 
 #### **_2.1. Homogeneous Transformation Matrices and Kinematic Analysis._** 
@@ -112,21 +105,13 @@ The set of parameters that are mentioned in table I and Figure 4, and Figure 5, 
 To reach the formulation presented in (2), we must first construct homogeneous transformation matrices (HTM) by vectorially multiplying the four matrices by going on every singular axis respectively as shown in (1) that we got from each parameter in Table 1. The matrices for each unique frame have been created depending on rotation and translation principles [8]. To determine the last point in which we are interested, we can multiply them individually. 
 
 
-
-
-
-
-
 The parameters expressed in (2) are 𝐶(𝛩𝑖) , 𝑆(𝛩𝑖) , 𝑆(αi) , 𝐶(αi) which represents the abbreviation of cos(𝛩𝑖),sin(𝛩𝑖), sin(αi), and  cos(αi) respectively and they will be used with all formulations in all kinematic and dynamic analyses. From equations 1 and 2 we can relate all joints to the reference frame like in the following expressions. In (3), we obtain the transformation matrix that relates joint 1 to the base frame. 
-
 
 
 In (4), we obtain the transformation matrix that relates joint 2 to the base frame. Moreover, the expression 𝛩12 is representing the algebraic summation of 𝛩1, 𝛩2. 
 
 
-
 In (5), we obtain the transformation matrix that relates joint 3 to the base frame. We generate new parameters which are 𝛽, 𝛾, 𝛿, 𝜀, P3X, P3Y, P3Z, P4X, P4Y, and P4Z that take expressions into them to minimize the size of the matrix as it is shown in equations group 1. 
-
 
 
 In (6), we obtain the transformation matrix that relates 
@@ -138,11 +123,9 @@ Basheer et al., International Journal of Applied Mathematics Electronics and Com
 joint4 to the base frame and we substitute the new parameters generated in group 1 like in (5). 
 
 
-
 In (7), we obtain the transformation matrix that relates end effector 1 to the base frame and we substitute the new parameters that we obtained in equation group 2, like in (5), and (6). Moreover, the expression 𝛩34 is representing the algebraic substruction of 𝛩3, 𝛩4. 
 
 ∀= 𝐶(𝛩12)𝐶(𝛩34) 
-
 
 
 _Pe1x=_ 𝑎1𝐶(𝛩1) + a2𝐶(𝛩12) + 𝑎3𝛽−d4𝛾+ d4𝑒1𝑆(𝛩12) 
@@ -152,11 +135,7 @@ first gripper, and second gripper respectively. Therefore, X1, Y1, Z1, and X2, Y
 **_2.1.1. Forward kinematics analysis for the first gripper_** 
 
 
-
 **_2.1.2. Forward kinematics analysis for the second gripper_** 
-
-
-
 
 
 _Pe1z=_ −𝑎3𝑆(𝛩3) −d4𝐶(𝛩3) 
@@ -164,13 +143,10 @@ _Pe1z=_ −𝑎3𝑆(𝛩3) −d4𝐶(𝛩3)
 _Pe2x=_ 𝑎1𝐶(𝛩1) + 𝑎2𝐶(𝛩12) + 𝑎3𝛽+ 𝑎4𝑒2𝛽− 𝑑4𝛾 _Pe2y=_ 𝑎1𝑆(𝛩1) + 𝑎2𝑆(𝛩12) + 𝑎3𝛿+ 𝑎4𝑒2𝛿− 𝑑4𝜀 
 
 
-
 In this formulation, we have new extra parameters which are like it shown in equation group 2. 
 
 
-
 In (8), we obtain the transformation matrix that relates end effector 2 to the base frame and we substitute the new parameters that we prepared in equations group 2. 
-
 
 
 A manipulator's forward kinematics determines the end effector's position and orientation in cartesian space using the input joint angles. The aforementioned matrix expresses the end-effector position, as can be seen by glancing at it. As shown in Matrix 7 and 8, we expressed the first-end effector and the second-end effector onto the base frame respectively[8]. Therefore, we can get the rotation and translation of them so that the forward kinematics analysis will be like the following. Equations group3, and group4, show the forward kinematics for the 
@@ -182,7 +158,6 @@ Robotics kinetic calculations assess and explain a robot's motion and external f
 Depending on the Lagrangian principle that aims to derive the governing general formulation of the dynamical equation of motion will be like it shown in (9). 
 
 
-
 The first term is called the inertia forces, the second term is called the Coriolis and centrifugal force, and the third term is representing the gravitational effects forces Where  𝜏 , 𝜃̈  ,𝐽<sup>𝑇</sup> 𝐹𝑒 , 𝑓𝑟   are representing joint torque, joint acceleration, Jacobian transpose, the force exerted on the joint, and friction force respectively. (10) is show the first term of (9) which is representing the inertia matrix. 
 
 **- 82 -** 
@@ -190,9 +165,7 @@ The first term is called the inertia forces, the second term is called the Corio
 Basheer et al., International Journal of Applied Mathematics Electronics and Computers 11(02): 079-087, 2023 
 
 
-
 By implementing the calculations shown in (10), we could end up with the 4X4 matrix for the first term of the general formulation of the dynamic equation, see (11). 
-
 
 
 **Table 2.** Christoffel Symbols 𝑐𝑖𝑗𝑘 values Table 
@@ -220,30 +193,17 @@ By implementing the calculations shown in (10), we could end up with the 4X4 mat
 |ROW4|C4R4|C414+C424+C434+C444|
 
 
+**Figure 6.  First Joint Torque**
+
+**Figure 7.  Second Joint Torque**
 
 
+**Figure 8.  Third Joint Torque**
 
 
-
-<!-- Start of picture text -->
-Figure 6.  First Joint Torque<br>Figure 7.  Second Joint Torque<br><!-- End of picture text -->
-
-
-
-
-
-<!-- Start of picture text -->
-Figure 8.  Third Joint Torque<br><!-- End of picture text -->
-
-
-
-
-
-<!-- Start of picture text -->
-Figure9.  Fourth Joint Torque<br><!-- End of picture text -->
+**Figure9.  Fourth Joint Torque**
 
 In addition, in the second term of (9) which is representing Coriolis, Centrifugal forces will be calculated the **_Christoffel Symbols of the First Kind_ , see** (12), making the calculations simple and more accurate when we will use them in torque computation. Coriolis force. 
-
 
 
 This kind of force is generated in a reference frame that is rotating relative to an inertial frame. Moreover, a "fictitious" force known as the centrifugal force affects things traveling in a circular motion in a frame of reference that is not inertial. 
@@ -255,9 +215,7 @@ This kind of force is generated in a reference frame that is rotating relative t
 Basheer et al., International Journal of Applied Mathematics Electronics and Computers 11(02): 079-087, 2023 
 
 
-
 Also, we re-formalize the general mechanical equation to be suitable for final torque computation, see (14). This equation is the governing equation for torque computation, we sum two 4X4  matrices which are inertia Mmatrix, and Vmatrix which represent the inertia matrix, and Coriolis, Centrifugal forces Matrix respectively. The final result of torque will be the robotic arm links length, and masses in terms of 𝜃 , 𝜃̇ , 𝑎𝑛𝑑  𝜃̈ , and the joint torques will be drawn regarding these variances concerning time-variant. 
-
 
 
 𝑘= 1 ,2, … , 𝑛  and 𝑛 is the number of robot arm joints. On the right-hand side, is the final torque of the joints. Finally, we used **Mathematica** platform to compute these calculations and draw the final torques of joint1, joint2, joint3, and joint4 as shown in Figure 6, Figure 7, Figure 8, and Figure 9, respectively. All codes can be found in our Githb repository link under the name of **<u>4-DoF Robotic Arm Analysis and Control.</u>** 
@@ -279,10 +237,6 @@ We realized that the actuators attached to the first and third joints, respectiv
 The robot arm will move following the requirements of the plant and the plant's readiness based on the feedback we will gather from the system we are using. Because of this, the entire governing algorithm will operate as indicated in Figure 10. The inputs for the system's master can come from a variety of sources. The expert who visits the farm daily, weekly, or even monthly can make use of these resources. Additionally, it can be obtained through the sensors that were mounted on the system during installation. 
 
 
-
-<!-- Start of picture text -->
-i<br>a<br>a<br><!-- End of picture text -->
-
 **Figure 10.** The Entire System Controlling Algorithm 
 
 These sensors may be vision sensors, such as cameras, or they may be digital, such as nutrient solution sensors or soil analyzer sensors. After receiving the inputs, we may examine them in the database we set up on the backend of our software frame and provide the instructions for the robot to follow to complete the required work [11]. 
@@ -300,27 +254,15 @@ Basheer et al., International Journal of Applied Mathematics Electronics and Com
 the real robot. Therefore, the robot model in ROS contains crucial packages and some important nodes that aid in creating the 3D robot models in the virtual frame. These packages employ the Unified Robot Description Format (URDF). So, the manipulator model is described in the URDF, which is an XML specification. To perform robot work, we have to prepare the inertia matrix, collision detection matrix, robot joints, and arms visualization, the transmission of joints actuators, reduction rate, actuators that will be used, gazebo plugin, sensor plugin, and required controllers that we may use during task implementation. 
 
 
-
-<!-- Start of picture text -->
-a et pacman ss 7 ream 7 ewcnd 9 rane 5 — =<br>——<br><!-- End of picture text -->
-
 **Figure 11.** RVIZ with its joint publisher GUI 
 
 Following the preparation of the packages we previously discussed, as shown in Figure 11, we could launch the files using a Linux terminal and visualize our robotic arm to interact with it using RVIZ, GAZEBO, and MOVEIT interfaces. There are two packages to deal with to interact with the robot arm which are joint_state_publisher and robot_state_publisher. These packages are responsible for transforming the internal case of the joint of the robot arm so that we can move, stop, and visualize the status of every singular joint by helping these two packages. 
 
 
-
-<!-- Start of picture text -->
-one<br><!-- End of picture text -->
-
 **Figure 12.** Path Planning with MOVEIT 
 
 In addition, we use **_rosserial_** protocol to enable the serial connection of the servo system of our robot arm for LX16A servo motor and the extra hardware elements such as Arduino microcontroller to the ROS system. 
 
-
-
-<!-- Start of picture text -->
-RoboticOperatingSystem (ROS) — Control Hardware Structure<br>= = a | E<br>100 > aa<br><!-- End of picture text -->
 
 **Figure 13.** Bus Servo connecting Arduino with LX-16 
 
@@ -338,10 +280,6 @@ As we mentioned before, we will get some data from some sensors, experts, and/or
 
 Basheer et al., International Journal of Applied Mathematics Electronics and Computers 11(02): 079-087, 2023 
 
-
-
-<!-- Start of picture text -->
-:| [eon]<br>gy — —momaisn | ° Gee<br>=<br>Ocecte =. |i ener an<br>sotooe : 7<br><!-- End of picture text -->
 
 **Figure 14.** The internal control algorithm of the robot arm 
 

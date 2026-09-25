@@ -31,6 +31,7 @@ URDF = os.path.join(HERE, '..', 'data', 'agrobot.urdf')
 FIGURES = os.path.join(HERE, '..', 'figures')
 PAYLOAD = 0.05     # kg in the gripper
 SAMPLES = 3000
+LX16A = 15 * 9.81 / 100   # N·m, the 15 kg·cm servo of the prototype
 
 
 def with_payload(model, mass):
@@ -62,6 +63,7 @@ def quintic_move(q0, q1, vmax):
         yield q0 + s * dq, sd * dq, sdd * dq
 
 
+
 def main():
     os.makedirs(FIGURES, exist_ok=True)
     empty = ArmModel.from_urdf(URDF)
@@ -89,6 +91,10 @@ def main():
               f'{rated[k] / max(required[k], 1e-6):.0f}× |')
     print('\nJoints 1 and 2 turn about vertical axes, so gravity does not load them;')
     print('their torque comes only from accelerating the arm.')
+    # The 3D-printed prototype of the paper used LX-16A bus servos (15 kg·cm) on
+    # every joint and showed vibration at joints 1 and 3.
+    print(f'\nPrototype servo LX-16A ({LX16A:.2f} N·m) safety factors: '
+          + ', '.join(f'{n} {LX16A / max(r, 1e-6):.1f}×' for n, r in zip(empty.joint_names, required)))
 
     fig, ax = plt.subplots(figsize=(8, 4.2))
     x = np.arange(4)

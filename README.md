@@ -9,13 +9,15 @@
 ![C++](https://img.shields.io/badge/C%2B%2B-17-00599C?logo=cplusplus)
 [![License: BSD-3-Clause](https://img.shields.io/badge/License-BSD--3--Clause-blue.svg)](LICENSE)
 
-![The AgroBot harvesting strawberries in simulation](docs/images/harvest_scene.png)
+| The real prototype | The robot in simulation |
+|:---:|:---:|
+| ![The 3D-printed AgroBot prototype](docs/images/real_robot.jpeg) | ![The AgroBot harvesting strawberries in simulation](docs/images/harvest_scene.png) |
 
 AgroBot is a 4-axis robot arm on a greenhouse rail trolley, with a single-jaw gripper and an RGB-D camera. It detects crops, decides which ones to handle, plans collision-free motions and executes them. The same software runs in the Gazebo simulator and on the real robot.
 
 The project covers the full development chain of a robot:
 
-1. **Analysis.** Kinematics, workspace and Euler–Lagrange dynamics of the arm, derived in Mathematica and recomputed in Python.
+1. **Analysis.** Denavit–Hartenberg kinematics, workspace and Lagrangian dynamics of the arm, [published](#citation) and recomputed step by step in Python.
 2. **Design.** A physically realistic model built from the CAD of the prototype, with servo sizing and the cell layout.
 3. **Software.** ROS 2 control, perception, inverse kinematics, collision checking and motion planning.
 4. **Applications.** Four agricultural scenarios with measurable results.
@@ -86,7 +88,8 @@ The four scenarios are `strawberry_harvest`, `plant_inspection`, `seedling_trans
 |---|---|
 | [Scenarios](docs/scenarios.md) | the four agricultural tasks: the real-world problem, how each works, results, and what is needed for the field |
 | [Robot design](docs/robot_design.md) | the arm, gripper, carrier, camera and electronics, and why they are built this way |
-| [Analysis](analysis/README.md) | kinematics, workspace, dynamics and actuator sizing, with formulas, code and figures |
+| [Analysis](analysis/README.md) | summary of kinematics, workspace, dynamics and actuator sizing, with code and figures |
+| [Kinematics](analysis/kinematics.md) · [Dynamics](analysis/dynamics.md) | the full derivations with equations and worked examples |
 | [Architecture](docs/architecture.md) | how the software is built: layers, ROS graph, frames, perception and planning pipelines, safety |
 | [Real robot](docs/real_robot.md) | step-by-step commissioning: parts, wiring, firmware, calibration, checklists |
 | [Development guide](docs/development.md) | building, testing, adding your own task, configuration reference, troubleshooting |
@@ -124,6 +127,24 @@ Every package has its own short README with its files and launch commands; the [
 
 ## Author
 
-**Basheer Al-Tawil**. The robot and its analysis originate from a master's thesis on a 4-DoF agricultural manipulator ([analysis](analysis/README.md)).
+**Basheer Al-Tawil**. The robot and its analysis originate from a master's thesis on a 4-DoF agricultural manipulator, published in the paper below.
 
-If you use this work, please cite it (see [CITATION.cff](CITATION.cff)). Licensed under the [BSD 3-Clause License](LICENSE).
+## Citation
+
+If you use this work, please cite the paper:
+
+```bibtex
+@article{altawil2023design,
+  title={Design and analysis of a four dof robotic arm with two grippers used in agricultural operations},
+  author={Altawil, Basheer and Can, Fatih Cemal},
+  journal={International Journal of Applied Mathematics Electronics and Computers},
+  volume={11},
+  number={2},
+  pages={79--87},
+  year={2023},
+  doi={10.18100/ijamec.1217072},
+  publisher={PLUSBASE AKADEM{\.I} ORGAN{\.I}ZASYON VE DANI{\c{S}}MANLIK}
+}
+```
+
+GitHub also offers this citation through the "Cite this repository" button ([CITATION.cff](CITATION.cff)). Licensed under the [BSD 3-Clause License](LICENSE).

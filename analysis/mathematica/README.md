@@ -1,6 +1,6 @@
 # Mathematica derivation of the arm (master's thesis material)
 
-These notebooks derive the kinematics and the Euler–Lagrange dynamics of the 4-axis arm symbolically. They were written in Mathematica 11.3 and are numbered in the order of the derivation.
+These notebooks derive the kinematics and the Euler–Lagrange dynamics of the 4-axis arm symbolically, for the paper [Altawil & Can, 2023](https://doi.org/10.18100/ijamec.1217072). The derivation is explained step by step in [../kinematics.md](../kinematics.md) and [../dynamics.md](../dynamics.md). They were written in Mathematica 11.3 and are numbered in the order of the derivation.
 
 GitHub cannot display `.nb` files, so each notebook also has a plain-text copy in [`text/`](text/) with its input cells in Mathematica syntax and its stored numeric results. The copies are regenerated with `python3 analysis/tools/nb_to_text.py`.
 
@@ -54,11 +54,12 @@ flowchart LR
 
 ## Findings of the review
 
-The Python scripts in [`../python/`](../python/) recompute these results. Three points need attention if the notebooks are reused:
+The Python scripts in [`../python/`](../python/) recompute these results. Four points need attention if the notebooks are reused (details and numbers in [../dynamics.md](../dynamics.md#8-review-of-the-thesis-computation)):
 
 1. **Christoffel symbols without the factor ½.** Notebooks 12–16 use cᵢⱼₖ = ∂Mₖⱼ/∂qᵢ + ∂Mₖᵢ/∂qⱼ − ∂Mᵢⱼ/∂qₖ. The standard definition has a factor ½ in front. With the notebook's M(q), `03_thesis_dynamics_check.py` reproduces τ1–τ3 of notebook 16 exactly without the factor, so the Coriolis and centrifugal torques there are twice too large.
 2. **No gravity term.** The torque equation is τ = M q̈ + C q̇. Joint 3 lifts the forearm and gripper, so the gravity term G(q) is its largest load and must be added: τ = M q̈ + C q̇ + G.
-3. **Jacobians of links 3 and 4.** The cross-product Jacobians of notebook 07 agree with the exact derivative ∂p_c/∂q for links 1 and 2, but not for links 3 and 4 (`01_kinematics_thesis_model.py` compares them). M(q) and the torques inherit this difference.
+3. **Sign error in R40.** Notebook 01 writes row 2, column 3 of R40 as +cos(q1+q2); the Denavit–Hartenberg product gives −cos(q1+q2). With the + sign the matrix is not a rotation (Rᵀ R ≠ I). `01_kinematics_thesis_model.py` shows both.
+4. **Jacobians of links 3 and 4.** The cross-product Jacobians of notebook 07 agree with the exact derivative ∂p_c/∂q for links 1 and 2, but not for links 3 and 4. M(q) and the torques inherit this difference.
 
 `../python/robot_model.py` applies the same method to the real robot with the corrections: Jacobians from the exact joint axes, CAD masses including the servos, the factor ½, and gravity.
 
