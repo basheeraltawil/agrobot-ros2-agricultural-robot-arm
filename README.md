@@ -1,27 +1,55 @@
+<div align="center">
+
 # AIBOMECH AgroBot
 
 **An agricultural robot arm for greenhouses, from kinematic analysis to ROS 2 software, simulation and real-hardware commissioning.**
 
 [![CI](https://github.com/basheeraltawil/agrobot-ros2-agricultural-robot-arm/actions/workflows/ci.yml/badge.svg)](https://github.com/basheeraltawil/agrobot-ros2-agricultural-robot-arm/actions/workflows/ci.yml)
+[![License: BSD-3-Clause](https://img.shields.io/badge/License-BSD--3--Clause-blue.svg)](LICENSE)
+<br/>
 ![ROS 2 Humble](https://img.shields.io/badge/ROS%202-Humble-22314E?logo=ros)
 ![Gazebo Fortress](https://img.shields.io/badge/Gazebo-Fortress-F58113)
 ![Python](https://img.shields.io/badge/Python-3.10-3776AB?logo=python&logoColor=white)
 ![C++](https://img.shields.io/badge/C%2B%2B-17-00599C?logo=cplusplus)
-[![License: BSD-3-Clause](https://img.shields.io/badge/License-BSD--3--Clause-blue.svg)](LICENSE)
 
-| CAD design | The real prototype | The robot in simulation |
-|:---:|:---:|:---:|
-| ![3D-rendered CAD design of the AgroBot arm](docs/images/3d_rendered_design.png) | ![The 3D-printed AgroBot prototype](docs/images/real_robot.jpeg) | ![The AgroBot harvesting ripe strawberries in Gazebo, 8x speed](docs/images/strawberry_harvest.gif) |
+[Results](#results) •
+[How it works](#how-it-works) •
+[Quick start](#quick-start) •
+[Documentation](#documentation) •
+[Repository layout](#repository-layout) •
+[Who can use it](#who-can-use-it) •
+[Citation](#citation)
+
+<br/>
+
+<table>
+  <tr>
+    <th align="center" width="33%">CAD design</th>
+    <th align="center" width="33%">The real prototype</th>
+    <th align="center" width="33%">The robot in simulation</th>
+  </tr>
+  <tr>
+    <td align="center"><img src="docs/images/3d_rendered_design.png" alt="3D-rendered CAD design of the AgroBot arm"/></td>
+    <td align="center"><img src="docs/images/real_robot.jpeg" alt="The 3D-printed AgroBot prototype"/></td>
+    <td align="center"><img src="docs/images/strawberry_harvest.gif" alt="The AgroBot harvesting ripe strawberries in Gazebo, 8x speed"/></td>
+  </tr>
+</table>
+
+</div>
 
 AgroBot is a 4-axis robot arm on a greenhouse rail trolley, with a single-jaw gripper and an RGB-D camera. It detects crops, decides which ones to handle, plans collision-free motions and executes them. The same software runs in the Gazebo simulator and on the real robot.
 
 The project covers the full development chain of a robot:
 
-1. **Analysis.** Denavit–Hartenberg kinematics, workspace and Lagrangian dynamics of the arm, [published](#citation) and recomputed step by step in Python.
-2. **Design.** A physically realistic model built from the CAD of the prototype, with servo sizing and the cell layout.
-3. **Software.** ROS 2 control, perception, inverse kinematics, collision checking and motion planning.
-4. **Applications.** Four agricultural scenarios with measurable results.
-5. **Hardware.** A `ros2_control` driver, motor-board firmware, an emulator, and a step-by-step commissioning guide.
+| | Stage | |
+|:---:|---|---|
+| **1** | **Analysis** | Denavit–Hartenberg kinematics, workspace and Lagrangian dynamics of the arm, [published](#citation) and recomputed step by step in Python. |
+| **2** | **Design** | A physically realistic model built from the CAD of the prototype, with servo sizing and the cell layout. |
+| **3** | **Software** | ROS 2 control, perception, inverse kinematics, collision checking and motion planning. |
+| **4** | **Applications** | Four agricultural scenarios with measurable results. |
+| **5** | **Hardware** | A `ros2_control` driver, motor-board firmware, an emulator, and a step-by-step commissioning guide. |
+
+---
 
 ## Results
 
@@ -29,12 +57,16 @@ Four agricultural tasks run end to end in simulation. Each crop's outcome is ver
 
 | Scenario | The problem it addresses | Result |
 |---|---|---|
-| **Strawberry harvesting** | labour shortage for selective picking | 12 of 12 ripe fruit picked into the crate, no unripe fruit |
-| **Plant inspection** | manual yield counting and scouting | 12/12 ripe and 10/10 unripe fruit counted, canopy and size per plant |
-| **Seedling transplanting** | repetitive, precise nursery handwork | 8 of 8 seedlings planted in their pots |
-| **Precision weeding** | herbicide-free weed control | 8 of 8 weeds pulled, lettuce protected by a safety radius |
+| 🍓 **Strawberry harvesting** | labour shortage for selective picking | **12 of 12** ripe fruit picked into the crate, no unripe fruit |
+| 🔎 **Plant inspection** | manual yield counting and scouting | **12/12** ripe and **10/10** unripe fruit counted, canopy and size per plant |
+| 🌱 **Seedling transplanting** | repetitive, precise nursery handwork | **8 of 8** seedlings planted in their pots |
+| 🌿 **Precision weeding** | herbicide-free weed control | **8 of 8** weeds pulled, lettuce protected by a safety radius |
 
-![Ripe (red) and unripe (yellow) strawberries detected by the trolley camera](docs/images/harvest_detection.png)
+<p align="center">
+  <img src="docs/images/harvest_detection.png" alt="Ripe (red) and unripe (yellow) strawberries detected by the trolley camera" width="80%"/>
+</p>
+
+---
 
 ## How it works
 
@@ -58,9 +90,12 @@ The robot surveys the row, then handles each crop:
 
 Crops that are blocked by a neighbour are retried after the rest of the row is done. The [architecture guide](docs/architecture.md) explains every layer with diagrams.
 
+---
+
 ## Quick start
 
-Requires Ubuntu 22.04 with ROS 2 Humble.
+> [!NOTE]
+> Requires Ubuntu 22.04 with ROS 2 Humble.
 
 ```bash
 # Dependencies (Gazebo Fortress comes with ros-humble-ros-gz)
@@ -82,18 +117,22 @@ ros2 launch aibomech_agrobot_tasks scenario.launch.py scenario:=strawberry_harve
 
 The four scenarios are `strawberry_harvest`, `plant_inspection`, `seedling_transplant` and `precision_weeding`. Add `gui:=false` to run without the Gazebo window. Every run writes a report (`summary.json`, `results.csv`, annotated images) to `~/.ros/agrobot_reports/`.
 
+---
+
 ## Documentation
 
 | Read this | To learn |
 |---|---|
-| [Scenarios](docs/scenarios.md) | the four agricultural tasks: the real-world problem, how each works, results, and what is needed for the field |
-| [Robot design](docs/robot_design.md) | the arm, gripper, carrier, camera and electronics, and why they are built this way |
-| [Analysis](analysis/README.md) | summary of kinematics, workspace, dynamics and actuator sizing, with code and figures |
-| [Kinematics](analysis/kinematics.md) · [Dynamics](analysis/dynamics.md) | the full derivations with equations and worked examples |
-| [Architecture](docs/architecture.md) | how the software is built: layers, ROS graph, frames, perception and planning pipelines, safety |
-| [Real robot](docs/real_robot.md) | step-by-step commissioning: parts, wiring, firmware, calibration, checklists |
-| [Development guide](docs/development.md) | building, testing, adding your own task, configuration reference, troubleshooting |
-| [Glossary](docs/glossary.md) | the robotics terms used in this project |
+| 🌾 [Scenarios](docs/scenarios.md) | the four agricultural tasks: the real-world problem, how each works, results, and what is needed for the field |
+| 🦾 [Robot design](docs/robot_design.md) | the arm, gripper, carrier, camera and electronics, and why they are built this way |
+| 📐 [Analysis](analysis/README.md) | summary of kinematics, workspace, dynamics and actuator sizing, with code and figures |
+| 🧮 [Kinematics](analysis/kinematics.md) · [Dynamics](analysis/dynamics.md) | the full derivations with equations and worked examples |
+| 🏗️ [Architecture](docs/architecture.md) | how the software is built: layers, ROS graph, frames, perception and planning pipelines, safety |
+| 🔧 [Real robot](docs/real_robot.md) | step-by-step commissioning: parts, wiring, firmware, calibration, checklists |
+| 💻 [Development guide](docs/development.md) | building, testing, adding your own task, configuration reference, troubleshooting |
+| 📖 [Glossary](docs/glossary.md) | the robotics terms used in this project |
+
+---
 
 ## Repository layout
 
@@ -112,17 +151,23 @@ aibomech_agrobot/
 └── docs/                            design, architecture, scenarios, commissioning
 ```
 
-Every package has its own short README with its files and launch commands; the [tasks package README](agrobot_ws/src/aibomech_agrobot_tasks/README.md) has a reading order for the code.
+> [!TIP]
+> Every package has its own short README with its files and launch commands; the [tasks package README](agrobot_ws/src/aibomech_agrobot_tasks/README.md) has a reading order for the code.
+
+---
 
 ## Who can use it
 
 | Audience | What this repository offers |
 |---|---|
-| **Researchers** | a reproducible perception → planning → control pipeline with ground-truth scoring, to compare detectors, planners or grippers on the same crop layouts |
-| **Educators and students** | small, readable implementations of IK, collision checking, RRT planning and Euler–Lagrange dynamics; four complete worked robot applications |
-| **Companies** | a template for greenhouse automation cells: rail as an external axis, KPI reports, and a hardware path from emulator to real robot |
+| 🔬 **Researchers** | a reproducible perception → planning → control pipeline with ground-truth scoring, to compare detectors, planners or grippers on the same crop layouts |
+| 🎓 **Educators and students** | small, readable implementations of IK, collision checking, RRT planning and Euler–Lagrange dynamics; four complete worked robot applications |
+| 🏭 **Companies** | a template for greenhouse automation cells: rail as an external axis, KPI reports, and a hardware path from emulator to real robot |
 
-**Limitations.** Crop detection uses colour thresholds tuned on the simulated crops; real fields need a trained detector (see the notes per scenario). Grasping in simulation is emulated with joints, as is common in agricultural simulation. The real-hardware driver has been tested against its emulator; commissioning on the physical robot follows the [guide](docs/real_robot.md).
+> [!IMPORTANT]
+> **Limitations.** Crop detection uses colour thresholds tuned on the simulated crops; real fields need a trained detector (see the notes per scenario). Grasping in simulation is emulated with joints, as is common in agricultural simulation. The real-hardware driver has been tested against its emulator; commissioning on the physical robot follows the [guide](docs/real_robot.md).
+
+---
 
 ## Author
 
