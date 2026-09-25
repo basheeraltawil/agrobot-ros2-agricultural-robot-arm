@@ -9,9 +9,9 @@
 ![C++](https://img.shields.io/badge/C%2B%2B-17-00599C?logo=cplusplus)
 [![License: BSD-3-Clause](https://img.shields.io/badge/License-BSD--3--Clause-blue.svg)](LICENSE)
 
-| The real prototype | The robot in simulation |
-|:---:|:---:|
-| ![The 3D-printed AgroBot prototype](docs/images/real_robot.jpeg) | ![The AgroBot harvesting ripe strawberries in Gazebo, 8x speed](docs/images/strawberry_harvest.gif) |
+| CAD design | The real prototype | The robot in simulation |
+|:---:|:---:|:---:|
+| ![3D-rendered CAD design of the AgroBot arm](docs/images/3d_rendered_design.png) | ![The 3D-printed AgroBot prototype](docs/images/real_robot.jpeg) | ![The AgroBot harvesting ripe strawberries in Gazebo, 8x speed](docs/images/strawberry_harvest.gif) |
 
 AgroBot is a 4-axis robot arm on a greenhouse rail trolley, with a single-jaw gripper and an RGB-D camera. It detects crops, decides which ones to handle, plans collision-free motions and executes them. The same software runs in the Gazebo simulator and on the real robot.
 
