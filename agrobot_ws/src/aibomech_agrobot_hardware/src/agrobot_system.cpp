@@ -1,3 +1,7 @@
+// ros2_control SystemInterface for the real AgroBot: sends joint setpoints to the
+// motor-controller board over serial and reads back positions, velocities and status.
+// Protocol: protocol.hpp. Commissioning: docs/real_robot.md.
+
 #include "aibomech_agrobot_hardware/agrobot_system.hpp"
 
 #include <algorithm>
@@ -187,7 +191,7 @@ void AgrobotSystemHardware::report_status_changes(uint32_t status)
   const uint32_t falling = ~status & last_status_;
   if (rising & STATUS_ESTOP) {
     RCLCPP_ERROR(kLogger, "EMERGENCY STOP pressed - drives are off. After releasing it, "
-      "re-activate the hardware (see README, 'Recovering from an e-stop').");
+      "re-activate the hardware (see docs/real_robot.md, 'Recovering from an e-stop').");
   }
   if (falling & STATUS_ESTOP) {
     RCLCPP_WARN(kLogger, "Emergency stop released. Drives stay off until the hardware is re-activated.");

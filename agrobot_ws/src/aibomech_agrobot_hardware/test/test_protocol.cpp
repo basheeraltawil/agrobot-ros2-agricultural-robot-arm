@@ -1,3 +1,5 @@
+// Unit tests of the line protocol: checksums, command frames, state frames, bad input.
+
 #include <gtest/gtest.h>
 
 #include "aibomech_agrobot_hardware/protocol.hpp"

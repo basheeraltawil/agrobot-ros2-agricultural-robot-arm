@@ -1,3 +1,5 @@
+// Non-blocking POSIX serial port for the link to the motor-controller board.
+
 #pragma once
 
 #include <string>

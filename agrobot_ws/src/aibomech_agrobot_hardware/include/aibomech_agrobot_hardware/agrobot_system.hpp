@@ -1,3 +1,5 @@
+// ros2_control hardware interface of the real AgroBot (implementation in agrobot_system.cpp).
+
 #pragma once
 
 #include <string>

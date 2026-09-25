@@ -1,4 +1,14 @@
-"""Common scaffolding of the agricultural task nodes."""
+"""Common scaffolding of the agricultural task nodes.
+
+AgrobotTask provides what every scenario needs:
+  - plan_reach(): choose a rail position and an arm configuration from which a
+    crop can be grasped along a straight, collision-free approach line
+  - approach(), go_home(), recover(): motion building blocks with error handling
+  - set_crop_obstacles(): add detected crops as collision boxes
+  - sim_poses(), in_crate(): ground truth from Gazebo, used only for scoring
+  - write_report(): summary.json, results.csv and images in ~/.ros/agrobot_reports/
+A scenario subclasses AgrobotTask and implements execute().
+"""
 import csv
 import json
 import os

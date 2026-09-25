@@ -1,3 +1,5 @@
+// Encoding and decoding of the host <-> board line protocol (see protocol.hpp).
+
 #include "aibomech_agrobot_hardware/protocol.hpp"
 
 #include <cstdio>

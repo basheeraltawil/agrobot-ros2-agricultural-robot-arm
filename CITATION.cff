@@ -1,0 +1,16 @@
+cff-version: 1.2.0
+message: "If you use this software or its analysis, please cite it as below."
+title: "AIBOMECH AgroBot: an agricultural robot arm with ROS 2 software, simulation and analysis"
+authors:
+  - family-names: "Al-Tawil"
+    given-names: "Basheer"
+repository-code: "https://github.com/basheeraltawil/aibomech_agrobot"
+license: BSD-3-Clause
+keywords:
+  - agricultural robotics
+  - ROS 2
+  - robot manipulator
+  - harvesting robot
+  - Gazebo
+  - kinematics
+  - dynamics

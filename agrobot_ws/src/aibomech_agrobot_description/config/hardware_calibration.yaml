@@ -2,7 +2,7 @@
 # channel   : actuator index on the motor-controller board (firmware array index)
 # direction : +1 or -1, flips the actuator sense to match the URDF axis
 # offset    : actuator reading (rad or m) when the URDF joint is at zero
-# Fill in the offsets with the procedure in README.md, section "Calibration".
+# Fill in the offsets with the procedure in docs/real_robot.md, "Step 5: Calibrate the joints".
 joint_1:           {channel: 0, direction: 1, offset: 0.0}
 joint_2:           {channel: 1, direction: 1, offset: 0.0}
 joint_3:           {channel: 2, direction: 1, offset: 0.0}

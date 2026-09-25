@@ -36,7 +36,7 @@ const uint8_t PIN_RAIL_HOME = 25;        // limit switch to GND at rail start
 const uint8_t SERVO_PINS[NUM_SERVOS] = {3, 5, 6, 9, 10};
 
 // Per-channel calibration: pulse width at 0 rad (or 0 m) and microseconds per
-// unit. Tune these on the bench (README, "Calibration").
+// unit. Tune these on the bench (docs/real_robot.md, "Step 5: Calibrate the joints").
 const float SERVO_CENTER_US[NUM_SERVOS] = {1500, 1500, 1500, 1500, 1500};
 const float SERVO_US_PER_UNIT[NUM_SERVOS] = {636.6, 636.6, 636.6, 636.6, 40000.0};  // 2000us/pi rad, 40us/mm
 const float LIMIT_LO[NUM_CHANNELS] = {-1.09, -2.10, -2.00, -1.00, -0.017, 0.0};

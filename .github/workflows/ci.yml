@@ -1,0 +1,35 @@
+# Builds the ROS 2 workspace and runs all unit tests on every push and pull request.
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-22.04
+    container: ros:humble-ros-base
+    defaults:
+      run:
+        shell: bash
+        working-directory: agrobot_ws
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          apt-get update
+          rosdep update --rosdistro humble
+          rosdep install --from-paths src --ignore-src -r -y
+
+      - name: Build
+        run: |
+          source /opt/ros/humble/setup.bash
+          colcon build --event-handlers console_direct-
+
+      - name: Test
+        run: |
+          source /opt/ros/humble/setup.bash
+          colcon test --event-handlers console_direct-
+          colcon test-result --verbose

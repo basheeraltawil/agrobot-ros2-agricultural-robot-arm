@@ -1,3 +1,5 @@
+// POSIX serial port used by the hardware interface (see serial_port.hpp).
+
 #include "aibomech_agrobot_hardware/serial_port.hpp"
 
 #include <fcntl.h>
