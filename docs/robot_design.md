@@ -15,7 +15,6 @@ The first prototype (above) was 3D-printed and analysed in the [paper](../analys
 | Wrist J4 | parallel to J3 (pitch) | perpendicular to J3 (turns the gripper) |
 | End effectors | fertiliser nozzle with peristaltic pump + gripper | one gripper; the nozzle is a possible extension |
 | Servos | LX-16A (1.47 N·m) on every joint; vibration at J1 and J3 | 2.9 N·m on J1–J3, 1.5 N·m on J4 ([why](../analysis/dynamics.md#9-from-torques-to-motors)) |
-| Software | ROS 1 Melodic, MoveIt, rosserial | ROS 2 Humble, `ros2_control`, own planning stack |
 | Mounting | lab table | greenhouse rail trolley (also `pedestal` and `table`) |
 
 ## Overview

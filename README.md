@@ -2,7 +2,7 @@
 
 **An agricultural robot arm for greenhouses, from kinematic analysis to ROS 2 software, simulation and real-hardware commissioning.**
 
-[![CI](https://github.com/basheeraltawil/aibomech_agrobot/actions/workflows/ci.yml/badge.svg)](https://github.com/basheeraltawil/aibomech_agrobot/actions/workflows/ci.yml)
+[![CI](https://github.com/basheeraltawil/agrobot-ros2-agricultural-robot-arm/actions/workflows/ci.yml/badge.svg)](https://github.com/basheeraltawil/agrobot-ros2-agricultural-robot-arm/actions/workflows/ci.yml)
 ![ROS 2 Humble](https://img.shields.io/badge/ROS%202-Humble-22314E?logo=ros)
 ![Gazebo Fortress](https://img.shields.io/badge/Gazebo-Fortress-F58113)
 ![Python](https://img.shields.io/badge/Python-3.10-3776AB?logo=python&logoColor=white)
@@ -11,7 +11,7 @@
 
 | The real prototype | The robot in simulation |
 |:---:|:---:|
-| ![The 3D-printed AgroBot prototype](docs/images/real_robot.jpeg) | ![The AgroBot harvesting strawberries in simulation](docs/images/harvest_scene.png) |
+| ![The 3D-printed AgroBot prototype](docs/images/real_robot.jpeg) | ![The AgroBot harvesting ripe strawberries in Gazebo, 8x speed](docs/images/strawberry_harvest.gif) |
 
 AgroBot is a 4-axis robot arm on a greenhouse rail trolley, with a single-jaw gripper and an RGB-D camera. It detects crops, decides which ones to handle, plans collision-free motions and executes them. The same software runs in the Gazebo simulator and on the real robot.
 
@@ -69,8 +69,8 @@ sudo apt install ros-humble-desktop ros-humble-ros-gz ros-humble-gz-ros2-control
                  python3-rosdep python3-colcon-common-extensions
 
 # Get and build the workspace (it is part of this repository)
-git clone https://github.com/basheeraltawil/aibomech_agrobot.git
-cd aibomech_agrobot/agrobot_ws
+git clone https://github.com/basheeraltawil/agrobot-ros2-agricultural-robot-arm.git
+cd agrobot-ros2-agricultural-robot-arm/agrobot_ws
 source /opt/ros/humble/setup.bash
 rosdep install --from-paths src --ignore-src -r -y
 colcon build --symlink-install
@@ -94,7 +94,6 @@ The four scenarios are `strawberry_harvest`, `plant_inspection`, `seedling_trans
 | [Real robot](docs/real_robot.md) | step-by-step commissioning: parts, wiring, firmware, calibration, checklists |
 | [Development guide](docs/development.md) | building, testing, adding your own task, configuration reference, troubleshooting |
 | [Glossary](docs/glossary.md) | the robotics terms used in this project |
-| [From ROS 1 to ROS 2](docs/ros1_to_ros2.md) | what changed from the original prototype package |
 
 ## Repository layout
 
