@@ -263,7 +263,7 @@ Inverse kinematics finds the joint angles for a wanted position. For this arm it
 ```math
 z = -a_3 S_3 - d_4 C_3
 \;\;\Rightarrow\;\;
-\rho \sin(\theta_3 + \varphi) = -z, \qquad \rho = \sqrt{a_3^2 + d_4^2},\ \ \varphi = \operatorname{atan2}(d_4, a_3)
+\rho \sin(\theta_3 + \varphi) = -z, \qquad \rho = \sqrt{a_3^2 + d_4^2},\ \ \varphi = \mathrm{atan2}(d_4, a_3)
 ```
 
 **Step 2: the SCARA pair.** Projected onto the floor, the forearm lengthens the second link to
@@ -276,11 +276,11 @@ so $\theta_1, \theta_2$ follow from the two-link formula (notebook 19):
 
 ```math
 \cos\theta_2 = \frac{x^2 + y^2 - a_1^2 - L_2^2}{2 a_1 L_2}, \qquad
-\theta_2 = \operatorname{atan2}\!\left(\pm\sqrt{1 - \cos^2\theta_2},\ \cos\theta_2\right)
+\theta_2 = \mathrm{atan2}\!\left(\pm\sqrt{1 - \cos^2\theta_2},\ \cos\theta_2\right)
 ```
 
 ```math
-\theta_1 = \operatorname{atan2}(y, x) - \operatorname{atan2}(L_2 \sin\theta_2,\ a_1 + L_2 \cos\theta_2)
+\theta_1 = \mathrm{atan2}(y, x) - \mathrm{atan2}(L_2 \sin\theta_2,\ a_1 + L_2 \cos\theta_2)
 ```
 
 The sign of the square root selects elbow-left or elbow-right.
@@ -292,9 +292,9 @@ The sign of the square root selects elbow-left or elbow-right.
 1. $\rho = \sqrt{8^2 + 8^2} = 11.31$ and $\varphi = 45^\circ$, so $\sin(\theta_3 + 45^\circ) = 8/11.31 = 0.707$. This gives $\theta_3 = 0^\circ$ or $90^\circ$; we take $90^\circ$.
 2. $L_2 = 12 + 8\cos 90^\circ - 8 \sin 90^\circ = 4$ cm.
 3. $\cos\theta_2 = (12.964^2 + 9.064^2 - 12^2 - 4^2) / (2 \cdot 12 \cdot 4) = 90.23 / 96 = 0.940$, so $\theta_2 = 20.0^\circ$.
-4. $\theta_1 = \operatorname{atan2}(9.064, 12.964) - \operatorname{atan2}(4 \sin 20^\circ,\ 12 + 4 \cos 20^\circ) = 34.96^\circ - 4.96^\circ = 30.0^\circ$.
+4. $\theta_1 = \mathrm{atan2}(9.064, 12.964) - \mathrm{atan2}(4 \sin 20^\circ,\ 12 + 4 \cos 20^\circ) = 34.96^\circ - 4.96^\circ = 30.0^\circ$.
 
-The original angles come back. The notebook example ($x = 150$, $y = 100$ mm, $a_1 = a_2 = 100$ mm) gives $\cos\theta_2 = 0.625$, $\theta_2 = \operatorname{atan}(\sqrt{39}/5) = 51.32^\circ$ and $\theta_1 = 8.03^\circ$.
+The original angles come back. The notebook example ($x = 150$, $y = 100$ mm, $a_1 = a_2 = 100$ mm) gives $\cos\theta_2 = 0.625$, $\theta_2 = \mathrm{atan}(\sqrt{39}/5) = 51.32^\circ$ and $\theta_1 = 8.03^\circ$.
 
 ## 9. From the paper model to the ROS 2 robot
 
