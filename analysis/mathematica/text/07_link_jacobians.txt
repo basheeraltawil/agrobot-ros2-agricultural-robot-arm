@@ -1,0 +1,65 @@
+(* Text export of 07_link_jacobians.nb (analysis/tools/nb_to_text.py) *)
+
+(* ---- Input ---- *)
+(*obtained from general_link_jacobian_position_vector_wrt_baseframe to take it time derivative and place it in a rule 
+({{jacobian1, 0, 0, 0}, {Placeholder, Placeholder, Placeholder, Placeholder}, {Placeholder, Placeholder, Placeholder, Placeholder}, {Placeholder, Placeholder, Placeholder, Placeholder}}) ,and extra ,until jacobian 4*)
+
+(* ---- Input ---- *)
+JV1=Simplify[({{-(1)/(2) a1 Sin[q1], 0, 0, 0}, {(1)/(2) a1 Cos[q1], 0, 0, 0}, {0, 0, 0, 0}})]//TraditionalForm
+JV2=Simplify[({{-a1 Sin[q1]-(1)/(2) a2 Sin[q1+q2], -(1)/(2) a2 Sin[q1+q2], 0, 0}, {a1 Cos[q1]+(1)/(2) a2 Cos[q1+q2], (1)/(2) a2 Cos[q1+q2], 0, 0}, {0, 0, 0, 0}})]//TraditionalForm
+JV3=Simplify[({{-d3 Cos[q1+q2] Cos[q3]- a3 Cos[q1+q2] Sin[q3], -a1 Sin[q1]- a2 Sin[q1+q2], -(1)/(2) a2 Sin[q1+q2], 0}, {-d3 Cos[q3] Sin[q1+q2]-a3 Sin[q1+q2] Sin[q3], a1 Cos[q1]+a2 Cos[q1+q2], (1)/(2) a2 Cos[q1+q2], 0}, {-a1 Cos[q1] Cos[q1+q2]-a2 Cos[q1+q2]^2- a3 Cos[q1+q2]^2 Cos[q3]-a1 Sin[q1] Sin[q1+q2]-a2 Sin[q1+q2]^2-a3 Cos[q3] Sin[q1+q2]^2+ d3 Cos[q1+q2]^2 Sin[q3]+d3 Sin[q1+q2]^2 Sin[q3], 0, 0, 0}})]//TraditionalForm
+JV4=Simplify[({{a1 Cos[q3] Sin[q1]+a2 Cos[q3] Sin[q1+q2]+a3 Cos[q3]^2 Sin[q1+q2]+(1)/(2) a4 Cos[q3] Cos[q3-q4] Sin[q1+q2]+a3 Sin[q1+q2] Sin[q3]^2+(1)/(2) a4 Sin[q1+q2] Sin[q3] Sin[q3-q4], -(1)/(2) d3 Cos[q1+q2] Cos[q3]-(1)/(2) a3 Cos[q1+q2] Sin[q3], -a1 Sin[q1]-(1)/(2) a2 Sin[q1+q2], -(1)/(2) a2 Sin[q1+q2]}, {-a1 Cos[q1] Cos[q3]-a2 Cos[q1+q2] Cos[q3]-a3 Cos[q1+q2] Cos[q3]^2-(1)/(2) a4 Cos[q1+q2] Cos[q3] Cos[q3-q4]-a3 Cos[q1+q2] Sin[q3]^2-(1)/(2) a4 Cos[q1+q2] Sin[q3] Sin[q3-q4], -(1)/(2) d3 Cos[q3] Sin[q1+q2]-(1)/(2) a3 Sin[q1+q2] Sin[q3], a1 Cos[q1]+(1)/(2) a2 Cos[q1+q2], (1)/(2) a2 Cos[q1+q2]}, {-a1 Cos[q1+q2] Sin[q1] Sin[q3]+a1 Cos[q1] Sin[q1+q2] Sin[q3], -a1 Cos[q1] Cos[q1+q2]-a2 Cos[q1+q2]^2-(1)/(2) a3 Cos[q1+q2]^2 Cos[q3]-a1 Sin[q1] Sin[q1+q2]-a2 Sin[q1+q2]^2-(1)/(2) a3 Cos[q3] Sin[q1+q2]^2+(1)/(2) d3 Cos[q1+q2]^2 Sin[q3]+(1)/(2) d3 Sin[q1+q2]^2 Sin[q3], 0, 0}})]//TraditionalForm
+
+(* ---- Output ---- *)
+({{-(1)/(2) a1 sin(q1), 0, 0, 0}, {(1)/(2) a1 cos(q1), 0, 0, 0}, {0, 0, 0, 0}})
+
+(* ---- Output ---- *)
+({{-a1 sin(q1)-(1)/(2) a2 sin(q1+q2), -(1)/(2) a2 sin(q1+q2), 0, 0}, {a1 cos(q1)+(1)/(2) a2 cos(q1+q2), (1)/(2) a2 cos(q1+q2), 0, 0}, {0, 0, 0, 0}})
+
+(* ---- Output ---- *)
+({{-cos(q1+q2) (d3 cos(q3)+a3 sin(q3)), -a1 sin(q1)-a2 sin(q1+q2), -(1)/(2) a2 sin(q1+q2), 0}, {-sin(q1+q2) (d3 cos(q3)+a3 sin(q3)), a1 cos(q1)+a2 cos(q1+q2), (1)/(2) a2 cos(q1+q2), 0}, {-a2-a1 cos(q2)-a3 cos(q3)+d3 sin(q3), 0, 0, 0}})
+
+(* ---- Input ---- *)
+JV1=({{-(1)/(2) a1 sin(q1), 0, 0, 0}, {(1)/(2) a1 cos(q1), 0, 0, 0}, {0, 0, 0, 0}})
+
+(* ---- Output ---- *)
+{{-(1)/(2) a1 Sin[q1],0,0,0},{(1)/(2) a1 Cos[q1],0,0,0},{0,0,0,0}}
+
+(* ---- Input ---- *)
+JV2=({{-a1 sin(q1)-(1)/(2) a2 sin(q1+q2), -(1)/(2) a2 sin(q1+q2), 0, 0}, {a1 cos(q1)+(1)/(2) a2 cos(q1+q2), (1)/(2) a2 cos(q1+q2), 0, 0}, {0, 0, 0, 0}})
+
+(* ---- Output ---- *)
+{{-a1 Sin[q1]-(1)/(2) a2 Sin[q1+q2],-(1)/(2) a2 Sin[q1+q2],0,0},{a1 Cos[q1]+(1)/(2) a2 Cos[q1+q2],(1)/(2) a2 Cos[q1+q2],0,0},{0,0,0,0}}
+
+(* ---- Input ---- *)
+JV3=({{-cos(q1+q2) (d3 cos(q3)+a3 sin(q3)), -a1 sin(q1)-a2 sin(q1+q2), -(1)/(2) a2 sin(q1+q2), 0}, {-sin(q1+q2) (d3 cos(q3)+a3 sin(q3)), a1 cos(q1)+a2 cos(q1+q2), (1)/(2) a2 cos(q1+q2), 0}, {-a2-a1 cos(q2)-a3 cos(q3)+d3 sin(q3), 0, 0, 0}})
+
+(* ---- Output ---- *)
+{{-Cos[q1+q2] (d3 Cos[q3]+a3 Sin[q3]),-a1 Sin[q1]-a2 Sin[q1+q2],-(1)/(2) a2 Sin[q1+q2],0},{-Sin[q1+q2] (d3 Cos[q3]+a3 Sin[q3]),a1 Cos[q1]+a2 Cos[q1+q2],(1)/(2) a2 Cos[q1+q2],0},{-a2-a1 Cos[q2]-a3 Cos[q3]+d3 Sin[q3],0,0,0}}
+
+(* ---- Input ---- *)
+JV4=({{(1)/(2) (cos(q2) (2 a3+2 a2 cos(q3)+a4 cos(q4)) sin(q1)+cos(q1) (2 a3+a4 cos(q4)) sin(q2)+2 cos(q3) (a1 sin(q1)+a2 cos(q1) sin(q2))), -(1)/(2) cos(q1+q2) (d3 cos(q3)+a3 sin(q3)), -a1 sin(q1)-(1)/(2) a2 sin(q1+q2), -(1)/(2) a2 sin(q1+q2)}, {(1)/(2) ((2 a3+2 a2 cos(q3)+a4 cos(q4)) sin(q1) sin(q2)-cos(q1) (2 a1 cos(q3)+cos(q2) (2 a3+2 a2 cos(q3)+a4 cos(q4)))), -(1)/(2) sin(q1+q2) (d3 cos(q3)+a3 sin(q3)), a1 cos(q1)+(1)/(2) a2 cos(q1+q2), (1)/(2) a2 cos(q1+q2)}, {a1 sin(q2) sin(q3), (1)/(2) (-2 a2-2 a1 cos(q2)-a3 cos(q3)+d3 sin(q3)), 0, 0}})
+
+(* ---- Input ---- *)
+Jw1=({{0, 0, 0, 0}, {0, 0, 0, 0}, {1, 0, 0, 0}})//MatrixForm
+Jw2=({{0, 0, 0, 0}, {0, 0, 0, 0}, {1, 1, 0, 0}})//MatrixForm
+Jw3=({{0, 0, 0, 0}, {0, 0, 0, 0}, {1, 1, 1, 0}})//MatrixForm
+Jw4=({{0, 0, 0, 0}, {0, 0, 0, 0}, {1, 1, 1, 1}})//MatrixForm
+
+(* ---- Output ---- *)
+({{0, 0, 0, 0}, {0, 0, 0, 0}, {1, 0, 0, 0}})
+
+(* ---- Output ---- *)
+({{0, 0, 0, 0}, {0, 0, 0, 0}, {1, 1, 0, 0}})
+
+(* ---- Output ---- *)
+({{0, 0, 0, 0}, {0, 0, 0, 0}, {1, 1, 1, 0}})
+
+(* ---- Output ---- *)
+({{0, 0, 0, 0}, {0, 0, 0, 0}, {1, 1, 1, 1}})
+
+(* ---- Input ---- *)
+Jw3=({{0, 0, 0, 0}, {0, 0, 0, 0}, {1, 1, 1, 0}})//MatrixForm
+
+(* ---- Output ---- *)
+({{0, 0, 0, 0}, {0, 0, 0, 0}, {1, 1, 1, 0}})

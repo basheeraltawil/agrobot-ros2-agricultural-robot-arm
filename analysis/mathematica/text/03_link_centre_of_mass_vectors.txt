@@ -1,0 +1,25 @@
+(* Text export of 03_link_centre_of_mass_vectors.nb (analysis/tools/nb_to_text.py) *)
+
+(* ---- Input ---- *)
+rc10=({{(1)/(2) a1 Cos[q1]}, {(1)/(2) a1 Sin[q1]}, {0}})//MatrixForm
+
+(* ---- Output ---- *)
+({{(1)/(2) a1 Cos[q1]}, {(1)/(2) a1 Sin[q1]}, {0}})
+
+(* ---- Input ---- *)
+rc21=({{(1)/(2) a2 Cos[q2]}, {(1)/(2) a2 Sin[q2]}, {0}})//MatrixForm
+
+(* ---- Output ---- *)
+({{(1)/(2) a2 Cos[q2]}, {(1)/(2) a2 Sin[q2]}, {0}})
+
+(* ---- Input ---- *)
+rc32=({{(1)/(2) a3 Cos[q3]}, {(1)/(2) a3 Sin[q3]}, {d3}})//MatrixForm
+
+(* ---- Output ---- *)
+({{(1)/(2) a3 Cos[q3]}, {(1)/(2) a3 Sin[q3]}, {d3}})
+
+(* ---- Input ---- *)
+rc43g1=({{(1)/(2) a4 Cos[q4]}, {(1)/(2) a4 Sin[q4]}, {0}})//MatrixForm
+
+(* ---- Output ---- *)
+({{(1)/(2) a4 Cos[q4]}, {(1)/(2) a4 Sin[q4]}, {0}})

@@ -1,0 +1,24 @@
+(* Text export of 02_joint_axis_directions.nb (analysis/tools/nb_to_text.py) *)
+
+(* ---- Input ---- *)
+z0=({{0}, {0}, {1}})//MatrixForm
+z1=({{Cos[q1], -Sin[q1], 0}, {Sin[q1], Cos[q1], 0}, {0, 0, 1}}).({{0}, {0}, {1}})//MatrixForm
+z2=({{Cos[q1+q2], 0, -Sin[q1+q2]}, {Sin[q1+q2], 0, Cos[q1+q2]}, {0, -1, 0}}).({{0}, {0}, {1}})//MatrixForm
+z3=({{Cos[q3] Cos[q1+q2], Sin[q1+q2], -Sin[q3]Cos[q1+q2]}, {Cos[q3]Sin[q1+q2], -Cos[q1+q2], -Sin[q3]Sin[q1+q2]}, {-Sin[q3], 0, -Cos[q3]}}).({{0}, {0}, {1}})//MatrixForm
+z4=({{Cos[q3-q4] Cos[q1+q2], Sin[q3-q4]Cos[q1+q2], Sin[q1+q2]}, {Cos[q3-q4]Sin[q1+q2], Sin[q3-q4]Sin[q1+q2], Cos[q1+q2]}, {-Sin[q3-q4], Cos[q3-q4], 0}})
+.({{0}, {0}, {1}})//MatrixForm
+
+(* ---- Output ---- *)
+({{0}, {0}, {1}})
+
+(* ---- Output ---- *)
+({{0}, {0}, {1}})
+
+(* ---- Output ---- *)
+({{-Sin[q1+q2]}, {Cos[q1+q2]}, {0}})
+
+(* ---- Output ---- *)
+({{-Cos[q1+q2] Sin[q3]}, {-Sin[q1+q2] Sin[q3]}, {-Cos[q3]}})
+
+(* ---- Output ---- *)
+({{Sin[q1+q2]}, {Cos[q1+q2]}, {0}})

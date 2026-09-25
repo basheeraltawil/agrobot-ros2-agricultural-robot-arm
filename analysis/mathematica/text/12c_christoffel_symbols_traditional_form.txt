@@ -1,0 +1,123 @@
+(* Text export of 12c_christoffel_symbols_traditional_form.nb (analysis/tools/nb_to_text.py) *)
+
+(* ---- Input ---- *)
+M11=(1)/(24) (8 a1^2 m1+24 a1^2 m2+8 a2^2 m2+12 a1^2 m3+24 a2^2 m3+25 a3^2 m3+24 d3^2 m3+18 a1^2 m4+12 a2^2 m4+24 a3^2 m4+4 a4^2 m4+24 a1 a2 (m2+2 m3+m4) Cos[q2]+6 a1^2 (2 m3-m4) Cos[2 q2]+12 a1 a2 m4 Cos[q2-2 q3]+24 a1 a3 m3 Cos[q2-q3]+24 a1 a3 m4 Cos[q2-q3]+3 a1^2 m4 Cos[2 (q2-q3)]+48 a2 a3 m3 Cos[q3]+48 a2 a3 m4 Cos[q3]-a3^2 m3 Cos[2 q3]+6 a1^2 m4 Cos[2 q3]+12 a2^2 m4 Cos[2 q3]+24 a1 a3 m3 Cos[q2+q3]+24 a1 a3 m4 Cos[q2+q3]+3 a1^2 m4 Cos[2 (q2+q3)]+12 a1 a2 m4 Cos[q2+2 q3]+6 a1 a4 m4 Cos[q2-q3-q4]+12 a2 a4 m4 Cos[q3-q4]+a4^2 m4 Cos[2 (q3-q4)]+6 a1 a4 m4 Cos[q2+q3-q4]+24 a3 a4 m4 Cos[q4]+3 a4^2 m4 Cos[2 q4]+6 a1 a4 m4 Cos[q2-q3+q4]+12 a2 a4 m4 Cos[q3+q4]+6 a1 a4 m4 Cos[q2+q3+q4]+24 a1 d3 m3 Sin[q2-q3]-48 a2 d3 m3 Sin[q3]-24 a1 d3 m3 Sin[q2+q3]);
+M12=(1)/(24) (8 a2^2 m2+a3^2 m3+a4^2 m4+12 a1 a2 m2 Cos[q2]-12 a1 (a3 m3+a2 m4) Cos[q2-q3]-6 a1^2 m4 Cos[2 q2-q3]-a3^2 m3 Cos[2 q3]+12 a1 a3 m3 Cos[q2+q3]+12 a1 a2 m4 Cos[q2+q3]+6 a1^2 m4 Cos[2 q2+q3]+a4^2 m4 Cos[2 (q3-q4)]+12 a1 d3 m4 Sin[q2]-12 a1 d3 m3 Sin[q2-q3]-12 a1 d3 m3 Sin[q2+q3]);
+
+M13=(1)/(24) (a3^2 m3-12 a2 a3 m4+a4^2 m4-24 a1 a3 m4 Cos[q2]-18 a1 a2 m4 Cos[q2-q3]-24 a1^2 m4 Cos[q3]-12 a2^2 m4 Cos[q3]-a3^2 m3 Cos[2 q3]-18 a1 a2 m4 Cos[q2+q3]-6 a1 a4 m4 Cos[q2-q4]+a4^2 m4 Cos[2 (q3-q4)]-6 a2 a4 m4 Cos[q4]-6 a1 a4 m4 Cos[q2+q4]);
+M14=(1)/(24) m4 (-12 a2 a3+a4^2-6 a1 a2 Cos[q2-q3]-12 a2^2 Cos[q3]-6 a1 a2 Cos[q2+q3]+a4^2 Cos[2 (q3-q4)]-6 a2 a4 Cos[q4]);
+M21=(1)/(24) (8 a2^2 m2+a3^2 m3+a4^2 m4+12 a1 a2 m2 Cos[q2]-12 a1 (a3 m3+a2 m4) Cos[q2-q3]-6 a1^2 m4 Cos[2 q2-q3]-a3^2 m3 Cos[2 q3]+12 a1 a3 m3 Cos[q2+q3]+12 a1 a2 m4 Cos[q2+q3]+6 a1^2 m4 Cos[2 q2+q3]+a4^2 m4 Cos[2 (q3-q4)]+12 a1 d3 m4 Sin[q2]-12 a1 d3 m3 Sin[q2-q3]-12 a1 d3 m3 Sin[q2+q3]);
+M22=(1)/(24) (8 a2^2 m2+24 a1^2 m3+24 a2^2 m3+a3^2 m3+12 a1^2 m4+24 a2^2 m4+6 a3^2 m4+a4^2 m4+6 d3^2 m4+48 a1 a2 (m3+m4) Cos[q2]+12 a1^2 m4 Cos[2 q2]+12 a1 a3 m4 Cos[q2-q3]+24 a2 a3 m4 Cos[q3]-a3^2 m3 Cos[2 q3]+12 a1 a3 m4 Cos[q2+q3]+a4^2 m4 Cos[2 (q3-q4)]+12 a1 d3 m4 Sin[q2-q3]-24 a2 d3 m4 Sin[q3]-12 a1 d3 m4 Sin[q2+q3]);
+M23=(1)/(24) (12 a2^2 m3+a3^2 m3+a4^2 m4+12 a1 a2 m3 Cos[q2]-6 a1 a3 m4 Cos[q2-q3]-a3^2 m3 Cos[2 q3]+6 a1 a3 m4 Cos[q2+q3]+a4^2 m4 Cos[2 (q3-q4)]-6 a1 d3 m4 Sin[q2-q3]-6 a1 d3 m4 Sin[q2+q3]);
+M24=(1)/(12) a4^2 m4 Cos[q3-q4]^2;
+M31=(1)/(24) (a3^2 m3-12 a2 a3 m4+a4^2 m4-24 a1 a3 m4 Cos[q2]-18 a1 a2 m4 Cos[q2-q3]-24 a1^2 m4 Cos[q3]-12 a2^2 m4 Cos[q3]-a3^2 m3 Cos[2 q3]-18 a1 a2 m4 Cos[q2+q3]-6 a1 a4 m4 Cos[q2-q4]+a4^2 m4 Cos[2 (q3-q4)]-6 a2 a4 m4 Cos[q4]-6 a1 a4 m4 Cos[q2+q4]);
+M32=(1)/(24) (12 a2^2 m3+a3^2 m3+a4^2 m4+12 a1 a2 m3 Cos[q2]-6 a1 a3 m4 Cos[q2-q3]-a3^2 m3 Cos[2 q3]+6 a1 a3 m4 Cos[q2+q3]+a4^2 m4 Cos[2 (q3-q4)]-6 a1 d3 m4 Sin[q2-q3]-6 a1 d3 m4 Sin[q2+q3]);
+M33=(1)/(24) (6 a2^2 m3+a3^2 m3+24 a1^2 m4+6 a2^2 m4+a4^2 m4+24 a1 a2 m4 Cos[q2]-a3^2 m3 Cos[2 q3]+a4^2 m4 Cos[2 (q3-q4)]);
+M34=(1)/(24) m4 (6 a2^2+a4^2+12 a1 a2 Cos[q2]+a4^2 Cos[2 (q3-q4)]);
+M41=(1)/(24) m4 (-12 a2 a3+a4^2-6 a1 a2 Cos[q2-q3]-12 a2^2 Cos[q3]-6 a1 a2 Cos[q2+q3]+a4^2 Cos[2 (q3-q4)]-6 a2 a4 Cos[q4]);
+M42=(1)/(12) a4^2 m4 Cos[q3-q4]^2;
+M43=(1)/(24) m4 (6 a2^2+a4^2+12 a1 a2 Cos[q2]+a4^2 Cos[2 (q3-q4)]);
+M44=(1)/(24) m4 (6 a2^2+a4^2+a4^2 Cos[2 (q3-q4)]);
+
+(* ---- Input ---- *)
+(*Christoffel Symbols Of the first Kind calculations*)
+(*for I equal to 1*)
+C111=Simplify[D[M11,q1]+D[M11,q1]-D[M11,q1]];
+C112=Simplify[D[M21,q1]+D[M21,q1]-D[M11,q2]]//TraditionalForm;
+C113=Simplify[D[M31,q1]+D[M31,q1]-D[M11,q3]]//TraditionalForm;
+C114=Simplify[D[M41,q1]+D[M41,q1]-D[M11,q4]]//TraditionalForm;
+C121=Simplify[D[M12,q1]+D[M11,q2]-D[M12,q1]];
+C122=Simplify[D[M22,q1]+D[M21,q2]-D[M12,q2]]//TraditionalForm;
+C123=Simplify[D[M32,q1]+D[M31,q2]-D[M12,q3]]//TraditionalForm;
+C124=Simplify[D[M42,q1]+D[M41,q2]-D[M12,q4]]//TraditionalForm;
+C131=Simplify[D[M13,q1]+D[M11,q3]-D[M13,q1]];
+C132=Simplify[D[M23,q1]+D[M21,q3]-D[M13,q2]]//TraditionalForm;
+C133=Simplify[D[M33,q1]+D[M31,q3]-D[M13,q3]]//TraditionalForm;
+C134=Simplify[D[M43,q1]+D[M41,q3]-D[M13,q4]]//TraditionalForm;
+C141=Simplify[D[M14,q1]+D[M11,q4]-D[M14,q1]];
+C142=Simplify[D[M24,q1]+D[M21,q4]-D[M14,q2]]//TraditionalForm;
+C143=Simplify[D[M34,q1]+D[M31,q4]-D[M14,q3]]//TraditionalForm;
+C144=Simplify[D[M44,q1]+D[M41,q4]-D[M14,q4]]//TraditionalForm;
+(*for I equal to 2*)
+C211=Simplify[D[M11,q2]+D[M12,q1]-D[M21,q1]];
+C212=Simplify[D[M21,q2]+D[M22,q1]-D[M21,q2]]//TraditionalForm;
+C213=Simplify[D[M31,q2]+D[M32,q1]-D[M21,q3]]//TraditionalForm;
+C214=Simplify[D[M41,q2]+D[M42,q1]-D[M21,q4]]//TraditionalForm;
+C221=Simplify[D[M12,q2]+D[M12,q2]-D[M22,q1]]//TraditionalForm;
+C222=Simplify[D[M22,q2]+D[M22,q2]-D[M22,q2]]//TraditionalForm;
+C223=Simplify[D[M32,q2]+D[M32,q2]-D[M22,q3]]//TraditionalForm;
+C224=Simplify[D[M42,q2]+D[M42,q2]-D[M22,q4]]//TraditionalForm;
+C231=Simplify[D[M13,q2]+D[M12,q3]-D[M23,q1]]//TraditionalForm;
+C232=Simplify[D[M23,q2]+D[M22,q3]-D[M23,q2]]//TraditionalForm;
+C233=Simplify[D[M33,q2]+D[M32,q3]-D[M23,q3]]//TraditionalForm;
+C234=Simplify[D[M43,q2]+D[M42,q3]-D[M23,q4]]//TraditionalForm;
+C241=Simplify[D[M14,q2]+D[M12,q4]-D[M24,q1]]//TraditionalForm;
+C242=Simplify[D[M24,q2]+D[M22,q4]-D[M24,q2]]//TraditionalForm;
+C243=Simplify[D[M34,q2]+D[M32,q4]-D[M24,q3]]//TraditionalForm;
+C244=Simplify[D[M44,q2]+D[M42,q4]-D[M24,q4]]//TraditionalForm;
+(*for I equal to 3*)
+C311=Simplify[D[M11,q3]+D[M13,q1]-D[M31,q1]];
+C312=Simplify[D[M21,q3]+D[M23,q1]-D[M31,q2]]//TraditionalForm;
+C313=Simplify[D[M31,q3]+D[M33,q1]-D[M31,q3]]//TraditionalForm;
+C314=Simplify[D[M41,q3]+D[M43,q1]-D[M31,q4]]//TraditionalForm;
+C321=Simplify[D[M12,q3]+D[M13,q2]-D[M32,q1]]//TraditionalForm;
+C322=Simplify[D[M22,q3]+D[M23,q2]-D[M32,q2]]//TraditionalForm;
+C323=Simplify[D[M32,q3]+D[M33,q2]-D[M32,q3]]//TraditionalForm;
+C324=Simplify[D[M42,q3]+D[M43,q2]-D[M32,q4]]//TraditionalForm;
+C331=Simplify[D[M13,q3]+D[M13,q3]-D[M33,q1]]//TraditionalForm;
+C332=Simplify[D[M23,q3]+D[M23,q3]-D[M33,q2]]//TraditionalForm;
+C333=Simplify[D[M33,q3]+D[M33,q3]-D[M33,q3]]//TraditionalForm;
+C234=Simplify[D[M43,q3]+D[M43,q3]-D[M33,q4]]//TraditionalForm;
+C341=Simplify[D[M14,q3]+D[M13,q4]-D[M34,q1]]//TraditionalForm;
+C342=Simplify[D[M24,q3]+D[M23,q4]-D[M34,q2]]//TraditionalForm;
+C343=Simplify[D[M34,q3]+D[M33,q4]-D[M34,q3]]//TraditionalForm;
+C344=Simplify[D[M44,q3]+D[M43,q4]-D[M34,q4]]//TraditionalForm;
+(*for I equal to 4*)
+C411=Simplify[D[M11,q4]+D[M14,q1]-D[M41,q1]];
+C412=Simplify[D[M21,q4]+D[M24,q1]-D[M41,q2]]//TraditionalForm;
+C413=Simplify[D[M31,q4]+D[M34,q1]-D[M41,q3]]//TraditionalForm;
+C314=Simplify[D[M41,q4]+D[M44,q1]-D[M31,q4]]//TraditionalForm;
+C421=Simplify[D[M12,q4]+D[M14,q2]-D[M42,q1]]//TraditionalForm;
+C422=Simplify[D[M22,q4]+D[M24,q2]-D[M42,q2]]//TraditionalForm;
+C423=Simplify[D[M32,q4]+D[M34,q2]-D[M42,q3]]//TraditionalForm;
+C424=Simplify[D[M42,q4]+D[M44,q2]-D[M42,q4]]//TraditionalForm;
+C431=Simplify[D[M13,q4]+D[M14,q3]-D[M43,q1]]//TraditionalForm;
+C432=Simplify[D[M23,q4]+D[M24,q3]-D[M43,q2]]//TraditionalForm;
+C433=Simplify[D[M33,q4]+D[M34,q3]-D[M43,q3]]//TraditionalForm;
+C434=Simplify[D[M43,q4]+D[M44,q3]-D[M43,q4]]//TraditionalForm;
+C441=Simplify[D[M14,q4]+D[M14,q4]-D[M44,q1]]//TraditionalForm;
+C442=Simplify[D[M24,q4]+D[M24,q4]-D[M44,q2]]//TraditionalForm;
+C443=Simplify[D[M34,q4]+D[M34,q4]-D[M44,q3]]//TraditionalForm;
+C444=Simplify[D[M44,q4]+D[M44,q4]-D[M44,q4]]//TraditionalForm;
+(*COLUMN 1 ROW 1 CALCULATIONS*)
+C1R1=Simplify[C111+C121+C131+C141]//TraditionalForm;n(*COLUMN 1 ROW 2 CALCULATIONS*)
+C1R2=Simplify[C112+C122+C132+C142]//TraditionalForm;
+(*COLUMN 1 ROW 3 CALCULATIONS*)
+C1R3=Simplify[C113+C123+C133+C143]//TraditionalForm;
+(*COLUMN 1 ROW 4 CALCULATIONS*)
+C1R4=Simplify[C114+C124+C134+C144]//TraditionalForm;
+(*//////////////////////////////*)
+(*COLUMN 2 ROW 1 CALCULATIONS*)
+C2R1=Simplify[C211+C221+C231+C241]//TraditionalForm;
+(*COLUMN 2 ROW 2 CALCULATIONS*)
+C2R2=Simplify[C212+C222+C232+C242]//TraditionalForm;
+(*COLUMN 2 ROW 3 CALCULATIONS*)
+C2R3=Simplify[C213+C223+C233+C243]//TraditionalForm;
+(*COLUMN 2 ROW 4 CALCULATIONS*)
+C2R4=Simplify[C214+C224+C234+C244]//TraditionalForm;
+(*//////////////////////////////*)
+(*COLUMN 3 ROW 1 CALCULATIONS*)
+C3R1=Simplify[C311+C321+C331+C341]//TraditionalForm;
+(*COLUMN 3 ROW 2 CALCULATIONS*)
+C3R2=Simplify[C312+C322+C332+C342]//TraditionalForm;
+(*COLUMN 3 ROW 3 CALCULATIONS*)
+C3R3=Simplify[C313+C323+C333+C343]//TraditionalForm;
+(*COLUMN 3 ROW 4 CALCULATIONS*)
+C3R4=Simplify[C314+C324+C234+C344]//TraditionalForm;
+(*//////////////////////////////*)
+(*COLUMN 4 ROW 1 CALCULATIONS*)
+C4R1=Simplify[C411+C421+C431+C441]//TraditionalForm;
+(*COLUMN 4 ROW 2 CALCULATIONS*)nC4R2=Simplify[C412+C422+C432+C442]//TraditionalForm;n(*COLUMN 4 ROW 3 CALCULATIONS*)
+C4R3=Simplify[C413+C423+C433+C443]//TraditionalForm;
+(*COLUMN 4 ROW 4 CALCULATIONS*)
+C4R4=Simplify[C414+C424+C434+C444]//TraditionalForm;

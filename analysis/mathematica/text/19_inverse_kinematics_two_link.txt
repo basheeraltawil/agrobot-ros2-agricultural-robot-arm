@@ -1,0 +1,17 @@
+(* Text export of 19_inverse_kinematics_two_link.nb (analysis/tools/nb_to_text.py) *)
+
+(* ---- Input ---- *)
+X=150;
+Y=100;
+a1=100;
+a2=100;
+C2=( X^2+Y^2-a1^2-a2^2)/(2 a1 a2);
+
+(* ---- Input ---- *)
+S2=Sqrt[1-C2^2];
+
+(* ---- Input ---- *)
+Simplify[ArcTan[C2,S2]]
+
+(* ---- Output ---- *)
+ArcTan[(Sqrt[39])/(5)]

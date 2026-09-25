@@ -1,0 +1,130 @@
+(* Text export of 12b_christoffel_symbols_organized.nb (analysis/tools/nb_to_text.py) *)
+
+(* ---- Input ---- *)
+(*Has been taken from manipulator_inertia_matrix_M_MATRIX_M1_M2_M3_M4_*)
+
+M11=(1)/(24) (8 a1^2 m1+24 a1^2 m2+8 a2^2 m2+12 a1^2 m3+24 a2^2 m3+25 a3^2 m3+24 d3^2 m3+18 a1^2 m4+12 a2^2 m4+24 a3^2 m4+4 a4^2 m4+24 a1 a2 (m2+2 m3+m4) Cos[q2]+6 a1^2 (2 m3-m4) Cos[2 q2]+12 a1 a2 m4 Cos[q2-2 q3]+24 a1 a3 m3 Cos[q2-q3]+24 a1 a3 m4 Cos[q2-q3]+3 a1^2 m4 Cos[2 (q2-q3)]+48 a2 a3 m3 Cos[q3]+48 a2 a3 m4 Cos[q3]-a3^2 m3 Cos[2 q3]+6 a1^2 m4 Cos[2 q3]+12 a2^2 m4 Cos[2 q3]+24 a1 a3 m3 Cos[q2+q3]+24 a1 a3 m4 Cos[q2+q3]+3 a1^2 m4 Cos[2 (q2+q3)]+12 a1 a2 m4 Cos[q2+2 q3]+6 a1 a4 m4 Cos[q2-q3-q4]+12 a2 a4 m4 Cos[q3-q4]+a4^2 m4 Cos[2 (q3-q4)]+6 a1 a4 m4 Cos[q2+q3-q4]+24 a3 a4 m4 Cos[q4]+3 a4^2 m4 Cos[2 q4]+6 a1 a4 m4 Cos[q2-q3+q4]+12 a2 a4 m4 Cos[q3+q4]+6 a1 a4 m4 Cos[q2+q3+q4]+24 a1 d3 m3 Sin[q2-q3]-48 a2 d3 m3 Sin[q3]-24 a1 d3 m3 Sin[q2+q3]);
+M12=(1)/(24) (8 a2^2 m2+a3^2 m3+a4^2 m4+12 a1 a2 m2 Cos[q2]-12 a1 (a3 m3+a2 m4) Cos[q2-q3]-6 a1^2 m4 Cos[2 q2-q3]-a3^2 m3 Cos[2 q3]+12 a1 a3 m3 Cos[q2+q3]+12 a1 a2 m4 Cos[q2+q3]+6 a1^2 m4 Cos[2 q2+q3]+a4^2 m4 Cos[2 (q3-q4)]+12 a1 d3 m4 Sin[q2]-12 a1 d3 m3 Sin[q2-q3]-12 a1 d3 m3 Sin[q2+q3]);
+
+M13=(1)/(24) (a3^2 m3-12 a2 a3 m4+a4^2 m4-24 a1 a3 m4 Cos[q2]-18 a1 a2 m4 Cos[q2-q3]-24 a1^2 m4 Cos[q3]-12 a2^2 m4 Cos[q3]-a3^2 m3 Cos[2 q3]-18 a1 a2 m4 Cos[q2+q3]-6 a1 a4 m4 Cos[q2-q4]+a4^2 m4 Cos[2 (q3-q4)]-6 a2 a4 m4 Cos[q4]-6 a1 a4 m4 Cos[q2+q4]);
+M14=(1)/(24) m4 (-12 a2 a3+a4^2-6 a1 a2 Cos[q2-q3]-12 a2^2 Cos[q3]-6 a1 a2 Cos[q2+q3]+a4^2 Cos[2 (q3-q4)]-6 a2 a4 Cos[q4]);
+M21=(1)/(24) (8 a2^2 m2+a3^2 m3+a4^2 m4+12 a1 a2 m2 Cos[q2]-12 a1 (a3 m3+a2 m4) Cos[q2-q3]-6 a1^2 m4 Cos[2 q2-q3]-a3^2 m3 Cos[2 q3]+12 a1 a3 m3 Cos[q2+q3]+12 a1 a2 m4 Cos[q2+q3]+6 a1^2 m4 Cos[2 q2+q3]+a4^2 m4 Cos[2 (q3-q4)]+12 a1 d3 m4 Sin[q2]-12 a1 d3 m3 Sin[q2-q3]-12 a1 d3 m3 Sin[q2+q3]);
+M22=(1)/(24) (8 a2^2 m2+24 a1^2 m3+24 a2^2 m3+a3^2 m3+12 a1^2 m4+24 a2^2 m4+6 a3^2 m4+a4^2 m4+6 d3^2 m4+48 a1 a2 (m3+m4) Cos[q2]+12 a1^2 m4 Cos[2 q2]+12 a1 a3 m4 Cos[q2-q3]+24 a2 a3 m4 Cos[q3]-a3^2 m3 Cos[2 q3]+12 a1 a3 m4 Cos[q2+q3]+a4^2 m4 Cos[2 (q3-q4)]+12 a1 d3 m4 Sin[q2-q3]-24 a2 d3 m4 Sin[q3]-12 a1 d3 m4 Sin[q2+q3]);
+M23=(1)/(24) (12 a2^2 m3+a3^2 m3+a4^2 m4+12 a1 a2 m3 Cos[q2]-6 a1 a3 m4 Cos[q2-q3]-a3^2 m3 Cos[2 q3]+6 a1 a3 m4 Cos[q2+q3]+a4^2 m4 Cos[2 (q3-q4)]-6 a1 d3 m4 Sin[q2-q3]-6 a1 d3 m4 Sin[q2+q3]);
+M24=(1)/(12) a4^2 m4 Cos[q3-q4]^2;
+M31=(1)/(24) (a3^2 m3-12 a2 a3 m4+a4^2 m4-24 a1 a3 m4 Cos[q2]-18 a1 a2 m4 Cos[q2-q3]-24 a1^2 m4 Cos[q3]-12 a2^2 m4 Cos[q3]-a3^2 m3 Cos[2 q3]-18 a1 a2 m4 Cos[q2+q3]-6 a1 a4 m4 Cos[q2-q4]+a4^2 m4 Cos[2 (q3-q4)]-6 a2 a4 m4 Cos[q4]-6 a1 a4 m4 Cos[q2+q4]);
+M32=(1)/(24) (12 a2^2 m3+a3^2 m3+a4^2 m4+12 a1 a2 m3 Cos[q2]-6 a1 a3 m4 Cos[q2-q3]-a3^2 m3 Cos[2 q3]+6 a1 a3 m4 Cos[q2+q3]+a4^2 m4 Cos[2 (q3-q4)]-6 a1 d3 m4 Sin[q2-q3]-6 a1 d3 m4 Sin[q2+q3]);
+M33=(1)/(24) (6 a2^2 m3+a3^2 m3+24 a1^2 m4+6 a2^2 m4+a4^2 m4+24 a1 a2 m4 Cos[q2]-a3^2 m3 Cos[2 q3]+a4^2 m4 Cos[2 (q3-q4)]);
+M34=(1)/(24) m4 (6 a2^2+a4^2+12 a1 a2 Cos[q2]+a4^2 Cos[2 (q3-q4)]);
+M41=(1)/(24) m4 (-12 a2 a3+a4^2-6 a1 a2 Cos[q2-q3]-12 a2^2 Cos[q3]-6 a1 a2 Cos[q2+q3]+a4^2 Cos[2 (q3-q4)]-6 a2 a4 Cos[q4]);
+M42=(1)/(12) a4^2 m4 Cos[q3-q4]^2;
+M43=(1)/(24) m4 (6 a2^2+a4^2+12 a1 a2 Cos[q2]+a4^2 Cos[2 (q3-q4)]);
+M44=(1)/(24) m4 (6 a2^2+a4^2+a4^2 Cos[2 (q3-q4)]);
+
+(* ---- Input ---- *)
+(*Christoffel Symbols Of the first Kind calculations*)
+(*for I equal to 1*)
+C111=Simplify[D[M11,q1]+D[M11,q1]-D[M11,q1]];
+C112=Simplify[D[M21,q1]+D[M21,q1]-D[M11,q2]];
+C113=Simplify[D[M31,q1]+D[M31,q1]-D[M11,q3]];
+C114=Simplify[D[M41,q1]+D[M41,q1]-D[M11,q4]];
+C121=Simplify[D[M12,q1]+D[M11,q2]-D[M12,q1]];
+C122=Simplify[D[M22,q1]+D[M21,q2]-D[M12,q2]];
+C123=Simplify[D[M32,q1]+D[M31,q2]-D[M12,q3]];
+C124=Simplify[D[M42,q1]+D[M41,q2]-D[M12,q4]];
+C131=Simplify[D[M13,q1]+D[M11,q3]-D[M13,q1]];
+C132=Simplify[D[M23,q1]+D[M21,q3]-D[M13,q2]];
+C133=Simplify[D[M33,q1]+D[M31,q3]-D[M13,q3]];
+C134=Simplify[D[M43,q1]+D[M41,q3]-D[M13,q4]];
+C141=Simplify[D[M14,q1]+D[M11,q4]-D[M14,q1]];
+C142=Simplify[D[M24,q1]+D[M21,q4]-D[M14,q2]];
+C143=Simplify[D[M34,q1]+D[M31,q4]-D[M14,q3]];
+C144=Simplify[D[M44,q1]+D[M41,q4]-D[M14,q4]];
+(*for I equal to 2*)
+C211=Simplify[D[M11,q2]+D[M12,q1]-D[M21,q1]];
+C212=Simplify[D[M21,q2]+D[M22,q1]-D[M21,q2]];
+C213=Simplify[D[M31,q2]+D[M32,q1]-D[M21,q3]];
+C214=Simplify[D[M41,q2]+D[M42,q1]-D[M21,q4]];
+C221=Simplify[D[M12,q2]+D[M12,q2]-D[M22,q1]];
+C222=Simplify[D[M22,q2]+D[M22,q2]-D[M22,q2]];
+C223=Simplify[D[M32,q2]+D[M32,q2]-D[M22,q3]];
+C224=Simplify[D[M42,q2]+D[M42,q2]-D[M22,q4]];
+C231=Simplify[D[M13,q2]+D[M12,q3]-D[M23,q1]];
+C232=Simplify[D[M23,q2]+D[M22,q3]-D[M23,q2]];
+C233=Simplify[D[M33,q2]+D[M32,q3]-D[M23,q3]];
+C234=Simplify[D[M43,q2]+D[M42,q3]-D[M23,q4]];
+C241=Simplify[D[M14,q2]+D[M12,q4]-D[M24,q1]];
+C242=Simplify[D[M24,q2]+D[M22,q4]-D[M24,q2]];
+C243=Simplify[D[M34,q2]+D[M32,q4]-D[M24,q3]];
+C244=Simplify[D[M44,q2]+D[M42,q4]-D[M24,q4]];
+(*Christoffel Symbols Of the first Kind calculations*)
+(*for I equal to 3*)
+C311=Simplify[D[M11,q3]+D[M13,q1]-D[M31,q1]];
+C312=Simplify[D[M21,q3]+D[M23,q1]-D[M31,q2]];
+C313=Simplify[D[M31,q3]+D[M33,q1]-D[M31,q3]];
+C314=Simplify[D[M41,q3]+D[M43,q1]-D[M31,q4]];
+C321=Simplify[D[M12,q3]+D[M13,q2]-D[M32,q1]];
+C322=Simplify[D[M22,q3]+D[M23,q2]-D[M32,q2]];
+C323=Simplify[D[M32,q3]+D[M33,q2]-D[M32,q3]];
+C324=Simplify[D[M42,q3]+D[M43,q2]-D[M32,q4]];
+C331=Simplify[D[M13,q3]+D[M13,q3]-D[M33,q1]];
+C332=Simplify[D[M23,q3]+D[M23,q3]-D[M33,q2]];
+C333=Simplify[D[M33,q3]+D[M33,q3]-D[M33,q3]];
+C234=Simplify[D[M43,q3]+D[M43,q3]-D[M33,q4]];
+C341=Simplify[D[M14,q3]+D[M13,q4]-D[M34,q1]];
+C342=Simplify[D[M24,q3]+D[M23,q4]-D[M34,q2]];
+C343=Simplify[D[M34,q3]+D[M33,q4]-D[M34,q3]];
+C344=Simplify[D[M44,q3]+D[M43,q4]-D[M34,q4]];
+(*for I equal to 4*)
+C411=Simplify[D[M11,q4]+D[M14,q1]-D[M41,q1]];
+C412=Simplify[D[M21,q4]+D[M24,q1]-D[M41,q2]];
+C413=Simplify[D[M31,q4]+D[M34,q1]-D[M41,q3]];
+C314=Simplify[D[M41,q4]+D[M44,q1]-D[M31,q4]];
+C421=Simplify[D[M12,q4]+D[M14,q2]-D[M42,q1]];
+C422=Simplify[D[M22,q4]+D[M24,q2]-D[M42,q2]];
+C423=Simplify[D[M32,q4]+D[M34,q2]-D[M42,q3]];
+C424=Simplify[D[M42,q4]+D[M44,q2]-D[M42,q4]];
+C431=Simplify[D[M13,q4]+D[M14,q3]-D[M43,q1]];
+C432=Simplify[D[M23,q4]+D[M24,q3]-D[M43,q2]];
+C433=Simplify[D[M33,q4]+D[M34,q3]-D[M43,q3]];
+C434=Simplify[D[M43,q4]+D[M44,q3]-D[M43,q4]];
+C441=Simplify[D[M14,q4]+D[M14,q4]-D[M44,q1]];
+C442=Simplify[D[M24,q4]+D[M24,q4]-D[M44,q2]];
+C443=Simplify[D[M34,q4]+D[M34,q4]-D[M44,q3]];
+C444=Simplify[D[M44,q4]+D[M44,q4]-D[M44,q4]];
+
+(* ---- Input ---- *)
+(*Christoffel Symbols with Coriolis and Centrifugal 
+4 by 4 matrix calculations*)
+(*COLUMN 1 ROW 1 CALCULATIONS*)
+C1R1=Simplify[C111*q1d+C121*q2d+C131*q3d+C141*q4d];n(*COLUMN 1 ROW 2 CALCULATIONS*)
+C1R2=Simplify[C112*q1d+C122*q2d+C132*q3d+C142*q4d];
+(*COLUMN 1 ROW 3 CALCULATIONS*)
+C1R3=Simplify[C113*q1d+C123*q2d+C133*q3d+C143*q4d];
+(*COLUMN 1 ROW 4 CALCULATIONS*)
+C1R4=Simplify[C114*q1d+C124*q2d+C134*q3d+C144*q4d];
+(*//////////////////////////////*)
+(*COLUMN 2 ROW 1 CALCULATIONS*)
+C2R1=Simplify[C211*q1d+C221*q2d+C231*q3d+C241*q4d];
+(*COLUMN 2 ROW 2 CALCULATIONS*)
+C2R2=Simplify[C212*q1d+C222*q2d+C232*q3d+C242*q4d];
+(*COLUMN 2 ROW 3 CALCULATIONS*)
+C2R3=Simplify[C213*q1d+C223*q2d+C233*q3d+C243*q4d];
+(*COLUMN 2 ROW 4 CALCULATIONS*)
+C2R4=Simplify[C214*q1d+C224*q2d+C234*q3d+C244*q4d];
+(*//////////////////////////////*)
+(*COLUMN 3 ROW 1 CALCULATIONS*)
+C3R1=Simplify[C311*q1d+C321*q2d+C331*q3d+C341*q4d];
+(*COLUMN 3 ROW 2 CALCULATIONS*)
+C3R2=Simplify[C312*q1d+C322*q2d+C332*q3d+C342*q4d];
+(*COLUMN 3 ROW 3 CALCULATIONS*)
+C3R3=Simplify[C313*q1d+C323*q2d+C333*q3d+C343*q4d];
+(*COLUMN 3 ROW 4 CALCULATIONS*)
+C3R4=Simplify[C314*q1d+C324*q2d+C234*q3d+C344*q4d];
+(*//////////////////////////////*)
+(*COLUMN 4 ROW 1 CALCULATIONS*)
+C4R1=Simplify[C411*q1d+C421*q2d+C431*q3d+C441*q4d];n(*COLUMN 4 ROW 2 CALCULATIONS*)
+C4R2=Simplify[C412*q1d+C422*q2d+C432*q3d+C442*q4d];n(*COLUMN 4 ROW 3 CALCULATIONS*)
+C4R3=Simplify[C413*q1d+C423*q2d+C433*q3d+C443*q4d];
+(*COLUMN 4 ROW 4 CALCULATIONS*)
+C4R4=Simplify[C414*q1d+C424*q2d+C434*q3d+C444*q4d];nCMATRIX=Simplify[({{C1R1 , C2R1, C3R1, C4R1}, {C1R2, C2R2, C3R2, C4R2}, {C1R3, C2R3, C3R3, C4R3}, {C1R4, C2R4, C3R4, C4R1}})]//MatrixForm

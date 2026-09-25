@@ -1,0 +1,19 @@
+(* Text export of 05_centre_of_mass_velocities.nb (analysis/tools/nb_to_text.py) *)
+
+(* ---- Input ---- *)
+Jv1=D[({{(1)/(2) a1 Cos[q1[t]]}, {(1)/(2) a1 Sin[q1[t]]}, {0}}),t]//MatrixForm
+
+(* ---- Output ---- *)
+({{-(1)/(2) a1 Sin[q1[t]] q1^'[t]}, {(1)/(2) a1 Cos[q1[t]] q1^'[t]}, {0}})
+
+(* ---- Input ---- *)
+Jv2=D[({{a1 Cos[q1[t]]+(1)/(2) a2 Cos[q1[t]+q2[t]]}, {a1 Sin[q1[t]]+(1)/(2) a2 Sin[q1[t]+q2[t]]}, {0}}),t]//MatrixForm
+
+(* ---- Output ---- *)
+({{-a1 Sin[q1[t]] q1^'[t]-(1)/(2) a2 Sin[q1[t]+q2[t]] (q1^'[t]+q2^'[t])}, {a1 Cos[q1[t]] q1^'[t]+(1)/(2) a2 Cos[q1[t]+q2[t]] (q1^'[t]+q2^'[t])}, {0}})
+
+(* ---- Input ---- *)
+Jv3=D[({{a1 Cos[q1[t]]+a2 Cos[q1[t]+q2[t]]+(1)/(2) a3 Cos[q1[t]+q2[t]] Cos[q3[t]]-(1)/(2) d3 Cos[q1[t]+q2[t]] Sin[q3[t]]}, {a1 Sin[q1[t]]+a2 Sin[q1[t]+q2[t]]+(1)/(2) a3 Cos[q3[t]] Sin[q1[t]+q2[t]]-(1)/(2) d3 Sin[q1[t]+q2[t]] Sin[q3[t]]}, {-(1)/(2) d3 Cos[q3[t]]-(1)/(2) a3 Sin[q3[t]]}}),t]//MatrixForm
+
+(* ---- Input ---- *)
+Jv4=D[({{a1 Cos[q1[t]]+a2 Cos[q1[t]+q2[t]]+a3 Cos[q1[t]+q2[t]] Cos[q3]+(1)/(2) a4 Cos[q1[t]+q2[t]] Cos[q3[t]-q4[t]]-d3 Cos[q1[t]+q2[t]] Sin[q3[t]]}, {a1 Sin[q1[t]]+a2 Sin[q1[t]+q2[t]]+a3 Cos[q3[t]] Sin[q1[t]+q2[t]]+(1)/(2) a4 Cos[q3[t]-q4[t]] Sin[q1[t]+q2[t]]-d3 Sin[q1[t]+q2[t]] Sin[q3[t]]}, {-d3 Cos[q3[t]]-a3 Sin[q3[t]]-(1)/(2) a4 Sin[q3[t]-q4[t]]}}),t]//MatrixForm

@@ -1,0 +1,19 @@
+(* Text export of 06_jacobian_columns_cross_product.nb (analysis/tools/nb_to_text.py) *)
+
+(* ---- Input ---- *)
+jv14=Cross[{0,0,1},{(1)/(2) a1 Cos[q1],(1)/(2) a1 Sin[q1],0}]//MatrixForm
+
+(* ---- Output ---- *)
+({{-(1)/(2) a1 Sin[q1]}, {(1)/(2) a1 Cos[q1]}, {0}})
+
+(* ---- Input ---- *)
+jv24=Cross[{0,0,1},{a1 Cos[q1]+(1)/(2) a2 Cos[q1+q2],a1 Sin[q1]+(1)/(2) a2 Sin[q1+q2],0}]//MatrixForm
+
+(* ---- Output ---- *)
+({{0}, {0}, {-a1 Cos[q1] Cos[q1+q2]-(1)/(2) a2 Cos[q1+q2]^2-a1 Sin[q1] Sin[q1+q2]-(1)/(2) a2 Sin[q1+q2]^2}})
+
+(* ---- Input ---- *)
+jv34=Cross[{-Sin[q1+q2],Cos[q1+q2],0},{a1 Cos[q1]+a2 Cos[q1+q2]+(1)/(2) a3 Cos[q1+q2] Cos[q3]-(1)/(2) d3 Cos[q1+q2] Sin[q3],a1 Sin[q1]+a2 Sin[q1+q2]+(1)/(2) a3 Cos[q3] Sin[q1+q2]-(1)/(2) d3 Sin[q1+q2] Sin[q3],-(1)/(2) d3 Cos[q3]-(1)/(2) a3 Sin[q3]}]//MatrixForm
+
+(* ---- Input ---- *)
+jv44=Cross[{-Cos[q1+q2] Sin[q3],-Sin[q1+q2] Sin[q3],-Cos[q3]},{a1 Cos[q1]+a2 Cos[q1+q2]+a3 Cos[q1+q2] Cos[q3]+(1)/(2) a4 Cos[q1+q2] Cos[q3-q4]-d3 Cos[q1+q2] Sin[q3],a1 Sin[q1]+a2 Sin[q1+q2]+a3 Cos[q3] Sin[q1+q2]+(1)/(2) a4 Cos[q3-q4] Sin[q1+q2]-d3 Sin[q1+q2] Sin[q3],-d3 Cos[q3]-a3 Sin[q3]-(1)/(2) a4 Sin[q3-q4]}]//MatrixForm

@@ -1,0 +1,127 @@
+(* Text export of 12_christoffel_symbols.nb (analysis/tools/nb_to_text.py) *)
+
+(* ---- Input ---- *)
+M11=(1)/(24) (8 a1^2 m1+24 a1^2 m2+8 a2^2 m2+12 a1^2 m3+24 a2^2 m3+25 a3^2 m3+24 d3^2 m3+18 a1^2 m4+12 a2^2 m4+24 a3^2 m4+4 a4^2 m4+24 a1 a2 (m2+2 m3+m4) Cos[q2]+6 a1^2 (2 m3-m4) Cos[2 q2]+12 a1 a2 m4 Cos[q2-2 q3]+24 a1 a3 m3 Cos[q2-q3]+24 a1 a3 m4 Cos[q2-q3]+3 a1^2 m4 Cos[2 (q2-q3)]+48 a2 a3 m3 Cos[q3]+48 a2 a3 m4 Cos[q3]-a3^2 m3 Cos[2 q3]+6 a1^2 m4 Cos[2 q3]+12 a2^2 m4 Cos[2 q3]+24 a1 a3 m3 Cos[q2+q3]+24 a1 a3 m4 Cos[q2+q3]+3 a1^2 m4 Cos[2 (q2+q3)]+12 a1 a2 m4 Cos[q2+2 q3]+6 a1 a4 m4 Cos[q2-q3-q4]+12 a2 a4 m4 Cos[q3-q4]+a4^2 m4 Cos[2 (q3-q4)]+6 a1 a4 m4 Cos[q2+q3-q4]+24 a3 a4 m4 Cos[q4]+3 a4^2 m4 Cos[2 q4]+6 a1 a4 m4 Cos[q2-q3+q4]+12 a2 a4 m4 Cos[q3+q4]+6 a1 a4 m4 Cos[q2+q3+q4]+24 a1 d3 m3 Sin[q2-q3]-48 a2 d3 m3 Sin[q3]-24 a1 d3 m3 Sin[q2+q3]);
+
+(* ---- Input ---- *)
+M12=(1)/(24) (8 a2^2 m2+a3^2 m3+a4^2 m4+12 a1 a2 m2 Cos[q2]-12 a1 (a3 m3+a2 m4) Cos[q2-q3]-6 a1^2 m4 Cos[2 q2-q3]-a3^2 m3 Cos[2 q3]+12 a1 a3 m3 Cos[q2+q3]+12 a1 a2 m4 Cos[q2+q3]+6 a1^2 m4 Cos[2 q2+q3]+a4^2 m4 Cos[2 (q3-q4)]+12 a1 d3 m4 Sin[q2]-12 a1 d3 m3 Sin[q2-q3]-12 a1 d3 m3 Sin[q2+q3]);
+
+(* ---- Input ---- *)
+M13=(1)/(24) (a3^2 m3-12 a2 a3 m4+a4^2 m4-24 a1 a3 m4 Cos[q2]-18 a1 a2 m4 Cos[q2-q3]-24 a1^2 m4 Cos[q3]-12 a2^2 m4 Cos[q3]-a3^2 m3 Cos[2 q3]-18 a1 a2 m4 Cos[q2+q3]-6 a1 a4 m4 Cos[q2-q4]+a4^2 m4 Cos[2 (q3-q4)]-6 a2 a4 m4 Cos[q4]-6 a1 a4 m4 Cos[q2+q4]);
+
+(* ---- Input ---- *)
+M14=(1)/(24) m4 (-12 a2 a3+a4^2-6 a1 a2 Cos[q2-q3]-12 a2^2 Cos[q3]-6 a1 a2 Cos[q2+q3]+a4^2 Cos[2 (q3-q4)]-6 a2 a4 Cos[q4]);
+
+(* ---- Input ---- *)
+M21=(1)/(24) (8 a2^2 m2+a3^2 m3+a4^2 m4+12 a1 a2 m2 Cos[q2]-12 a1 (a3 m3+a2 m4) Cos[q2-q3]-6 a1^2 m4 Cos[2 q2-q3]-a3^2 m3 Cos[2 q3]+12 a1 a3 m3 Cos[q2+q3]+12 a1 a2 m4 Cos[q2+q3]+6 a1^2 m4 Cos[2 q2+q3]+a4^2 m4 Cos[2 (q3-q4)]+12 a1 d3 m4 Sin[q2]-12 a1 d3 m3 Sin[q2-q3]-12 a1 d3 m3 Sin[q2+q3]);
+
+(* ---- Input ---- *)
+M22=(1)/(24) (8 a2^2 m2+24 a1^2 m3+24 a2^2 m3+a3^2 m3+12 a1^2 m4+24 a2^2 m4+6 a3^2 m4+a4^2 m4+6 d3^2 m4+48 a1 a2 (m3+m4) Cos[q2]+12 a1^2 m4 Cos[2 q2]+12 a1 a3 m4 Cos[q2-q3]+24 a2 a3 m4 Cos[q3]-a3^2 m3 Cos[2 q3]+12 a1 a3 m4 Cos[q2+q3]+a4^2 m4 Cos[2 (q3-q4)]+12 a1 d3 m4 Sin[q2-q3]-24 a2 d3 m4 Sin[q3]-12 a1 d3 m4 Sin[q2+q3]);
+
+(* ---- Input ---- *)
+M23=(1)/(24) (12 a2^2 m3+a3^2 m3+a4^2 m4+12 a1 a2 m3 Cos[q2]-6 a1 a3 m4 Cos[q2-q3]-a3^2 m3 Cos[2 q3]+6 a1 a3 m4 Cos[q2+q3]+a4^2 m4 Cos[2 (q3-q4)]-6 a1 d3 m4 Sin[q2-q3]-6 a1 d3 m4 Sin[q2+q3]);
+
+(* ---- Input ---- *)
+M24=(1)/(12) a4^2 m4 Cos[q3-q4]^2;
+
+(* ---- Input ---- *)
+M31=(1)/(24) (a3^2 m3-12 a2 a3 m4+a4^2 m4-24 a1 a3 m4 Cos[q2]-18 a1 a2 m4 Cos[q2-q3]-24 a1^2 m4 Cos[q3]-12 a2^2 m4 Cos[q3]-a3^2 m3 Cos[2 q3]-18 a1 a2 m4 Cos[q2+q3]-6 a1 a4 m4 Cos[q2-q4]+a4^2 m4 Cos[2 (q3-q4)]-6 a2 a4 m4 Cos[q4]-6 a1 a4 m4 Cos[q2+q4]);
+
+(* ---- Input ---- *)
+M32=(1)/(24) (12 a2^2 m3+a3^2 m3+a4^2 m4+12 a1 a2 m3 Cos[q2]-6 a1 a3 m4 Cos[q2-q3]-a3^2 m3 Cos[2 q3]+6 a1 a3 m4 Cos[q2+q3]+a4^2 m4 Cos[2 (q3-q4)]-6 a1 d3 m4 Sin[q2-q3]-6 a1 d3 m4 Sin[q2+q3]);
+
+(* ---- Input ---- *)
+M33=(1)/(24) (6 a2^2 m3+a3^2 m3+24 a1^2 m4+6 a2^2 m4+a4^2 m4+24 a1 a2 m4 Cos[q2]-a3^2 m3 Cos[2 q3]+a4^2 m4 Cos[2 (q3-q4)]);
+
+(* ---- Input ---- *)
+M34=(1)/(24) m4 (6 a2^2+a4^2+12 a1 a2 Cos[q2]+a4^2 Cos[2 (q3-q4)]);
+
+(* ---- Input ---- *)
+M41=(1)/(24) m4 (-12 a2 a3+a4^2-6 a1 a2 Cos[q2-q3]-12 a2^2 Cos[q3]-6 a1 a2 Cos[q2+q3]+a4^2 Cos[2 (q3-q4)]-6 a2 a4 Cos[q4]);
+
+(* ---- Input ---- *)
+M42=(1)/(12) a4^2 m4 Cos[q3-q4]^2;
+
+(* ---- Input ---- *)
+M43=(1)/(24) m4 (6 a2^2+a4^2+12 a1 a2 Cos[q2]+a4^2 Cos[2 (q3-q4)]);
+
+(* ---- Input ---- *)
+M44=(1)/(24) m4 (6 a2^2+a4^2+a4^2 Cos[2 (q3-q4)]);
+
+(* ---- Input ---- *)
+C111=Simplify[D[M11,q1]+D[M11,q1]-D[M11,q1]]
+
+(* ---- Output ---- *)
+0
+
+(* ---- Output ---- *)
+a1 sin(q2) (a1 cos(q2) (2 m3+m4 cos(2 q3)-m4)+a2 m2+2 a2 m3-a2 m4 sin^2(q3)+a2 m4 cos^2(q3)+a2 m4+cos(q3) (2 a3 (m3+m4)+a4 m4 cos(q4))-2 d3 m3 sin(q3))
+
+(* ---- Input ---- *)
+C114=Simplify[D[M41,q1]+D[M41,q1]-D[M11,q4]]//TraditionalForm
+
+(* ---- Output ---- *)
+(1)/(12) a4 m4 (-2 cos(q3) (a4 sin(q3) cos^2(q4)-6 sin(q4) (a1 cos(q2)+a2))+sin(q4) (12 a3+a4 cos(2 q3-q4)+5 a4 cos(q4))+a4 cos^2(q3) sin(2 q4))
+
+(* ---- Output ---- *)
+-a1 sin(q2) (a1 cos(q2) (2 m3+m4 cos(2 q3)-m4)+a2 m2+2 a2 m3-a2 m4 sin^2(q3)+a2 m4 cos^2(q3)+a2 m4+cos(q3) (2 a3 (m3+m4)+a4 m4 cos(q4))-2 d3 m3 sin(q3))
+
+(* ---- Output ---- *)
+0
+
+(* ---- Input ---- *)
+C123=Simplify[D[M32,q1]+D[M31,q2]-D[M12,q3]]//TraditionalForm
+
+(* ---- Output ---- *)
+(1)/(12) (6 a1 sin(q2) (cos(q3) (2 a1 m4 cos(q2)+5 a2 m4+2 a3 m3)+2 a3 m4+a4 m4 cos(q4)-2 d3 m3 sin(q3))+a3^2 (-m3) sin(2 q3)+a4^2 m4 sin(2 (q3-q4)))
+
+(* ---- Input ---- *)
+C124=Simplify[D[M42,q1]+D[M41,q2]-D[M12,q4]]//TraditionalForm
+
+(* ---- Output ---- *)
+(1)/(12) m4 (3 a1 a2 sin(q2-q3)+3 a1 a2 sin(q2+q3)+a4^2 (-sin(2 (q3-q4))))
+
+(* ---- Input ---- *)
+C131=Simplify[D[M13,q1]+D[M11,q3]-D[M13,q1]]//TraditionalForm
+
+(* ---- Input ---- *)
+C132=Simplify[D[M23,q1]+D[M21,q3]-D[M13,q2]]//TraditionalForm
+
+(* ---- Output ---- *)
+(1)/(12) (-6 a1 sin(q2) (cos(q3) (2 a1 m4 cos(q2)+5 a2 m4+2 a3 m3)+2 a3 m4+a4 m4 cos(q4)-2 d3 m3 sin(q3))+a3^2 m3 sin(2 q3)-a4^2 m4 sin(2 (q3-q4)))
+
+(* ---- Input ---- *)
+C133=Simplify[D[M33,q1]+D[M31,q3]-D[M13,q3]]//TraditionalForm
+
+(* ---- Output ---- *)
+0
+
+(* ---- Input ---- *)
+C134=Simplify[D[M43,q1]+D[M41,q3]-D[M13,q4]]//TraditionalForm
+
+(* ---- Output ---- *)
+-(1)/(12) m4 (3 a1 a2 sin(q2-q3)-3 a1 a2 sin(q2+q3)-3 a1 a4 sin(q2-q4)+3 a1 a4 sin(q2+q4)-6 a2^2 sin(q3)+3 a2 a4 sin(q4)+2 a4^2 sin(2 (q3-q4)))
+
+(* ---- Input ---- *)
+C141=Simplify[D[M14,q1]+D[M11,q4]-D[M14,q1]]//TraditionalForm
+
+(* ---- Output ---- *)
+-(1)/(12) a4 m4 (-2 cos(q3) (a4 sin(q3) cos^2(q4)-6 sin(q4) (a1 cos(q2)+a2))+sin(q4) (12 a3+a4 cos(2 q3-q4)+5 a4 cos(q4))+a4 cos^2(q3) sin(2 q4))
+
+(* ---- Input ---- *)
+C142=Simplify[D[M24,q1]+D[M21,q4]-D[M14,q2]]//TraditionalForm
+
+(* ---- Output ---- *)
+(1)/(12) m4 (-3 a1 a2 sin(q2-q3)-3 a1 a2 sin(q2+q3)+a4^2 sin(2 (q3-q4)))
+
+(* ---- Input ---- *)
+C143=Simplify[D[M34,q1]+D[M31,q4]-D[M14,q3]]//TraditionalForm
+
+(* ---- Output ---- *)
+(1)/(12) m4 (3 a1 a2 sin(q2-q3)-3 a1 a2 sin(q2+q3)-3 a1 a4 sin(q2-q4)+3 a1 a4 sin(q2+q4)-6 a2^2 sin(q3)+3 a2 a4 sin(q4)+2 a4^2 sin(2 (q3-q4)))
+
+(* ---- Input ---- *)
+C144=Simplify[D[M44,q1]+D[M41,q4]-D[M14,q4]]//TraditionalForm
+
+(* ---- Output ---- *)
+0

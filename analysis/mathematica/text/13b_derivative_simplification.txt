@@ -1,0 +1,10 @@
+(* Text export of 13b_derivative_simplification.nb (analysis/tools/nb_to_text.py) *)
+
+(* ---- Input ---- *)
+Simplify[m2 (-(1)/(2) a2 (-a1 Cos[q1]-(1)/(2) a2 Cos[q1+q2]) Sin[q1+q2]-(1)/(2) a2 (a1 Cos[q1]+(1)/(2) a2 Cos[q1+q2]) Sin[q1+q2])+m3 ((-a1 Cos[q1]-a2 Cos[q1+q2]) (-d3 Cos[q1+q2] Cos[q3]-a3 Cos[q1+q2] Sin[q3])+(a1 Cos[q1]+a2 Cos[q1+q2]) (-d3 Cos[q1+q2] Cos[q3]-a3 Cos[q1+q2] Sin[q3])+(-a1 Sin[q1]-a2 Sin[q1+q2]) (-d3 Cos[q3] Sin[q1+q2]-a3 Sin[q1+q2] Sin[q3])+(-a1 Sin[q1]-a2 Sin[q1+q2]) (d3 Cos[q3] Sin[q1+q2]+a3 Sin[q1+q2] Sin[q3]))+m4 ((-(1)/(2) d3 Cos[q1+q2] Cos[q3]-(1)/(2) a3 Cos[q1+q2] Sin[q3]) (-a1 Cos[q1] Cos[q3]-a2 Cos[q1+q2] Cos[q3]-a3 Cos[q1+q2] Cos[q3]^2-(1)/(2) a4 Cos[q1+q2] Cos[q3] Cos[q3-q4]-a3 Cos[q1+q2] Sin[q3]^2-(1)/(2) a4 Cos[q1+q2] Sin[q3] Sin[q3-q4])+(-(1)/(2) d3 Cos[q1+q2] Cos[q3]-(1)/(2) a3 Cos[q1+q2] Sin[q3]) (a1 Cos[q1] Cos[q3]+a2 Cos[q1+q2] Cos[q3]+a3 Cos[q1+q2] Cos[q3]^2+(1)/(2) a4 Cos[q1+q2] Cos[q3] Cos[q3-q4]+a3 Cos[q1+q2] Sin[q3]^2+(1)/(2) a4 Cos[q1+q2] Sin[q3] Sin[q3-q4])+(-(1)/(2) d3 Cos[q3] Sin[q1+q2]-(1)/(2) a3 Sin[q1+q2] Sin[q3]) (a1 Cos[q3] Sin[q1]+a2 Cos[q3] Sin[q1+q2]+a3 Cos[q3]^2 Sin[q1+q2]+(1)/(2) a4 Cos[q3] Cos[q3-q4] Sin[q1+q2]+a3 Sin[q1+q2] Sin[q3]^2+(1)/(2) a4 Sin[q1+q2] Sin[q3] Sin[q3-q4])+((1)/(2) d3 Cos[q3] Sin[q1+q2]+(1)/(2) a3 Sin[q1+q2] Sin[q3]) (a1 Cos[q3] Sin[q1]+a2 Cos[q3] Sin[q1+q2]+a3 Cos[q3]^2 Sin[q1+q2]+(1)/(2) a4 Cos[q3] Cos[q3-q4] Sin[q1+q2]+a3 Sin[q1+q2] Sin[q3]^2+(1)/(2) a4 Sin[q1+q2] Sin[q3] Sin[q3-q4]))]
+
+(* ---- Output ---- *)
+0
+
+(* ---- Output ---- *)
+-(1)/(2) a1 (2 a1 m4 Cos[q2]^2 Sin[q3]+Cos[q2] (-d3 m4+2 d3 m3 Cos[q3]+2 (a3 m3+a2 m4) Sin[q3])+Sin[q2] (a2 m2-2 a1 m4 Sin[q2] Sin[q3]))

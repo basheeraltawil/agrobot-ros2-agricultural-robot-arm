@@ -1,0 +1,57 @@
+(* Text export of 18_workspace.nb (analysis/tools/nb_to_text.py) *)
+
+(* ---- Input ---- *)
+a1=12;
+a2=12;
+a3=8;
+a4=8.5;
+d4=8;
+d4e1=5;
+a4e2=5;
+tpp=8;
+tstep=0.001;(*TIME STEP*)
+tpath=t-6;(*END EFFECTOR FUNCTION*)
+tdpath=1;
+tddpath=0;
+q1value=360;
+q2value=360;
+q3value=360;
+q4value=360;
+m1=0.07;
+m2=0.07;
+m3=0.05;
+m4=0.05;
+q1=Table[(47+q1value)*tpath*π/180,{t,1,tpp,tstep}];
+q2=Table[(191+q2value)*tpath*π/180,{t,1,tpp,tstep}];
+q3=Table[(164+q3value)*tpath*π/180,{t,1,tpp,tstep}];
+q4=Table[(180+q4value)*tpath*π/180,{t,1,tpp,tstep}];
+
+                    (*GRIPPER ONE FORWARD KINEMATIC*)
+Forward1=({{Cos[q1+q2]*Cos[q3-q4], Cos[q1+q2]*Sin[q3-q4], Sin[q1+q2], a1*Cos[q1]+a2*Cos[q1+q2]+a3*Cos[q3]*Cos[q1+q2]-d4*Sin[q3]*Cos[q1+q2]+d4e1*Sin[q1+q2]}, {Sin[q1+q2]*Cos[q3-q4], Sin[q1+q2]*Sin[q3-q4], -Cos[q1+q2], a1*Sin[q1]+a2*Sin[q1+q2]+a3*Cos[q3]*Sin[q1+q2]-d4*Sin[q3]*Sin[q1+q2]-d4e1*Cos[q1+q2]}, {-Sin[q3-q4], Cos[q3-q4], 0, a3*Sin[q3]-d4*Cos[q3]}, {0, 0, 0, 1}});
+                      (*GRIPPER TWO FORWARD KINEMATIC*)
+Forward2=({{Cos[q1+q2]*Cos[q3-q4], Cos[q1+q2]*Sin[q3-q4], Sin[q1+q2], a1*Cos[q1]+a2*Cos[q1+q2]+a3*Cos[q3]*Cos[q1+q2]+a4e2*Cos[q3]*Cos[q1+q2]-d4*Sin[q3]*Cos[q1+q2]}, {Sin[q1+q2]*Cos[q3-q4], Sin[q1+q2]*Sin[q3-q4], -Cos[q1+q2], a1*Sin[q1]+a2*Sin[q1+q2]+a3*Cos[q3]*Sin[q1+q2]+a4e2*Cos[q3]*Sin[q1+q2]-d4*Sin[q3]*Sin[q1+q2]}, {-Sin[q3-q4], Cos[q3-q4], 1, -a3*Sin[q3]-a4e2*Sin[q3]-d4*Cos[q3]}, {0, 0, 0, 1}});
+
+(*GRIPPER ONE POSITIONS*)
+XPOSITIONEE1=Forward1[[1,4]];
+YPOSITIONEE1=Forward1[[2,4]];
+ZPOSITIONEE1=Forward1[[3,4]];
+Points1=Table[{XPOSITIONEE1[[i]],YPOSITIONEE1[[i]],ZPOSITIONEE1[[i]]},{i,0,Dimensions[XPOSITIONEE1][[1]]}];
+(*ListPointPlot3D[Points1,PlotRange->All,ColorFunction->Function[{x,y,z},Hue[z]],PlotLabel->"Gripper1",Filling->Top]*)
+ListPointPlot3D[Points1,PlotRange->All,PlotStyle->{Darker[Brown],Specularity[Red,5],PointSize[0.1]},Axes->None,PlotLabel->"Gripper1",Filling->Top]
+(*GRIPPER TOW POSITIONS*)
+XPOSITIONEE2=Forward2[[1,4]];
+YPOSITIONEE2=Forward2[[2,4]];
+ZPOSITIONEE2=Forward2[[3,4]];
+Points2=Table[{XPOSITIONEE2[[j]],YPOSITIONEE2[[j]],ZPOSITIONEE2[[j]]},{j,0,Dimensions[XPOSITIONEE2][[1]]}];
+(*ListPointPlot3D[Points2,PlotRange->All,PlotStyle->PointSize[Tiny],Filling->Top]*)
+ListPointPlot3D[Points2,PlotRange->All,PlotStyle->{Darker[Purple],Specularity[Red,5],PointSize[0.1]},Axes->None,PlotLabel->"Gripper2",Filling->Top]
+(*GRIPEER ONE PLOTTING*)
+(*ListPlot[{XPOSITIONEE1},PlotLegends->{"XPOSITIONE-E1"}]
+ListPlot[{YPOSITIONEE1},PlotLegends->{"YPOSITIONE-E1"}]
+ListPlot[{ZPOSITIONEE1},PlotLegends->{"ZPOSITIONE-E1"}]
+ListLinePlot[{XPOSITIONEE1,YPOSITIONEE1,ZPOSITIONEE1},PlotLegends->{"XPOSITIONEE1","YPOSITIONEE1","ZPOSITIONEE1"}]
+(*GRIPEER TOW PLOTTING*)
+ListPlot[{XPOSITIONEE2},PlotLegends->{"XPOSITIONE-E2"}]
+ListPlot[{YPOSITIONEE2},PlotLegends->{"YPOSITIONE-E2"}]
+ListPlot[{ZPOSITIONEE2},PlotLegends->{"ZPOSITIONE-E2"}]
+ListLinePlot[{XPOSITIONEE2,YPOSITIONEE2,ZPOSITIONEE2},PlotLegends->{"XPOSITIONEE2","YPOSITIONEE2","ZPOSITIONEE2"}]*)

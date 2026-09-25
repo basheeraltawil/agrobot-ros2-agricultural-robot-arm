@@ -1,0 +1,10 @@
+(* Text export of 13_partial_derivative_check.nb (analysis/tools/nb_to_text.py) *)
+
+(* ---- Input ---- *)
+matrix={{1,2,3},{4,5,6},{7,8,9}};nmatrix[[2,2]]
+
+(* ---- Output ---- *)
+5
+
+(* ---- Input ---- *)
+D[(a2^2 m2)/(12)+(1)/(12) a4^2 m4 Cos[q3-q4]^2+m2 ((1)/(2) a2 Cos[q1+q2] (a1 Cos[q1]+(1)/(2) a2 Cos[q1+q2])-(1)/(2) a2 Sin[q1+q2] (-a1 Sin[q1]-(1)/(2) a2 Sin[q1+q2]))+(1)/(12) a3^2 m3 Sin[q3]^2+m3 ((-a1 Sin[q1]-a2 Sin[q1+q2]) (-d3 Cos[q1+q2] Cos[q3]-a3 Cos[q1+q2] Sin[q3])+(a1 Cos[q1]+a2 Cos[q1+q2]) (-d3 Cos[q3] Sin[q1+q2]-a3 Sin[q1+q2] Sin[q3]))+m4 ((-a1 Cos[q1+q2] Sin[q1] Sin[q3]+a1 Cos[q1] Sin[q1+q2] Sin[q3]) (-a1 Cos[q1] Cos[q1+q2]-a2 Cos[q1+q2]^2-(1)/(2) a3 Cos[q1+q2]^2 Cos[q3]-a1 Sin[q1] Sin[q1+q2]-a2 Sin[q1+q2]^2-(1)/(2) a3 Cos[q3] Sin[q1+q2]^2+(1)/(2) d3 Cos[q1+q2]^2 Sin[q3]+(1)/(2) d3 Sin[q1+q2]^2 Sin[q3])+(-(1)/(2) d3 Cos[q3] Sin[q1+q2]-(1)/(2) a3 Sin[q1+q2] Sin[q3]) (-a1 Cos[q1] Cos[q3]-a2 Cos[q1+q2] Cos[q3]-a3 Cos[q1+q2] Cos[q3]^2-(1)/(2) a4 Cos[q1+q2] Cos[q3] Cos[q3-q4]-a3 Cos[q1+q2] Sin[q3]^2-(1)/(2) a4 Cos[q1+q2] Sin[q3] Sin[q3-q4])+(-(1)/(2) d3 Cos[q1+q2] Cos[q3]-(1)/(2) a3 Cos[q1+q2] Sin[q3]) (a1 Cos[q3] Sin[q1]+a2 Cos[q3] Sin[q1+q2]+a3 Cos[q3]^2 Sin[q1+q2]+(1)/(2) a4 Cos[q3] Cos[q3-q4] Sin[q1+q2]+a3 Sin[q1+q2] Sin[q3]^2+(1)/(2) a4 Sin[q1+q2] Sin[q3] Sin[q3-q4])),q1]

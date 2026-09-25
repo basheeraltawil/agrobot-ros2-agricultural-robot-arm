@@ -1,0 +1,44 @@
+(* Text export of 16_joint_torques_numeric_example.nb (analysis/tools/nb_to_text.py) *)
+
+(* ---- Input ---- *)
+a1=12;
+a2=12;
+a3=8;
+a4=8.5;
+d3=8;
+(*q1:=0.051*t^5-0.1765*t^4+1.6861*t^3-1.9407*t^2-6.1531*t-239.36;
+q2:=0.051*t^5-0.1765*t^4+1.6861*t^3-1.9407*t^2-6.1531*t-239.36;
+q3:=0.051*t^5-0.1765*t^4+1.6861*t^3-1.9407*t^2-6.1531*t-239.36;
+q4:=0.051*t^5-0.1765*t^4+1.6861*t^3-1.9407*t^2-6.1531*t-239.36;*)
+q1=30 Degree;
+q2=20  Degree;
+q3=90  Degree;
+q4=-15  Degree;
+q1d=0.5;
+q2d=0.4;
+q3d=0.4;
+q4d=0.4;
+q1dd=0;
+q2dd=0;
+q3dd=0;
+q4dd=0;
+m1=0.08;
+m2=0.08;
+m3=0.08;
+m4=0.06;
+T1=(1)/(24) (m4 q4dd (-12 a2 a3+a4^2-6 a1 a2 Cos[q2-q3]-12 a2^2 Cos[q3]-6 a1 a2 Cos[q2+q3]+a4^2 Cos[2 (q3-q4)]-6 a2 a4 Cos[q4])-q3dd (-a3^2 m3+12 a2 a3 m4-a4^2 m4+24 a1 a3 m4 Cos[q2]+18 a1 a2 m4 Cos[q2-q3]+24 a1^2 m4 Cos[q3]+12 a2^2 m4 Cos[q3]+a3^2 m3 Cos[2 q3]+18 a1 a2 m4 Cos[q2+q3]+6 a1 a4 m4 Cos[q2-q4]-a4^2 m4 Cos[2 (q3-q4)]+6 a2 a4 m4 Cos[q4]+6 a1 a4 m4 Cos[q2+q4])-48 a1^2 m4 Cos[q2]^2 (q2d^2+q1d q3d Cos[q3]) Sin[q3]+q1dd (8 a1^2 m1+24 a1^2 m2+8 a2^2 m2+12 a1^2 m3+24 a2^2 m3+25 a3^2 m3+24 d3^2 m3+18 a1^2 m4+12 a2^2 m4+24 a3^2 m4+4 a4^2 m4+24 a1 a2 (m2+2 m3+m4) Cos[q2]+6 a1^2 (2 m3-m4) Cos[2 q2]+12 a1 a2 m4 Cos[q2-2 q3]+24 a1 a3 m3 Cos[q2-q3]+24 a1 a3 m4 Cos[q2-q3]+3 a1^2 m4 Cos[2 (q2-q3)]+48 a2 a3 m3 Cos[q3]+48 a2 a3 m4 Cos[q3]-a3^2 m3 Cos[2 q3]+6 a1^2 m4 Cos[2 q3]+12 a2^2 m4 Cos[2 q3]+24 a1 a3 m3 Cos[q2+q3]+24 a1 a3 m4 Cos[q2+q3]+3 a1^2 m4 Cos[2 (q2+q3)]+12 a1 a2 m4 Cos[q2+2 q3]+6 a1 a4 m4 Cos[q2-q3-q4]+12 a2 a4 m4 Cos[q3-q4]+a4^2 m4 Cos[2 (q3-q4)]+6 a1 a4 m4 Cos[q2+q3-q4]+24 a3 a4 m4 Cos[q4]+3 a4^2 m4 Cos[2 q4]+6 a1 a4 m4 Cos[q2-q3+q4]+12 a2 a4 m4 Cos[q3+q4]+6 a1 a4 m4 Cos[q2+q3+q4]+24 a1 d3 m3 Sin[q2-q3]-48 a2 d3 m3 Sin[q3]-24 a1 d3 m3 Sin[q2+q3])+q2dd (8 a2^2 m2+a3^2 m3+a4^2 m4+12 a1 a2 m2 Cos[q2]-12 a1 (a3 m3+a2 m4) Cos[q2-q3]-6 a1^2 m4 Cos[2 q2-q3]-a3^2 m3 Cos[2 q3]+12 a1 a3 m3 Cos[q2+q3]+12 a1 a2 m4 Cos[q2+q3]+6 a1^2 m4 Cos[2 q2+q3]+a4^2 m4 Cos[2 (q3-q4)]+12 a1 d3 m4 Sin[q2]-12 a1 d3 m3 Sin[q2-q3]-12 a1 d3 m3 Sin[q2+q3])-24 a1 Cos[q2] (-d3 m4 q2d^2+4 a1 m3 q1d q2d Sin[q2]+2 a3 m3 q2d^2 Sin[q3]+2 a2 m4 q2d^2 Sin[q3]+4 a3 m3 q1d q3d Sin[q3]+4 a3 m4 q1d q3d Sin[q3]-a2 m4 q3d q4d Sin[q3]+2 a4 m4 q1d q3d Cos[q4] Sin[q3]-a4 m4 q3d q4d Sin[q4]+2 Cos[q3] (d3 m3 q2d^2+2 d3 m3 q1d q3d+a1 m4 q2d q3d Sin[q2]+4 a2 m4 q1d q3d Sin[q3]+a4 m4 q1d q4d Sin[q4]))+4 (6 a1^2 m4 q1d q2d Sin[2 q2]-6 a1^2 m4 q1d q2d Cos[2 q3] Sin[2 q2]-9 a1 a2 m4 q3d^2 Sin[q2-q3]+3 a1 a2 m4 q2d q4d Sin[q2-q3]-24 a2 a3 m3 q1d q3d Sin[q3]-24 a2 a3 m4 q1d q3d Sin[q3]+12 a1^2 m4 q3d^2 Sin[q3]+6 a2^2 m4 q3d^2 Sin[q3]+6 a2^2 m4 q3d q4d Sin[q3]-12 a2 a4 m4 q1d q3d Cos[q4] Sin[q3]+12 a1^2 m4 q2d^2 Sin[q2]^2 Sin[q3]-6 a1 q2d Sin[q2] (2 a2 m2 q1d+4 a2 m3 q1d+a2 m4 q1d+a2 m2 q2d-2 a3 m4 q3d+a2 m4 q1d Cos[2 q3]-a4 m4 q3d Cos[q4]-4 d3 m3 q1d Sin[q3]-2 d3 m3 q3d Sin[q3])+a3^2 m3 q1d q3d Sin[2 q3]-12 a2^2 m4 q1d q3d Sin[2 q3]+a3^2 m3 q2d q3d Sin[2 q3]+a3^2 m3 q3d^2 Sin[2 q3]-3 a1^2 m4 q1d q3d Cos[2 q2] Sin[2 q3]+a4^2 m4 q1d q4d Cos[q4]^2 Sin[2 q3]-a4^2 m4 q1d q3d Cos[2 q4] Sin[2 q3]+9 a1 a2 m4 q3d^2 Sin[q2+q3]+3 a1 a2 m4 q2d q4d Sin[q2+q3]-a4^2 m4 q2d q3d Sin[2 (q3-q4)]-a4^2 m4 q3d^2 Sin[2 (q3-q4)]+a4^2 m4 q2d q4d Sin[2 (q3-q4)]+a4^2 m4 q4d^2 Sin[2 (q3-q4)]-12 a3 a4 m4 q1d q4d Sin[q4]+3 a2 a4 m4 q3d q4d Sin[q4]+3 a2 a4 m4 q4d^2 Sin[q4]-a4^2 m4 q1d q4d Cos[2 q3-q4] Sin[q4]-5 a4^2 m4 q1d q4d Cos[q4] Sin[q4]-2 a4^2 m4 q1d q3d Cos[q4] Sin[q3]^2 Sin[q4]-6 Cos[q3] (a1 q2d (4 a3 m3 q1d+4 a3 m4 q1d+2 a3 m3 q3d-a2 m4 q3d+2 a4 m4 q1d Cos[q4]) Sin[q2]+q1d (4 a2 d3 m3 q3d+a1^2 m4 q3d Sin[q3]+2 a2 a4 m4 q4d Sin[q4]))-m4 q1d Cos[q3]^2 (12 a1 a2 q2d Sin[q2]+a4^2 (-q3d+q4d) Sin[2 q4])))
+T2=(1)/(24) (2 a4^2 m4 q4dd Cos[q3-q4]^2+q1dd (8 a2^2 m2+a3^2 m3+a4^2 m4+12 a1 a2 m2 Cos[q2]-12 a1 (a3 m3+a2 m4) Cos[q2-q3]-6 a1^2 m4 Cos[2 q2-q3]-a3^2 m3 Cos[2 q3]+12 a1 a3 m3 Cos[q2+q3]+12 a1 a2 m4 Cos[q2+q3]+6 a1^2 m4 Cos[2 q2+q3]+a4^2 m4 Cos[2 (q3-q4)]+12 a1 d3 m4 Sin[q2]-12 a1 d3 m3 Sin[q2-q3]-12 a1 d3 m3 Sin[q2+q3])+q2dd (8 a2^2 m2+24 a1^2 m3+24 a2^2 m3+a3^2 m3+12 a1^2 m4+24 a2^2 m4+6 a3^2 m4+a4^2 m4+6 d3^2 m4+48 a1 a2 (m3+m4) Cos[q2]+12 a1^2 m4 Cos[2 q2]+12 a1 a3 m4 Cos[q2-q3]+24 a2 a3 m4 Cos[q3]-a3^2 m3 Cos[2 q3]+12 a1 a3 m4 Cos[q2+q3]+a4^2 m4 Cos[2 (q3-q4)]+12 a1 d3 m4 Sin[q2-q3]-24 a2 d3 m4 Sin[q3]-12 a1 d3 m4 Sin[q2+q3])+q3dd (12 a2^2 m3+a3^2 m3+a4^2 m4+12 a1 a2 m3 Cos[q2]-6 a1 a3 m4 Cos[q2-q3]-a3^2 m3 Cos[2 q3]+6 a1 a3 m4 Cos[q2+q3]+a4^2 m4 Cos[2 (q3-q4)]-6 a1 d3 m4 Sin[q2-q3]-6 a1 d3 m4 Sin[q2+q3])+4 (-3 a1 d3 m4 (2 q2d-q3d) q3d Cos[q2-q3]-6 a1 d3 m4 q2d q3d Cos[q2+q3]-3 a1 d3 m4 q3d^2 Cos[q2+q3]+6 a1 a2 m2 q1d^2 Sin[q2]+12 a1 a2 m3 q1d^2 Sin[q2]+6 a1 a2 m4 q1d^2 Sin[q2]-12 a1 a2 m3 q2d^2 Sin[q2]-12 a1 a2 m4 q2d^2 Sin[q2]-12 a1 a3 m4 q1d q3d Sin[q2]+6 a1 a2 m4 q3d^2 Sin[q2]+6 a1 a2 m4 q3d q4d Sin[q2]-6 a1^2 m4 q1d^2 Cos[q2] Sin[q2]+6 a1 a2 m4 q1d^2 Cos[q3]^2 Sin[q2]-6 a1 a4 m4 q1d q3d Cos[q4] Sin[q2]+6 a1 Cos[q3] (a3 m4 (2 q1d^2-q2d^2)+2 a3 m3 q1d (q1d-q3d)-5 a2 m4 q1d q3d+a4 m4 q1d^2 Cos[q4]) Sin[q2]+6 a1^2 m3 q1d^2 Sin[2 q2]-6 a1^2 m4 q2d^2 Sin[2 q2]+3 a1^2 m4 q1d^2 Cos[2 q3] Sin[2 q2]-6 m4 q3d Cos[q3] (2 a2 d3 q2d+a1^2 q1d Sin[2 q2])+6 a1 a3 m4 q2d q3d Sin[q2-q3]-3 a1 a3 m4 q3d^2 Sin[q2-q3]-3 a1 a2 m4 q1d q4d Sin[q2-q3]-12 a2 a3 m4 q2d q3d Sin[q3]-12 a1 d3 m3 q1d^2 Sin[q2] Sin[q3]+6 a1 d3 m4 q2d^2 Sin[q2] Sin[q3]+12 a1 d3 m3 q1d q3d Sin[q2] Sin[q3]-6 a1 a2 m4 q1d^2 Sin[q2] Sin[q3]^2+a3^2 m3 q1d q3d Sin[2 q3]+a3^2 m3 q2d q3d Sin[2 q3]+a3^2 m3 q3d^2 Sin[2 q3]-6 a1 a3 m4 q2d q3d Sin[q2+q3]-3 a1 a3 m4 q3d^2 Sin[q2+q3]-3 a1 a2 m4 q1d q4d Sin[q2+q3]-a4^2 m4 q1d q3d Sin[2 (q3-q4)]-a4^2 m4 q2d q3d Sin[2 (q3-q4)]-a4^2 m4 q3d^2 Sin[2 (q3-q4)]+a4^2 m4 q1d q4d Sin[2 (q3-q4)]+a4^2 m4 q2d q4d Sin[2 (q3-q4)]+a4^2 m4 q4d^2 Sin[2 (q3-q4)]))
+T3=(1)/(24) (m4 q4dd (6 a2^2+a4^2+12 a1 a2 Cos[q2]+a4^2 Cos[2 (q3-q4)])+q3dd (6 a2^2 m3+a3^2 m3+24 a1^2 m4+6 a2^2 m4+a4^2 m4+24 a1 a2 m4 Cos[q2]-a3^2 m3 Cos[2 q3]+a4^2 m4 Cos[2 (q3-q4)])-q1dd (-a3^2 m3+12 a2 a3 m4-a4^2 m4+24 a1 a3 m4 Cos[q2]+18 a1 a2 m4 Cos[q2-q3]+24 a1^2 m4 Cos[q3]+12 a2^2 m4 Cos[q3]+a3^2 m3 Cos[2 q3]+18 a1 a2 m4 Cos[q2+q3]+6 a1 a4 m4 Cos[q2-q4]-a4^2 m4 Cos[2 (q3-q4)]+6 a2 a4 m4 Cos[q4]+6 a1 a4 m4 Cos[q2+q4])+q2dd (12 a2^2 m3+a3^2 m3+a4^2 m4+12 a1 a2 m3 Cos[q2]-6 a1 a3 m4 Cos[q2-q3]-a3^2 m3 Cos[2 q3]+6 a1 a3 m4 Cos[q2+q3]+a4^2 m4 Cos[2 (q3-q4)]-6 a1 d3 m4 Sin[q2-q3]-6 a1 d3 m4 Sin[q2+q3])+2 (6 a1 a2 m4 q1d q4d Sin[q2-q3]+24 a2 a3 m3 q1d^2 Sin[q3]+24 a2 a3 m4 q1d^2 Sin[q3]+12 a2 a3 m4 q2d^2 Sin[q3]-12 a2^2 m4 q1d q4d Sin[q3]+24 a1 a3 m3 q1d^2 Cos[q2] Sin[q3]+24 a1 a3 m4 q1d^2 Cos[q2] Sin[q3]+12 a2 a4 m4 q1d^2 Cos[q4] Sin[q3]+12 a1 a4 m4 q1d^2 Cos[q2] Cos[q4] Sin[q3]-12 a1 q2d Sin[q2] (-2 a3 m4 q1d+a2 m3 q2d+2 a2 m4 q3d+a2 m4 q4d-a4 m4 q1d Cos[q4]+2 d3 m3 q1d Sin[q3])+2 Cos[q3] (12 a2 d3 m3 q1d^2+6 a2 d3 m4 q2d^2+6 a1 (2 a3 m3+5 a2 m4) q1d q2d Sin[q2]+6 a1^2 m4 q1d q2d Sin[2 q2]-a3^2 m3 q1d^2 Sin[q3]+3 a1^2 m4 q1d^2 Sin[q3]-a3^2 m3 q2d^2 Sin[q3]+12 a1 q1d^2 Cos[q2] (d3 m3+2 a2 m4 Sin[q3]))+12 a2^2 m4 q1d^2 Sin[2 q3]-2 a3^2 m3 q1d q2d Sin[2 q3]+a3^2 m3 q3d^2 Sin[2 q3]+6 a1^2 m4 q1d^2 Cos[q2]^2 Sin[2 q3]+3 a1^2 m4 q1d^2 Cos[2 q2] Sin[2 q3]+a4^2 m4 q1d^2 Cos[2 q4] Sin[2 q3]-6 a1 a2 m4 q1d q4d Sin[q2+q3]-6 a1 a4 m4 q1d q4d Sin[q2-q4]+2 a4^2 m4 q1d q2d Sin[2 (q3-q4)]+a4^2 m4 q2d^2 Sin[2 (q3-q4)]-a4^2 m4 q3d^2 Sin[2 (q3-q4)]+4 a4^2 m4 q1d q4d Sin[2 (q3-q4)]+4 a4^2 m4 q2d q4d Sin[2 (q3-q4)]+2 a4^2 m4 q3d q4d Sin[2 (q3-q4)]+3 a4^2 m4 q4d^2 Sin[2 (q3-q4)]+6 a2 a4 m4 q1d q4d Sin[q4]-2 a4^2 m4 q1d^2 Cos[q3]^2 Cos[q4] Sin[q4]+a4^2 m4 q1d^2 Sin[q3]^2 Sin[2 q4]+6 a1 a4 m4 q1d q4d Sin[q2+q4]))
+T4=(1)/(24) m4 (2 a4^2 q2dd Cos[q3-q4]^2+q4dd (6 a2^2+a4^2+a4^2 Cos[2 (q3-q4)])+q3dd (6 a2^2+a4^2+12 a1 a2 Cos[q2]+a4^2 Cos[2 (q3-q4)])+q1dd (-12 a2 a3+a4^2-6 a1 a2 Cos[q2-q3]-12 a2^2 Cos[q3]-6 a1 a2 Cos[q2+q3]+a4^2 Cos[2 (q3-q4)]-6 a2 a4 Cos[q4])+2 (q2d (3 a1 a2 q1d Sin[q2-q3]+3 a1 a2 q1d Sin[q2+q3]-a4^2 (q1d+q2d+3 q3d) Sin[2 (q3-q4)])-q3d (6 a1 a2 q2d Sin[q2]+a4 (a4 (2 q2d+3 q3d+q4d) Sin[2 (q3-q4)]+6 a1 q1d Cos[q2] Sin[q4]))+q4d (q2d (3 a1 a2 Sin[q2-q3]+3 a1 a2 Sin[q2+q3]+a4^2 Sin[2 (q3-q4)])+2 a4 q4d (a4 Sin[2 (q3-q4)]+3 a2 Sin[q4])+3 q3d (2 a2 (a2+a1 Cos[q2]) Sin[q3]+a4 (a2+2 a1 Cos[q2]) Sin[q4])-a4 q1d ((12 a3+a4 Cos[2 q3-q4]+5 a4 Cos[q4]) Sin[q4]-2 Cos[q3] (a4 Cos[q4]^2 Sin[q3]-6 (a2+a1 Cos[q2]) Sin[q4])+a4 Cos[q3]^2 Sin[2 q4]))+q1d (q2d (3 a1 a2 Sin[q2-q3]+3 a1 a2 Sin[q2+q3]-a4^2 Sin[2 (q3-q4)])+a4 q1d ((12 a3+a4 Cos[2 q3-q4]+5 a4 Cos[q4]) Sin[q4]-2 Cos[q3] (a4 Cos[q4]^2 Sin[q3]-6 (a2+a1 Cos[q2]) Sin[q4])+a4 Cos[q3]^2 Sin[2 q4])-q3d (3 a1 a2 Sin[q2-q3]-6 a2^2 Sin[q3]-3 a1 a2 Sin[q2+q3]-3 a1 a4 Sin[q2-q4]+2 a4^2 Sin[2 (q3-q4)]+3 a2 a4 Sin[q4]+3 a1 a4 Sin[q2+q4]))))
+
+(* ---- Output ---- *)
+-22.93141862495481`
+
+(* ---- Output ---- *)
+-3.131435415037906`
+
+(* ---- Output ---- *)
+10.585918521974984`
+
+(* ---- Output ---- *)
+3.123879655347872`

@@ -1,0 +1,11 @@
+(* Text export of 01_rotation_matrices.nb (analysis/tools/nb_to_text.py) *)
+
+(* ---- Input ---- *)
+R10=({{Cos[q1], -Sin[q1], 0}, {Sin[q1], Cos[q1], 0}, {0, 0, 1}})
+
+(* ---- Input ---- *)
+R20=({{Cos[q1+q2], 0, -Sin[q1+q2]}, {Sin[q1+q2], 0, Cos[q1+q2]}, {0, -1, 0}})
+R30=({{Cos[q3] Cos[q1+q2], Sin[q1+q2], -Sin[q3]Cos[q1+q2]}, {Cos[q3]Sin[q1+q2], -Cos[q1+q2], -Sin[q3]Sin[q1+q2]}, {-Sin[q3], 0, -Cos[q3]}})
+
+(* ---- Input ---- *)
+R40=({{Cos[q3-q4] Cos[q1+q2], Sin[q3-q4]Cos[q1+q2], Sin[q1+q2]}, {Cos[q3-q4]Sin[q1+q2], Sin[q3-q4]Sin[q1+q2], Cos[q1+q2]}, {-Sin[q3-q4], Cos[q3-q4], 0}})

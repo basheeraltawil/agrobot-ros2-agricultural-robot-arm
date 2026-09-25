@@ -1,0 +1,65 @@
+(* Text export of 08_link_inertia_tensors.nb (analysis/tools/nb_to_text.py) *)
+
+(* ---- Input ---- *)
+(*Inertia Matrices computation*)
+I11=(1)/(12) m1 a1a1({{0, 0, 0}, {0, 1, 0}, {0, 0, 1}})//MatrixForm
+
+(* ---- Output ---- *)
+({{0, 0, 0}, {0, (a1^2 m1)/(12), 0}, {0, 0, (a1^2 m1)/(12)}})
+
+(* ---- Input ---- *)
+I1=Simplify[({{Cos[q1], -Sin[q1], 0}, {Sin[q1], Cos[q1], 0}, {0, 0, 1}}).({{0, 0, 0}, {0, (a1^2 m1)/(12), 0}, {0, 0, (a1^2 m1)/(12)}}).Transpose[({{Cos[q1], -Sin[q1], 0}, {Sin[q1], Cos[q1], 0}, {0, 0, 1}})]]//TraditionalForm
+
+(* ---- Output ---- *)
+({{(1)/(12) a1^2 m1 sin^2(q1), -(1)/(12) a1^2 m1 cos(q1) sin(q1), 0}, {-(1)/(12) a1^2 m1 cos(q1) sin(q1), (1)/(12) a1^2 m1 cos^2(q1), 0}, {0, 0, (a1^2 m1)/(12)}})
+
+(* ---- Input ---- *)
+I1=({{(1)/(12) a1^2 m1 sin^2(q1), -(1)/(12) a1^2 m1 cos(q1) sin(q1), 0}, {-(1)/(12) a1^2 m1 cos(q1) sin(q1), (1)/(12) a1^2 m1 cos^2(q1), 0}, {0, 0, (a1^2 m1)/(12)}})
+
+(* ---- Output ---- *)
+{{(1)/(12) a1^2 m1 Sin[q1]^2,-(1)/(12) a1^2 m1 Cos[q1] Sin[q1],0},{-(1)/(12) a1^2 m1 Cos[q1] Sin[q1],(1)/(12) a1^2 m1 Cos[q1]^2,0},{0,0,(a1^2 m1)/(12)}}
+
+(* ---- Input ---- *)
+I22=(1)/(12) m2 a2a2({{0, 0, 0}, {0, 1, 0}, {0, 0, 1}})//MatrixForm
+
+(* ---- Output ---- *)
+({{0, 0, 0}, {0, (a2^2 m2)/(12), 0}, {0, 0, (a2^2 m2)/(12)}})
+
+(* ---- Input ---- *)
+I2=Simplify[({{Cos[q1+q2], 0, -Sin[q1+q2]}, {Sin[q1+q2], 0, Cos[q1+q2]}, {0, -1, 0}}).({{0, 0, 0}, {0, (a2^2 m2)/(12), 0}, {0, 0, (a2^2 m2)/(12)}}).Transpose[({{Cos[q1+q2], 0, -Sin[q1+q2]}, {Sin[q1+q2], 0, Cos[q1+q2]}, {0, -1, 0}})]]//TraditionalForm
+
+(* ---- Output ---- *)
+({{(1)/(12) a2^2 m2 sin^2(q1+q2), -(1)/(24) a2^2 m2 sin(2 (q1+q2)), 0}, {-(1)/(24) a2^2 m2 sin(2 (q1+q2)), (1)/(12) a2^2 m2 cos^2(q1+q2), 0}, {0, 0, (a2^2 m2)/(12)}})
+
+(* ---- Input ---- *)
+I2=({{(1)/(12) a2^2 m2 sin^2(q1+q2), -(1)/(24) a2^2 m2 sin(2 (q1+q2)), 0}, {-(1)/(24) a2^2 m2 sin(2 (q1+q2)), (1)/(12) a2^2 m2 cos^2(q1+q2), 0}, {0, 0, (a2^2 m2)/(12)}})
+
+(* ---- Output ---- *)
+{{(1)/(12) a2^2 m2 Sin[q1+q2]^2,-(1)/(24) a2^2 m2 Sin[2 (q1+q2)],0},{-(1)/(24) a2^2 m2 Sin[2 (q1+q2)],(1)/(12) a2^2 m2 Cos[q1+q2]^2,0},{0,0,(a2^2 m2)/(12)}}
+
+(* ---- Input ---- *)
+I33=(1)/(12) m3 a3a3({{1, 0, 0}, {0, 1, 0}, {0, 0, 0}})//MatrixForm
+
+(* ---- Output ---- *)
+({{(a3^2 m3)/(12), 0, 0}, {0, (a3^2 m3)/(12), 0}, {0, 0, 0}})
+
+(* ---- Input ---- *)
+I3=Simplify[({{Cos[q3] Cos[q1+q2], Sin[q1+q2], -Sin[q3]Cos[q1+q2]}, {Cos[q3]Sin[q1+q2], -Cos[q1+q2], -Sin[q3]Sin[q1+q2]}, {-Sin[q3], 0, -Cos[q3]}}).({{(a3^2 m3)/(12), 0, 0}, {0, (a3^2 m3)/(12), 0}, {0, 0, 0}}).Transpose[({{Cos[q3] Cos[q1+q2], Sin[q1+q2], -Sin[q3]Cos[q1+q2]}, {Cos[q3]Sin[q1+q2], -Cos[q1+q2], -Sin[q3]Sin[q1+q2]}, {-Sin[q3], 0, -Cos[q3]}})]]//TraditionalForm
+
+(* ---- Input ---- *)
+I3=({{(1)/(12) a3^2 m3 (cos^2(q1+q2) cos^2(q3)+sin^2(q1+q2)), -(1)/(24) a3^2 m3 sin(2 (q1+q2)) sin^2(q3), -(1)/(24) a3^2 m3 cos(q1+q2) sin(2 q3)}, {-(1)/(24) a3^2 m3 sin(2 (q1+q2)) sin^2(q3), (1)/(12) a3^2 m3 (cos^2(q1+q2)+cos^2(q3) sin^2(q1+q2)), -(1)/(24) a3^2 m3 sin(q1+q2) sin(2 q3)}, {-(1)/(24) a3^2 m3 cos(q1+q2) sin(2 q3), -(1)/(24) a3^2 m3 sin(q1+q2) sin(2 q3), (1)/(12) a3^2 m3 sin^2(q3)}})
+
+(* ---- Input ---- *)
+I44=(1)/(12) m4 a4a4({{0, 0, 0}, {0, 1, 0}, {0, 0, 1}})//MatrixForm
+
+(* ---- Output ---- *)
+({{0, 0, 0}, {0, (a4^2 m4)/(12), 0}, {0, 0, (a4^2 m4)/(12)}})
+
+(* ---- Input ---- *)
+I4=({{Cos[q3-q4] Cos[q1+q2], Sin[q3-q4]Cos[q1+q2], Sin[q1+q2]}, {Cos[q3-q4]Sin[q1+q2], Sin[q3-q4]Sin[q1+q2], Cos[q1+q2]}, {-Sin[q3-q4], Cos[q3-q4], 0}}).({{0, 0, 0}, {0, (a4^2 m4)/(12), 0}, {0, 0, (a4^2 m4)/(12)}}).Transpose[({{Cos[q3-q4] Cos[q1+q2], Sin[q3-q4]Cos[q1+q2], Sin[q1+q2]}, {Cos[q3-q4]Sin[q1+q2], Sin[q3-q4]Sin[q1+q2], Cos[q1+q2]}, {-Sin[q3-q4], Cos[q3-q4], 0}})]//TraditionalForm
+
+(* ---- Input ---- *)
+Simplify[({{(1)/(12) a4^2 m4 sin^2(q1+q2)+(1)/(12) a4^2 m4 cos^2(q1+q2) sin^2(q3-q4), (1)/(12) m4 cos(q1+q2) sin(q1+q2) sin^2(q3-q4) a4^2+(1)/(12) m4 cos(q1+q2) sin(q1+q2) a4^2, (1)/(12) a4^2 m4 cos(q1+q2) cos(q3-q4) sin(q3-q4)}, {(1)/(12) m4 cos(q1+q2) sin(q1+q2) sin^2(q3-q4) a4^2+(1)/(12) m4 cos(q1+q2) sin(q1+q2) a4^2, (1)/(12) a4^2 m4 cos^2(q1+q2)+(1)/(12) a4^2 m4 sin^2(q1+q2) sin^2(q3-q4), (1)/(12) a4^2 m4 cos(q3-q4) sin(q1+q2) sin(q3-q4)}, {(1)/(12) a4^2 m4 cos(q1+q2) cos(q3-q4) sin(q3-q4), (1)/(12) a4^2 m4 cos(q3-q4) sin(q1+q2) sin(q3-q4), (1)/(12) a4^2 m4 cos^2(q3-q4)}})]//TraditionalForm
+
+(* ---- Input ---- *)
+I4=({{(1)/(12) a4^2 m4 (sin^2(q1+q2)+cos^2(q1+q2) sin^2(q3-q4)), -(1)/(48) a4^2 m4 (cos(2 (q3-q4))-3) sin(2 (q1+q2)), (1)/(24) a4^2 m4 cos(q1+q2) sin(2 (q3-q4))}, {-(1)/(48) a4^2 m4 (cos(2 (q3-q4))-3) sin(2 (q1+q2)), (1)/(12) a4^2 m4 (cos^2(q1+q2)+sin^2(q1+q2) sin^2(q3-q4)), (1)/(24) a4^2 m4 sin(q1+q2) sin(2 (q3-q4))}, {(1)/(24) a4^2 m4 cos(q1+q2) sin(2 (q3-q4)), (1)/(24) a4^2 m4 sin(q1+q2) sin(2 (q3-q4)), (1)/(12) a4^2 m4 cos^2(q3-q4)}})

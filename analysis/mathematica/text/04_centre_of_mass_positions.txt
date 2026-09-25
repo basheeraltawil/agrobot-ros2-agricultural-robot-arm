@@ -1,0 +1,21 @@
+(* Text export of 04_centre_of_mass_positions.nb (analysis/tools/nb_to_text.py) *)
+
+(* ---- Input ---- *)
+(*obtained from file with name Radius_of_links_rc_i  and file with name axes_rotation_matrixes *)
+
+PC10=({{Cos[q1], 0, -Sin[q1]}, {Sin[q1], 0, Cos[q1]}, {0, -1, 0}}).({{a1/2}, {0}, {0}})//TraditionalForm
+PC20=({{Cos[q1], 0, -Sin[q1]}, {Sin[q1], 0, Cos[q1]}, {0, -1, 0}}).({{a1}, {0}, {0}})+({{Cos[q1+q2], 0, -Sin[q1+q2]}, {Sin[q1+q2], 0, Cos[q1+q2]}, {0, -1, 0}}).({{a2/2}, {0}, {0}})//TraditionalForm
+PC30=({{Cos[q1], 0, -Sin[q1]}, {Sin[q1], 0, Cos[q1]}, {0, -1, 0}}).({{a1}, {0}, {0}})+({{Cos[q1+q2], 0, -Sin[q1+q2]}, {Sin[q1+q2], 0, Cos[q1+q2]}, {0, -1, 0}}).({{a2}, {0}, {0}})+({{Cos[q3] Cos[q1+q2], Sin[q1+q2], -Sin[q3]Cos[q1+q2]}, {Cos[q3]Sin[q1+q2], -Cos[q1+q2], -Sin[q3]Sin[q1+q2]}, {-Sin[q3], 0, -Cos[q3]}}).({{a3/2}, {0}, {d3/2}})//TraditionalForm
+PC40=({{Cos[q1], 0, -Sin[q1]}, {Sin[q1], 0, Cos[q1]}, {0, -1, 0}}).({{a1}, {0}, {0}})+({{Cos[q1+q2], 0, -Sin[q1+q2]}, {Sin[q1+q2], 0, Cos[q1+q2]}, {0, -1, 0}}).({{a2}, {0}, {0}})+({{Cos[q3] Cos[q1+q2], Sin[q1+q2], -Sin[q3]Cos[q1+q2]}, {Cos[q3]Sin[q1+q2], -Cos[q1+q2], -Sin[q3]Sin[q1+q2]}, {-Sin[q3], 0, -Cos[q3]}}).({{a3}, {0}, {d3}})+({{Cos[q3-q4] Cos[q1+q2], Sin[q3-q4]Cos[q1+q2], Sin[q1+q2]}, {Cos[q3-q4]Sin[q1+q2], Sin[q3-q4]Sin[q1+q2], Cos[q1+q2]}, {-Sin[q3-q4], Cos[q3-q4], 0}}).({{a4/2}, {0}, {0}})//TraditionalForm
+
+(* ---- Input ---- *)
+PC10=({{(1)/(2) a1 cos(q1)}, {(1)/(2) a1 sin(q1)}, {0}})
+
+(* ---- Input ---- *)
+PC20=({{a1 cos(q1)+(1)/(2) a2 cos(q1+q2)}, {a1 sin(q1)+(1)/(2) a2 sin(q1+q2)}, {0}})
+
+(* ---- Input ---- *)
+PC30=({{a1 cos(q1)+a2 cos(q1+q2)+(1)/(2) a3 cos(q1+q2) cos(q3)-(1)/(2) d3 cos(q1+q2) sin(q3)}, {a1 sin(q1)+a2 sin(q1+q2)+(1)/(2) a3 cos(q3) sin(q1+q2)-(1)/(2) d3 sin(q1+q2) sin(q3)}, {-(1)/(2) d3 cos(q3)-(1)/(2) a3 sin(q3)}})
+
+(* ---- Input ---- *)
+PC40=({{a1 cos(q1)+a2 cos(q1+q2)+a3 cos(q1+q2) cos(q3)+(1)/(2) a4 cos(q1+q2) cos(q3-q4)-d3 cos(q1+q2) sin(q3)}, {a1 sin(q1)+a2 sin(q1+q2)+a3 cos(q3) sin(q1+q2)+(1)/(2) a4 cos(q3-q4) sin(q1+q2)-d3 sin(q1+q2) sin(q3)}, {-d3 cos(q3)-a3 sin(q3)-(1)/(2) a4 sin(q3-q4)}})
