@@ -43,13 +43,17 @@ Frame *i* then follows from frame *i−1* by four elementary motions:
 Multiplying the four motions gives the homogeneous transformation of one link:
 
 ```math
-A_i = \operatorname{Rot}_z(\theta_i)\,\operatorname{Trans}_z(d_i)\,\operatorname{Trans}_x(a_i)\,\operatorname{Rot}_x(\alpha_i)
+\[
+A_i
+= \mathrm{Rot}_z(\theta_i)\,\mathrm{Trans}_z(d_i)\,
+  \mathrm{Trans}_x(a_i)\,\mathrm{Rot}_x(\alpha_i)
 = \begin{bmatrix}
 C_{\theta_i} & -S_{\theta_i} C_{\alpha_i} & S_{\theta_i} S_{\alpha_i} & a_i C_{\theta_i} \\
 S_{\theta_i} & C_{\theta_i} C_{\alpha_i} & -C_{\theta_i} S_{\alpha_i} & a_i S_{\theta_i} \\
 0 & S_{\alpha_i} & C_{\alpha_i} & d_i \\
 0 & 0 & 0 & 1
 \end{bmatrix}
+\]
 ```
 
 $C$ and $S$ abbreviate cosine and sine, and sums of indices mean sums of angles: $C_{12} = \cos(\theta_1 + \theta_2)$, $S_{34} = \sin(\theta_3 - \theta_4)$ (the paper defines $\theta_{34}$ as the difference). The upper-left 3×3 block is the rotation of the frame, the last column its position.
