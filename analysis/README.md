@@ -45,7 +45,7 @@ The arm has two vertical joints (J1, J2: a SCARA pair), a pitch joint (J3) and a
 The paper describes it with the Denavit–Hartenberg convention. Each link contributes one matrix
 
 $$
-A_i = \operatorname{Rot}_z(\theta_i)\,\operatorname{Trans}_z(d_i)\,\operatorname{Trans}_x(a_i)\,\operatorname{Rot}_x(\alpha_i), \qquad {}^{0}T_{n} = A_1 A_2 \cdots A_n
+A_i = \mathrm{Rot}_z(\theta_i)\,\mathrm{Trans}_z(d_i)\,\mathrm{Trans}_x(a_i)\,\mathrm{Rot}_x(\alpha_i), \qquad {}^{0}T_{n} = A_1 A_2 \cdots A_n
 $$
 
 and the gripper position follows from the product. For example:
